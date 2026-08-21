@@ -1,0 +1,60 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+frontend/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+frontend/.next/
+frontend/out/
+
+# production
+frontend/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files - real values stay local, .env.example templates are committed
+.env*
+!.env.example
+!**/.env.example
+
+# vercel
+.vercel
+
+# file-backed user store written at runtime by src/lib/storage.ts
+frontend/.data/
+
+# typescript
+*.tsbuildinfo
+frontend/next-env.d.ts
+
+frontend/src/generated/prisma
+
+.gstack/
+.impeccable/
+.obsidian/
+.vscode/
+
+# Local-only docs and build noise
+PRD.md
+CLAUDE.md
+build.log
+prisma-error*.log
+prisma-format.log

@@ -1,0 +1,216 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Core Colors — deep slate with soft neon accents */
+  --bg-primary: #07090F;
+  --bg-secondary: #0D1220;
+  --bg-elevated: #121A2C;
+  --bg-glass: rgba(13, 18, 32, 0.72);
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  /* Was #64748B, which measured 4.22:1 on --bg-primary and 4.06:1 on the glass
+     panel — under the 4.5:1 floor, and this token carries the small print:
+     footnotes, captions, timestamps, "N of M priced". Raised to the lightest
+     value that still reads a clear step below --text-secondary: 4.98:1 on the
+     page, 4.78:1 on a glass panel. */
+  --text-muted: #72809A;
+
+  /* Brand/Accent Colors */
+  --accent-green: #34D399;
+  --accent-red: #F87171;
+  --accent-blue: #60A5FA;
+  --accent-purple: #A78BFA;
+  --accent-amber: #FBBF24;
+  --accent-cyan: #22D3EE;
+
+  /* UI Tokens */
+  --border-subtle: rgba(148, 163, 184, 0.12);
+  --border-strong: rgba(148, 163, 184, 0.24);
+  --border-focus: rgba(52, 211, 153, 0.5);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Shadows and Effects */
+  --shadow-glow-green: 0 0 24px rgba(52, 211, 153, 0.15);
+  --shadow-glow-red: 0 0 24px rgba(248, 113, 113, 0.15);
+  --shadow-glass: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset, 0 8px 32px rgba(0, 0, 0, 0.35);
+  --blur-glass: blur(16px);
+
+  /* Typography
+     Two faces, one rule: General Sans carries PROSE (headings, descriptions,
+     article copy), JetBrains Mono carries DATA (tickers, prices, percentages,
+     counts, timestamps, labels). Anything a trader reads as a number or an
+     identifier is mono; anything they read as a sentence is General Sans.
+
+     Both --font-sans and --font-mono are defined by next/font/local in
+     layout.tsx and set on <html>, so they already carry their own
+     metric-matched fallback chain. Nothing to declare here. */
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(96, 165, 250, 0.08), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(167, 139, 250, 0.05), transparent);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  /* `clip` rather than `hidden`: both stop the sideways scroll a stray wide
+     table can cause, but `hidden` silently makes this element a scroll
+     container, which breaks `position: sticky` on every descendant (the
+     Navigation bar, the Movers section headers). `clip` does not. */
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+}
+
+/* Slim custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.35);
+}
+
+::selection {
+  background: rgba(52, 211, 153, 0.25);
+}
+
+/* The caret ships as the browser's, which on a dark surface is a thin black
+   bar that all but disappears in the share-size and search inputs. It is part
+   of the interface; it gets a token like everything else. */
+input,
+textarea,
+[contenteditable] {
+  caret-color: var(--accent-green);
+}
+
+/* Placeholders inherit a browser grey that measures well under 4.5:1 here.
+   Pinned to the muted token, which is now above the floor. */
+::placeholder {
+  color: var(--text-muted);
+  opacity: 1; /* Firefox dims placeholders by default; the token already is dim. */
+}
+
+.glass-panel {
+  background: var(--bg-glass);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glass);
+  transition: border-color 0.25s ease;
+}
+
+.glass-panel:hover {
+  border-color: var(--border-strong);
+}
+
+/* ==========================================================================
+   Data typography.
+
+   `.tabular` marks a numeric readout, and every numeric readout in this app is
+   mono — so the class carries the family as well as the figures. That is the
+   one lever that keeps numbers consistent across ~14 routes: the alternative
+   was `font-mono` hand-applied at 60-odd call sites, which is exactly how the
+   app drifted into mixed fonts in the first place.
+
+   Apply `.tabular` to the number ITSELF, never to a block of prose containing
+   a number, or the sentence around it turns monospaced too.
+   ========================================================================== */
+.tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A ticker or instrument code: mono, slightly open, never wrapped mid-symbol. */
+.ticker {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+/* Section eyebrows, column headers and metric captions. */
+.label {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+}
+
+/* General Sans is a geometric-leaning grotesque and already sets fairly tight
+   at display sizes, so this pulls in less than the old Raleway did — enough to
+   keep the big headings from reading airy without crowding the counters. */
+h1, h2, h3 {
+  letter-spacing: -0.02em;
+}
+
+/* Shared micro-interaction for cards */
+.hover-lift {
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   Reduced motion — hard requirement (CLAUDE.md).
+   One central kill-switch for all CSS-driven motion: marquees, gradients,
+   shine, meteors, pulses, transitions. Loading spinners are carved out —
+   a frozen spinner reads as "hung", and a slow rotation conveys state
+   without vestibular-trigger motion.
+   JS-driven motion (GSAP, anime.js, R3F, framer springs) is gated in the
+   components themselves via usePrefersReducedMotion / gsap.matchMedia.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *:not(.animate-spin),
+  *:not(.animate-spin)::before,
+  *:not(.animate-spin)::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-spin {
+    animation-duration: 1.8s !important;
+  }
+}
+
+/* Visible keyboard focus (nav buttons previously used focus:outline-none) */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
