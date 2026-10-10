@@ -1,6 +1,7 @@
-// Central base URL for the Flask quant backend.
-export const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000';
+// Every backend call goes through this app's own server (app/api/backend),
+// which attaches the signed-in user's Clerk token. The API's real address is
+// server-only (FLINT_API_URL) and never reaches the browser.
+export const API_BASE = '/api/backend';
 
 /**
  * User-facing copy for any failed backend call. Deliberately generic: it names

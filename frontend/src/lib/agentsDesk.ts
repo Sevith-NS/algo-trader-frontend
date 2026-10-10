@@ -114,7 +114,7 @@ export async function streamDesk(
 export async function fetchJournal(symbol?: string, limit = 60): Promise<JournalResponse> {
   const params = new URLSearchParams({ limit: String(limit) });
   if (symbol) params.set('symbol', symbol);
-  const res = await fetch(`${API_BASE}/api/agents/journal?${params}`);
+  const res = await fetch(`${API_BASE}/api/journal?${params}`);
   const body = await res.json().catch(() => null);
   if (res.status === 429) throw new DeskRateLimited(retryAfterFrom(res, body));
   if (!res.ok) {
@@ -124,7 +124,7 @@ export async function fetchJournal(symbol?: string, limit = 60): Promise<Journal
 }
 
 export async function deleteJournalEntry(id: string): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/agents/journal/${encodeURIComponent(id)}`, {
+  const res = await fetch(`${API_BASE}/api/journal/${encodeURIComponent(id)}`, {
     method: 'DELETE',
   });
   if (!res.ok) {
