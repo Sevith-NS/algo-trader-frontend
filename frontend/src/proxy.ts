@@ -1,50 +1,37 @@
 /**
- * Server-side route protection.
+ * Server-side route protection, backed by Clerk.
  *
- * Until now the only thing between an anonymous visitor and the authenticated
- * app was the UI: Navigation hides its links behind `useSession()`, and the
- * community page renders a signed-out variant. Neither is enforcement — the
- * pages themselves rendered fine for anyone who typed the URL. This runs
- * before them and redirects to /login instead.
+ * Runs before every matched request. Anything in `isProtectedRoute` requires
+ * a verified Clerk session; signed-out visitors are sent to /sign-in and
+ * returned to where they were going afterwards. Unlike the old next-auth
+ * guard, this is a real boundary: Clerk verifies the session token
+ * server-side, so there is no password-less shortcut around it.
  *
- * Written against `getToken` rather than next-auth's `withAuth` wrapper: this
- * is Next's `proxy` convention (which replaced `middleware` in 16.x), and a
- * plain function keeps the redirect and the callbackUrl behaviour visible
- * instead of inherited.
- *
- * Public by design, and therefore absent from `matcher` below:
- *   /            the landing page
- *   /login       the sign-in page itself
- *   /community   has a built-in signed-out state, and its one mutation
- *                (createCommunityPost) already does its own getServerSession
- *                check server-side — the pattern the rest of the app lacked.
- *
- * NOTE: this is defence in depth, not a security boundary, while the
- * credentials provider still accepts any password for a known email. It stops
- * a drive-by, not someone who reads the login form.
+ * Public by design: / (landing), /sign-in, /sign-up, /community (has a
+ * signed-out state; its mutation checks auth itself).
  */
-import { NextResponse, type NextRequest } from 'next/server';
-import { getToken } from 'next-auth/jwt';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-export default async function proxy(req: NextRequest) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  if (token) return NextResponse.next();
+const isProtectedRoute = createRouteMatcher([
+  '/dashboard(.*)',
+  '/portfolio(.*)',
+  '/screener(.*)',
+  '/movers(.*)',
+  '/discover(.*)',
+  '/markets(.*)',
+  '/geotrade(.*)',
+  '/news(.*)',
+]);
 
-  // Preserve where they were going so sign-in can land them back there.
-  const login = new URL('/login', req.url);
-  login.searchParams.set('callbackUrl', req.nextUrl.pathname + req.nextUrl.search);
-  return NextResponse.redirect(login);
-}
+export default clerkMiddleware(async (auth, req) => {
+  if (isProtectedRoute(req)) await auth.protect();
+});
 
 export const config = {
   matcher: [
-    '/dashboard/:path*',
-    '/portfolio/:path*',
-    '/screener/:path*',
-    '/movers/:path*',
-    '/discover/:path*',
-    '/markets/:path*',
-    '/geotrade/:path*',
-    '/news/:path*',
+    // Skip Next.js internals and static files unless found in search params.
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    '/(api|trpc)(.*)',
+    '/__clerk/:path*',
   ],
 };

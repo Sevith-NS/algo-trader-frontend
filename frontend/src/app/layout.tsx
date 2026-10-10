@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
@@ -73,14 +74,16 @@ export default function RootLayout({
     // are in scope for everything globals.css sets at :root.
     <html lang="en" className={`${generalSans.variable} ${jetbrainsMono.variable}`}>
       <body>
-        <AuthProvider>
-          <PortfolioProvider>
-            <SmoothScroll>{children}</SmoothScroll>
-            <Suspense fallback={null}>
-              <AIAssistant />
-            </Suspense>
-          </PortfolioProvider>
-        </AuthProvider>
+        <ClerkProvider>
+          <AuthProvider>
+            <PortfolioProvider>
+              <SmoothScroll>{children}</SmoothScroll>
+              <Suspense fallback={null}>
+                <AIAssistant />
+              </Suspense>
+            </PortfolioProvider>
+          </AuthProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

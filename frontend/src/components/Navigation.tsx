@@ -1,18 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { useSession, signOut } from 'next-auth/react';
+import { Show, SignUpButton, UserButton } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
-import { Menu, X, User, ChevronDown, LogOut } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
 
 export default function Navigation() {
-  const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
 
   useEffect(() => {
     // Lenis drives native scroll, so window.scrollY is truthful on every route
@@ -59,51 +57,16 @@ export default function Navigation() {
 
           {/* User Auth Section */}
           <div className="hidden lg:flex items-center gap-4">
-            {session ? (
-              <div className="relative">
-                <button
-                  onClick={() => setProfileOpen(!profileOpen)}
-                  aria-expanded={profileOpen}
-                  aria-haspopup="menu"
-                  className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-textSecondary transition-colors hover:text-textPrimary"
-                >
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/[0.08] text-textSecondary">
-                    <User size={12} />
-                  </div>
-                  <span className="max-w-[14ch] truncate font-medium">{session.user?.name}</span>
-                  <ChevronDown size={14} className={clsx("transition-transform duration-200", profileOpen && "rotate-180")} />
+            <Show when="signed-in">
+              <UserButton />
+            </Show>
+            <Show when="signed-out">
+              <SignUpButton>
+                <button className="rounded-full bg-textPrimary px-5 py-2 text-sm font-semibold text-bgPrimary transition-colors hover:bg-white">
+                  Sign up
                 </button>
-                
-                <AnimatePresence>
-                  {profileOpen && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 5, scale: 0.95 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border border-borderSubtle bg-bgSecondary py-1 shadow-card"
-                    >
-                      <button 
-                        onClick={() => {
-                          setProfileOpen(false);
-                          signOut({ callbackUrl: '/' });
-                        }}
-                        className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-textSecondary transition-colors hover:bg-white/5 hover:text-textPrimary"
-                      >
-                        <LogOut size={14} /> Disconnect
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              <Link 
-                href="/login" 
-                className="rounded-full bg-textPrimary px-5 py-2 text-sm font-semibold text-bgPrimary transition-colors hover:bg-white"
-              >
-                Sign In
-              </Link>
-            )}
+              </SignUpButton>
+            </Show>
           </div>
 
           {/* Mobile menu button */}
@@ -155,33 +118,21 @@ export default function Navigation() {
               <MobileNavLink href="/community" text="Community" onClick={() => setIsOpen(false)} />
               
               <div className="mt-4 border-t border-borderSubtle pt-4">
-                {session ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 px-4 py-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.08] text-textSecondary">
-                        <User size={16} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-textPrimary">{session.user?.name}</p>
-                        <p className="text-xs text-textMuted">{session.user?.email}</p>
-                      </div>
-                    </div>
-                    <button 
-                      onClick={() => { setIsOpen(false); signOut({ callbackUrl: '/' }); }} 
-                      className="flex w-full items-center gap-2 px-4 py-2 text-sm font-medium text-textSecondary transition-colors hover:text-textPrimary"
-                    >
-                      <LogOut size={16} /> Disconnect
-                    </button>
+                <Show when="signed-in">
+                  <div className="px-4 py-2">
+                    <UserButton showName />
                   </div>
-                ) : (
-                  <Link 
-                    href="/login" 
-                    onClick={() => setIsOpen(false)}
-                    className="block w-full rounded-xl bg-textPrimary px-4 py-2.5 text-center text-sm font-semibold text-bgPrimary transition-colors hover:bg-white"
-                  >
-                    Sign In
-                  </Link>
-                )}
+                </Show>
+                <Show when="signed-out">
+                  <SignUpButton>
+                    <button
+                      onClick={() => setIsOpen(false)}
+                      className="block w-full rounded-xl bg-textPrimary px-4 py-2.5 text-center text-sm font-semibold text-bgPrimary transition-colors hover:bg-white"
+                    >
+                      Sign up
+                    </button>
+                  </SignUpButton>
+                </Show>
               </div>
             </div>
           </motion.div>

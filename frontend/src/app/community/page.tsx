@@ -111,7 +111,7 @@ export default async function CommunityPage() {
               {!session ? (
                 <div className="text-center py-6">
                   <p className="text-textSecondary mb-4 text-sm">Sign in to publish your analysis and receive AI feedback.</p>
-                  <a href="/login" className="bg-accentBlue text-textPrimary px-4 py-2 rounded font-medium shadow-[0_0_10px_rgba(96,165,250,0.3)] hover:shadow-[0_0_20px_rgba(96,165,250,0.5)] transition-shadow duration-200">
+                  <a href="/sign-up" className="bg-accentBlue text-textPrimary px-4 py-2 rounded font-medium shadow-[0_0_10px_rgba(96,165,250,0.3)] hover:shadow-[0_0_20px_rgba(96,165,250,0.5)] transition-shadow duration-200">
                     Sign In to Post
                   </a>
                 </div>
