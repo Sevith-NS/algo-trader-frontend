@@ -8,10 +8,9 @@ import MarketsTabs from '../../components/MarketsTabs';
 import PctChip from '../../components/discover/PctChip';
 import { TAG_ORDER, TAG_LABELS, TAG_STYLES } from '../../components/discover/tagStyles';
 import { fmtPrice } from '../../components/intel/format';
-import { API_BASE } from '../../lib/api';
+import { API_BASE, DATA_UNAVAILABLE } from '../../lib/api';
 import type { DiscoverCard, DiscoverResponse, HorizonTagId } from '../../types/discover';
 
-const BACKEND_DOWN = 'Market data backend unreachable. Start it with: cd backend && python app.py';
 
 // Session-cache TTL — matches the backend's Cache-Control max-age=300, so a
 // long-lived tab doesn't render prices frozen at first fetch all session.
@@ -166,7 +165,7 @@ export default function MarketsPage() {
         }
       } catch (err) {
         console.error('Failed to fetch market data', err);
-        if (!cancelled) setError(BACKEND_DOWN);
+        if (!cancelled) setError(DATA_UNAVAILABLE);
       } finally {
         if (!cancelled) setLoading(false);
       }

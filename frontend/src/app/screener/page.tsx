@@ -10,8 +10,10 @@ import SearchInput from '../../components/SearchInput';
 import Chart from '../../components/Chart';
 import NewsIntelPanel from '../../components/intel/NewsIntelPanel';
 import DeepAnalysisSection from '../../components/intel/DeepAnalysisSection';
+import TradingDeskSection from '../../components/agents/TradingDeskSection';
+import BacktestSection from '../../components/backtest/BacktestSection';
 import { usePortfolio } from '../../context/PortfolioContext';
-import { API_BASE } from '../../lib/api';
+import { API_BASE, DATA_UNAVAILABLE } from '../../lib/api';
 import { migrateLegacyStorageKeys } from '../../lib/legacyStorage';
 
 const fmtUsd = (val: number | undefined | null, currency = 'USD') =>
@@ -374,7 +376,7 @@ function ScreenerContent() {
       } catch (err) {
         console.error("Failed to fetch data", err);
         if (!cancelled) {
-          setFetchError('Market data backend unreachable. Start it with: cd backend && python app.py');
+          setFetchError(DATA_UNAVAILABLE);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -918,6 +920,24 @@ function ScreenerContent() {
       {!loading && !fetchError && (
         <div className="mt-5">
           <DeepAnalysisSection symbol={symbol} currency={currency} />
+        </div>
+      )}
+
+      {/* ---- Trading desk: the multi-agent run over the same computed numbers.
+          Sits below Deep Analysis deliberately — the deterministic verdict is
+          the thing the desk argues with, so it should already be on screen. */}
+      {!loading && !fetchError && (
+        <div className="mt-5">
+          <TradingDeskSection symbol={symbol} currency={currency} />
+        </div>
+      )}
+
+      {/* ---- Backtest: the same symbol, run over its whole history.
+          Last deliberately — everything above is a claim about what happens
+          next, and this is the only panel that checks what actually did. */}
+      {!loading && !fetchError && (
+        <div className="mt-5">
+          <BacktestSection symbol={symbol} currency={currency} />
         </div>
       )}
     </div>

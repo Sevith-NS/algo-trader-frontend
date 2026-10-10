@@ -51,8 +51,19 @@ function readDB(): Database {
   return JSON.parse(data);
 }
 
+/**
+ * Write via a temp file and rename.
+ *
+ * A plain writeFileSync truncates the real file first, so a crash, a restart
+ * or a full disk mid-write leaves a half-written db.json that readDB's
+ * JSON.parse then throws on — taking down every request that touches storage.
+ * rename within the same directory is atomic: a reader sees either the whole
+ * old file or the whole new one, never a prefix of either.
+ */
 function writeDB(data: Database) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  const tmp = `${DATA_FILE}.${process.pid}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(data, null, 2), 'utf-8');
+  fs.renameSync(tmp, DATA_FILE);
 }
 
 // User Operations

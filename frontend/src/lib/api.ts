@@ -2,6 +2,14 @@
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000';
 
+/**
+ * User-facing copy for any failed backend call. Deliberately generic: it names
+ * no host, port, or run command, since it renders in the browser for end users.
+ * Diagnostic detail belongs in console.error at the call site.
+ */
+export const DATA_UNAVAILABLE =
+  'Market data is temporarily unavailable. Please try again shortly.';
+
 export async function apiGet<T = any>(path: string): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`);
   if (!res.ok) throw new Error(`API ${path} failed: ${res.status}`);

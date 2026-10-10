@@ -13,7 +13,7 @@ import UniversePicker from '../../components/discover/UniversePicker';
 import FreshnessNote from '../../components/discover/FreshnessNote';
 import { TAG_ORDER, TAG_LABELS, TAG_STYLES } from '../../components/discover/tagStyles';
 import { fmtPrice } from '../../components/intel/format';
-import { API_BASE } from '../../lib/api';
+import { API_BASE, DATA_UNAVAILABLE } from '../../lib/api';
 import type {
   DiscoverResponse,
   HorizonTagId,
@@ -25,7 +25,6 @@ import type {
   UniverseMeta,
 } from '../../types/discover';
 
-const BACKEND_DOWN = 'Market data backend unreachable. Start it with: cd backend && python app.py';
 
 // Shown while the first response is in flight. The real list (with live
 // counts, groups and availability) replaces this from any scan payload.
@@ -143,7 +142,7 @@ function DiscoverContent() {
         }
       } catch (err) {
         console.error('Failed to fetch discover data', err);
-        if (!cancelled) setIdeasError(BACKEND_DOWN);
+        if (!cancelled) setIdeasError(DATA_UNAVAILABLE);
       } finally {
         if (!cancelled) setIdeasLoading(false);
       }
@@ -183,7 +182,7 @@ function DiscoverContent() {
         }
       } catch (err) {
         console.error('Failed to fetch levels', err);
-        if (!cancelled) setLevelsError(BACKEND_DOWN);
+        if (!cancelled) setLevelsError(DATA_UNAVAILABLE);
       } finally {
         if (!cancelled) setLevelsLoading(false);
       }
@@ -215,7 +214,7 @@ function DiscoverContent() {
         }
       } catch (err) {
         console.error('Failed to fetch screens list', err);
-        if (!cancelled) setScreensError(BACKEND_DOWN);
+        if (!cancelled) setScreensError(DATA_UNAVAILABLE);
       }
     }
 
@@ -250,7 +249,7 @@ function DiscoverContent() {
         }
       } catch (err) {
         console.error('Failed to run screen', err);
-        if (!cancelled) setRunError(BACKEND_DOWN);
+        if (!cancelled) setRunError(DATA_UNAVAILABLE);
       } finally {
         if (!cancelled) setRunLoading(false);
       }

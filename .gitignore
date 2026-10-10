@@ -1,7 +1,15 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# ---------------------------------------------------------------- secrets ---
+# Real values stay local; only the .env.example templates are committed.
+.env*
+!.env.example
+!**/.env.example
 
-# dependencies
-frontend/node_modules
+# File-backed user store written at runtime by frontend/src/lib/storage.ts.
+# Holds real account records (emails) — never commit it.
+frontend/.data/
+
+# ------------------------------------------------------------ dependencies ---
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -10,51 +18,44 @@ frontend/node_modules
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
-# next.js
+# ------------------------------------------------------------ build output ---
 frontend/.next/
 frontend/out/
-
-# production
 frontend/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files - real values stay local, .env.example templates are committed
-.env*
-!.env.example
-!**/.env.example
-
-# vercel
-.vercel
-
-# file-backed user store written at runtime by src/lib/storage.ts
-frontend/.data/
-
-# typescript
+/coverage
 *.tsbuildinfo
 frontend/next-env.d.ts
-
 frontend/src/generated/prisma
 
+# Atomic-write temp files (storage.ts writes .tmp then renames).
+*.tmp
+
+# ------------------------------------------------------ tooling / editors ---
+# graphify knowledge graph: regenerate with `/graphify . --update`. Large,
+# generated, and goes stale the moment the source changes.
+graphify-out/
+# Skill scratch output, consistent with .gstack/ and .impeccable/ below.
+design-dna.json
 .gstack/
 .impeccable/
 .obsidian/
 .vscode/
 
-# Local-only docs and build noise
+# ------------------------------------------------------- local-only docs ---
 PRD.md
 CLAUDE.md
-build.log
+
+# ------------------------------------------------------------------ noise ---
+.DS_Store
+Thumbs.db
+*.pem
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.log
 prisma-error*.log
 prisma-format.log
+
+# ----------------------------------------------------------------- deploy ---
+.vercel
