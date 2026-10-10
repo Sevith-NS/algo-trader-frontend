@@ -60,7 +60,7 @@ export default function EquityChart({
     const chart = createChart(containerRef.current, {
       layout: {
         background: { type: ColorType.Solid, color: 'transparent' },
-        textColor: '#94A3B8',
+        textColor: '#A4ACA8',
         panes: { separatorColor: 'rgba(148,163,184,0.12)' },
       },
       autoSize: true,
@@ -90,7 +90,7 @@ export default function EquityChart({
     }
 
     const strategy = chart.addSeries(LineSeries, {
-      color: '#22D3EE',
+      color: '#A4ACA8',
       lineWidth: 2,
       priceLineVisible: false,
       title: 'strategy',
@@ -108,7 +108,7 @@ export default function EquityChart({
       const dd = chart.addSeries(
         AreaSeries,
         {
-          lineColor: '#F87171',
+          lineColor: '#E5484D',
           topColor: 'rgba(248,113,113,0.05)',
           bottomColor: 'rgba(248,113,113,0.45)',
           lineWidth: 1,

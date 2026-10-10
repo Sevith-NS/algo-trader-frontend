@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { Newspaper, TrendingUp, TrendingDown, Minus, ExternalLink, ChevronDown } from 'lucide-react';
+import { Newspaper, TrendingUp, TrendingDown, Minus, ExternalLink, ChevronDown } from '@/components/ui/icons';
 import clsx from 'clsx';
 import { stanceColor } from './format';
 
@@ -18,7 +18,7 @@ export default function NewsIntelPanel({ data }: { data: any }) {
   const shown = expanded ? data.articles : data.articles.slice(0, 6);
 
   return (
-    <div className="glass-panel p-5" style={{ borderTop: `2px solid ${color}` }}>
+    <div className="glass-panel p-5">
       <h3 className="mb-3 flex items-center gap-2 border-b border-borderSubtle pb-3 text-sm font-semibold text-textPrimary">
         <Newspaper size={15} style={{ color }} /> News Intelligence
         <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide text-textMuted">
@@ -69,8 +69,8 @@ export default function NewsIntelPanel({ data }: { data: any }) {
               <span
                 className={clsx(
                   'mt-0.5 shrink-0 rounded px-1 py-px text-[9px] font-bold uppercase',
-                  a.sentiment === 'bullish' && 'bg-emerald-400/10 text-accentGreen',
-                  a.sentiment === 'bearish' && 'bg-red-400/10 text-accentRed',
+                  a.sentiment === 'bullish' && 'bg-up/10 text-accentGreen',
+                  a.sentiment === 'bearish' && 'bg-down/10 text-accentRed',
                   a.sentiment === 'neutral' && 'bg-white/5 text-textMuted',
                 )}
               >

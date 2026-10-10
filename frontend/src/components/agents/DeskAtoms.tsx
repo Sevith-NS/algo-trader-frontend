@@ -1,7 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from '@/components/ui/icons';
 import { scoreColor } from './deskFormat';
 
 /** The small mono caps used for every field label across the desk panels. */

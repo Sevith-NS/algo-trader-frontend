@@ -10,7 +10,7 @@ export default function PctChip({ value }: { value: number | null | undefined })
     <span
       className={clsx(
         'whitespace-nowrap rounded px-1.5 py-0.5 text-[11px] font-semibold tabular',
-        value >= 0 ? 'bg-emerald-400/10 text-accentGreen' : 'bg-red-400/10 text-accentRed',
+        value >= 0 ? 'bg-up/10 text-accentGreen' : 'bg-down/10 text-accentRed',
       )}
     >
       {value >= 0 ? '+' : ''}{value.toFixed(2)}%

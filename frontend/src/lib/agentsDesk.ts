@@ -132,3 +132,12 @@ export async function deleteJournalEntry(id: string): Promise<void> {
     throw new Error((body as { error?: string })?.error || 'Could not delete that decision.');
   }
 }
+
+/** Deletes are soft for 30 days; this brings one back. */
+export async function restoreJournalEntry(id: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/journal/${encodeURIComponent(id)}/restore`, { method: 'POST' });
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error((body as { error?: string })?.error || 'Could not restore that decision.');
+  }
+}

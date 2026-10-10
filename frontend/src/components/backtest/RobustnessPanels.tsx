@@ -1,18 +1,18 @@
 'use client';
 
 import clsx from 'clsx';
-import { Dices, SplitSquareHorizontal } from 'lucide-react';
+import { Dices, SplitSquareHorizontal } from '@/components/ui/icons';
 import type { MonteCarlo, OosResult, Verdict } from '../../types/backtest';
 import { num, pct, signedPct, shortDate, toneFor, VERDICT_COLOR } from '../../lib/backtest';
 import { MicroLabel } from '../agents/DeskAtoms';
 
 /** The verdict line. Colour carries the same meaning as the text, not more. */
 export function VerdictBanner({ verdict }: { verdict: Verdict }) {
-  const color = VERDICT_COLOR[verdict.level] ?? '#94A3B8';
+  const color = VERDICT_COLOR[verdict.level] ?? '#A4ACA8';
   return (
     <div
       className="rounded-lg p-2.5 text-[12px] leading-relaxed"
-      style={{ border: `1px solid ${color}40`, background: `${color}0d`, color: '#CBD5E1' }}
+      style={{ border: `1px solid ${color}40`, background: `${color}0d`, color: '#F2F4F3' }}
     >
       {verdict.text}
     </div>

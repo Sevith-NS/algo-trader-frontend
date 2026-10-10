@@ -1,6 +1,6 @@
 'use client';
 
-import { Landmark, CandlestickChart, Newspaper, Waves, Users2, Hourglass } from 'lucide-react';
+import { Landmark, CandlestickChart, Newspaper, Waves, Users2, Hourglass } from '@/components/ui/icons';
 import clsx from 'clsx';
 import type { AnalystEvent } from '../../types/agents';
 import { ANALYST_ORDER, scoreColor } from './deskFormat';
@@ -100,7 +100,7 @@ export default function AnalystCards({
     : null;
 
   return (
-    <div className="glass-panel p-5" style={{ borderTop: '2px solid #22D3EE' }}>
+    <div className="glass-panel p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
         <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <Users2 size={15} className="text-accentCyan" /> Analyst Team

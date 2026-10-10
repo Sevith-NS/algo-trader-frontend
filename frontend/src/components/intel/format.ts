@@ -24,17 +24,17 @@ export const fmtBig = (val: number | null | undefined, currency = 'USD') => {
 };
 
 export const stanceColor = (stance: string | undefined) =>
-  stance === 'bullish' ? '#34D399' : stance === 'bearish' ? '#F87171' : '#FBBF24';
+  stance === 'bullish' ? '#2FBF71' : stance === 'bearish' ? '#E5484D' : '#A4ACA8';
 
 export const callColor = (call: string | undefined) =>
-  call === 'BUY' ? '#34D399' : call === 'AVOID' ? '#F87171' : '#FBBF24';
+  call === 'BUY' ? '#2FBF71' : call === 'AVOID' ? '#E5484D' : '#A4ACA8';
 
 export const gradeColor = (grade: string | undefined) => {
-  if (!grade) return '#64748B';
-  if (grade.startsWith('A')) return '#34D399';
-  if (grade === 'B') return '#60A5FA';
-  if (grade === 'C') return '#FBBF24';
-  return '#F87171';
+  if (!grade) return '#848C88';
+  if (grade.startsWith('A')) return '#2FBF71';
+  if (grade === 'B') return '#A4ACA8';
+  if (grade === 'C') return '#A4ACA8';
+  return '#E5484D';
 };
 
 export const PHASE_LABELS: Record<string, string> = {
@@ -46,8 +46,8 @@ export const PHASE_LABELS: Record<string, string> = {
 };
 
 export const phaseColor = (phase: string | undefined) =>
-  phase === 'markup' ? '#34D399'
-  : phase === 'markdown' ? '#F87171'
-  : phase === 'accumulation' ? '#22D3EE'
-  : phase === 'distribution' ? '#FBBF24'
-  : '#94A3B8';
+  phase === 'markup' ? '#2FBF71'
+  : phase === 'markdown' ? '#E5484D'
+  : phase === 'accumulation' ? '#A4ACA8'
+  : phase === 'distribution' ? '#A4ACA8'
+  : '#A4ACA8';

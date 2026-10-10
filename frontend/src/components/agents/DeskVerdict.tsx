@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import clsx from 'clsx';
-import { Stamp, CheckCircle2, XCircle, CalendarClock, ListChecks, Wallet } from 'lucide-react';
+import { Stamp, CheckCircle2, XCircle, CalendarClock, ListChecks, Wallet } from '@/components/ui/icons';
 import type { VerdictEvent } from '../../types/agents';
 import { fmtPrice } from '../intel/format';
 import { actionColor, decisionColor, rawPct } from './deskFormat';
@@ -25,9 +25,10 @@ export default function DeskVerdict({
   verdict: VerdictEvent;
   symbol: string;
   currency: string;
-  onExecute?: (shares: number, price: number) => ExecuteResult;
+  onExecute?: (shares: number) => Promise<ExecuteResult>;
 }) {
   const [executed, setExecuted] = useState<ExecuteResult | null>(null);
+  const [placing, setPlacing] = useState(false);
   const dColor = decisionColor(verdict.decision);
   const aColor = actionColor(verdict.action);
   const { sizing } = verdict;
@@ -39,13 +40,19 @@ export default function DeskVerdict({
     sizing.shares > 0 &&
     Boolean(sizing.price);
 
-  const handleExecute = () => {
-    if (!onExecute || !sizing.price) return;
-    setExecuted(onExecute(sizing.shares, sizing.price));
+  // The server prices and fills the order; a failure leaves the button live
+  // so the person can try again.
+  const handleExecute = async () => {
+    if (!onExecute || placing) return;
+    setPlacing(true);
+    const result = await onExecute(sizing.shares);
+    setPlacing(false);
+    setExecuted(result);
   };
+  const done = Boolean(executed?.success);
 
   return (
-    <div className="glass-panel p-5" style={{ borderTop: `2px solid ${dColor}` }}>
+    <div className="glass-panel p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
         <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <Stamp size={15} style={{ color: dColor }} /> Desk Verdict
@@ -131,7 +138,8 @@ export default function DeskVerdict({
         <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-borderSubtle pt-3">
           <button
             onClick={handleExecute}
-            disabled={Boolean(executed)}
+            disabled={done || placing}
+            aria-busy={placing || undefined}
             className={clsx(
               'flex items-center gap-2 rounded-lg border px-4 py-2 text-xs font-semibold transition-colors disabled:opacity-50',
               verdict.action === 'BUY'
@@ -140,8 +148,10 @@ export default function DeskVerdict({
             )}
           >
             <Wallet size={13} />
-            {executed
-              ? 'Sent to paper portfolio'
+            {done
+              ? 'Placed in your paper portfolio'
+              : placing
+              ? 'Placing order'
               : `${verdict.action} ${sizing.shares.toLocaleString()} ${symbol} on paper`}
           </button>
           {executed && (
@@ -149,9 +159,9 @@ export default function DeskVerdict({
               {executed.message}
             </span>
           )}
-          {!executed && (
+          {!done && !executed && (
             <span className="text-[11px] text-textMuted">
-              Places exactly the order above in your paper portfolio.
+              Places this order at the live price in your paper portfolio.
             </span>
           )}
         </div>

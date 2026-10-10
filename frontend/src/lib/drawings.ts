@@ -52,21 +52,21 @@ export const POINT_COUNT: Record<DrawingType, 1 | 2> = {
 };
 
 export const DRAW_COLORS: Record<DrawingType, string> = {
-  trend: '#60A5FA',  // accentBlue
-  ray: '#60A5FA',
-  hline: '#FBBF24',  // accentAmber
-  rect: '#60A5FA',
-  fib: '#94A3B8',    // textSecondary
+  trend: '#F2F4F3',
+  ray: '#F2F4F3',
+  hline: '#C9CFCC',
+  rect: '#A4ACA8',
+  fib: '#A4ACA8',
 };
 
 export const FIB_LEVELS: { r: number; color: string }[] = [
-  { r: 0, color: '#94A3B8' },
-  { r: 0.236, color: '#F87171' },
-  { r: 0.382, color: '#FBBF24' },
-  { r: 0.5, color: '#34D399' },
-  { r: 0.618, color: '#22D3EE' },
-  { r: 0.786, color: '#A78BFA' },
-  { r: 1, color: '#94A3B8' },
+  { r: 0, color: '#A4ACA8' },
+  { r: 0.236, color: '#7E8682' },
+  { r: 0.382, color: '#A4ACA8' },
+  { r: 0.5, color: '#F2F4F3' },
+  { r: 0.618, color: '#C9CFCC' },
+  { r: 0.786, color: '#7E8682' },
+  { r: 1, color: '#A4ACA8' },
 ];
 
 /** Pointer slop, in CSS px, for grabbing a line. Endpoints get a little more. */
@@ -350,8 +350,8 @@ export interface RenderState {
 function drawHandle(ctx: CanvasRenderingContext2D, x: number, y: number) {
   ctx.save();
   ctx.setLineDash([]);
-  ctx.fillStyle = '#0D1220';   // bgSecondary
-  ctx.strokeStyle = '#F1F5F9'; // textPrimary
+  ctx.fillStyle = '#181B1A';   // ink-2
+  ctx.strokeStyle = '#F2F4F3'; // fg
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.arc(x, y, HANDLE_R, 0, Math.PI * 2);

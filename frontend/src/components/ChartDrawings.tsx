@@ -15,7 +15,7 @@ import type { RefObject } from 'react';
 import type { IChartApi, ISeriesApi, Logical, Time } from 'lightweight-charts';
 import {
   MousePointer2, TrendingUp, MoveUpRight, Minus, Square, Rows3, Eraser, Trash2,
-} from 'lucide-react';
+} from '@/components/ui/icons';
 import clsx from 'clsx';
 import {
   Drawing, DrawingType, HitPart, Projector, Pt, ToolId,

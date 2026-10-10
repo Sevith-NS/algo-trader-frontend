@@ -1,6 +1,6 @@
 'use client';
 
-import { Flame, Scale, ShieldCheck, Lock, Hourglass, SlidersHorizontal } from 'lucide-react';
+import { Flame, Scale, ShieldCheck, Lock, Hourglass, SlidersHorizontal } from '@/components/ui/icons';
 import type { RiskEvent } from '../../types/agents';
 import { rawPct, riskStanceColor, SEAT_LABELS } from './deskFormat';
 import { Chip, MicroLabel, SeatError } from './DeskAtoms';
@@ -87,7 +87,7 @@ export default function RiskCommittee({
   const spread = sizes.length > 1 ? Math.max(...sizes) - Math.min(...sizes) : null;
 
   return (
-    <div className="glass-panel p-5" style={{ borderTop: '2px solid #FBBF24' }}>
+    <div className="glass-panel p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
         <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <SlidersHorizontal size={15} className="text-accentAmber" /> Risk Committee

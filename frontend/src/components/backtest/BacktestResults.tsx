@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import clsx from 'clsx';
-import { ArrowDownRight, ArrowUpRight, Layers, ListOrdered, Ruler, TrendingUp } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, Layers, ListOrdered, Ruler, TrendingUp } from '@/components/ui/icons';
 import type { BacktestResult, MonthlyRow, Num, TradeRow } from '../../types/backtest';
 import { money, num, pct, ratio, shortDate, signedPct, toneFor } from '../../lib/backtest';
 import { MicroLabel } from '../agents/DeskAtoms';
@@ -64,8 +64,8 @@ function monthTint(value: Num, extreme: number): string | undefined {
   if (value === null || value === undefined || !Number.isFinite(value)) return undefined;
   const weight = Math.min(Math.abs(value) / (extreme || 1), 1) * 0.55 + 0.06;
   return value >= 0
-    ? `rgba(52, 211, 153, ${weight.toFixed(3)})`
-    : `rgba(248, 113, 113, ${weight.toFixed(3)})`;
+    ? `rgba(47, 191, 113, ${weight.toFixed(3)})`
+    : `rgba(229, 72, 77, ${weight.toFixed(3)})`;
 }
 
 function MonthlyGrid({ rows }: { rows: MonthlyRow[] }) {
@@ -246,8 +246,8 @@ export default function BacktestResults({ result, currency }: {
       <div
         className="rounded-xl p-3 text-[12px] leading-relaxed"
         style={{
-          border: `1px solid ${beatBuyHold ? '#34D39940' : '#FBBF2440'}`,
-          background: beatBuyHold ? '#34D3990d' : '#FBBF240d',
+          border: `1px solid ${beatBuyHold ? '#2FBF7140' : '#A4ACA840'}`,
+          background: beatBuyHold ? '#2FBF710d' : '#A4ACA80d',
         }}
       >
         <span className="text-textSecondary">

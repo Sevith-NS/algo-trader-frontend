@@ -1,6 +1,6 @@
 'use client';
 
-import { Gavel, ShieldAlert, Ban, Sparkle } from 'lucide-react';
+import { Gavel, ShieldAlert, Ban, Sparkle } from '@/components/ui/icons';
 import type { JudgeEvent } from '../../types/agents';
 import { callColor, winnerColor } from './deskFormat';
 import { Chip, ConvictionMeter, MicroLabel, SeatError, TintPanel } from './DeskAtoms';
@@ -23,7 +23,7 @@ export default function ThesisPanel({ judge }: { judge: JudgeEvent }) {
   const wColor = winnerColor(judge.winner);
 
   return (
-    <div className="glass-panel p-5" style={{ borderTop: `2px solid ${stanceColor}` }}>
+    <div className="glass-panel p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
         <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <Gavel size={15} style={{ color: stanceColor }} /> Desk Thesis
@@ -58,7 +58,7 @@ export default function ThesisPanel({ judge }: { judge: JudgeEvent }) {
       )}
 
       {judge.decisive_argument && (
-        <TintPanel color="#A78BFA" className="mt-4">
+        <TintPanel color="#A4ACA8" className="mt-4">
           <div className="flex gap-2">
             <Sparkle size={13} className="mt-0.5 shrink-0 text-accentPurple" />
             <div className="min-w-0">
@@ -80,7 +80,7 @@ export default function ThesisPanel({ judge }: { judge: JudgeEvent }) {
             </div>
           )}
           {judge.invalidation && (
-            <div className="rounded-xl border border-accentRed/25 bg-red-400/[0.06] p-3.5">
+            <div className="rounded-xl border border-accentRed/25 bg-down/[0.06] p-3.5">
               <h5 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold font-mono uppercase tracking-wider text-accentRed">
                 <Ban size={12} /> Thesis is wrong if
               </h5>

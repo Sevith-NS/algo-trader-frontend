@@ -7,13 +7,13 @@ import type {
 } from '../../types/agents';
 
 export const ACCENT = {
-  green: '#34D399',
-  red: '#F87171',
-  amber: '#FBBF24',
-  cyan: '#22D3EE',
-  purple: '#A78BFA',
-  blue: '#60A5FA',
-  muted: '#72809A',
+  green: '#2FBF71',
+  red: '#E5484D',
+  amber: '#A4ACA8',
+  cyan: '#A4ACA8',
+  purple: '#A4ACA8',
+  blue: '#A4ACA8',
+  muted: '#848C88',
 } as const;
 
 export const actionColor = (action: DeskAction | undefined) =>

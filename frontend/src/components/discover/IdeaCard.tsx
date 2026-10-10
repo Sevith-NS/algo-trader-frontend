@@ -13,7 +13,7 @@ import PctChip from './PctChip';
 export default function IdeaCard({ card }: { card: DiscoverCard }) {
   return (
     <Link
-      href={`/screener?q=${encodeURIComponent(card.symbol)}`}
+      href={`/s/${encodeURIComponent(card.symbol)}`}
       className="glass-panel block p-4 transition-colors hover:bg-white/[0.04] focus-visible:ring-1 focus-visible:ring-accentCyan/50"
     >
       <div className="flex items-start justify-between gap-3">

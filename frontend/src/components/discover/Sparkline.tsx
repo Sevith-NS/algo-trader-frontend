@@ -35,7 +35,7 @@ export default function Sparkline({ data, className }: { data: number[] | null |
       <polyline
         points={points}
         fill="none"
-        stroke={up ? '#34D399' : '#F87171'}
+        stroke={up ? '#2FBF71' : '#E5484D'}
         strokeWidth={1.5}
         strokeLinejoin="round"
         strokeLinecap="round"

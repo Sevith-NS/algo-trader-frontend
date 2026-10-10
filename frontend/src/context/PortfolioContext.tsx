@@ -1,132 +1,93 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+/**
+ * The signed-in user's paper account, read from the server ledger.
+ *
+ * v1 kept the portfolio in localStorage, so clearing the browser erased the
+ * track record and nothing tied it to the user. Now the server is the record:
+ * this context only caches what /api/accounts returns and re-reads it after
+ * every order. Prices for orders are set by the server, never sent from here.
+ */
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { apiGet, apiPost } from '@/lib/api';
+import type { Account, OrderResult, PositionsResponse, Profile } from '@/types/api';
 
-export interface Position {
-  symbol: string;
-  shares: number;
-  averagePrice: number;
-}
+/** Shape older components read (agents desk, assistant context). */
+export type Position = { symbol: string; shares: number; averagePrice: number };
 
-export interface Trade {
-  id: string;
-  symbol: string;
-  type: 'BUY' | 'SELL';
-  shares: number;
-  price: number;
-  timestamp: number;
-}
-
-interface PortfolioContextType {
+type PortfolioState = {
+  loading: boolean;
+  error: unknown;
+  profile: Profile | null;
+  account: Account | null;
+  book: PositionsResponse | null;
+  /** Cash in the account currency. */
   balance: number;
   positions: Position[];
-  trades: Trade[];
-  executeTrade: (symbol: string, type: 'BUY' | 'SELL', shares: number, price: number) => { success: boolean, message: string };
-  resetPortfolio: () => void;
-}
+  refresh: () => Promise<void>;
+  placeOrder: (symbol: string, side: 'buy' | 'sell', quantity: number,
+               extra?: { stop_price?: number; note?: string }) => Promise<OrderResult>;
+};
 
-const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
+const PortfolioContext = createContext<PortfolioState | null>(null);
 
-export function PortfolioProvider({ children }: { children: React.ReactNode }) {
-  const [balance, setBalance] = useState<number>(100000); // Start with $100k
-  const [positions, setPositions] = useState<Position[]>([]);
-  const [trades, setTrades] = useState<Trade[]>([]);
-  const [loaded, setLoaded] = useState(false);
+export function PortfolioProvider({ children }: { children: ReactNode }) {
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [account, setAccount] = useState<Account | null>(null);
+  const [book, setBook] = useState<PositionsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<unknown>(null);
 
-  // Load from local storage — defensively. PortfolioProvider wraps every page,
-  // so corrupt storage (interrupted write, devtools edits) must never throw:
-  // an unguarded JSON.parse here used to take down the whole app on load.
-  useEffect(() => {
+  const refresh = useCallback(async () => {
     try {
-      const storedBalance = parseFloat(localStorage.getItem('pt_balance') ?? '');
-      const storedPositions = JSON.parse(localStorage.getItem('pt_positions') ?? '[]');
-      const storedTrades = JSON.parse(localStorage.getItem('pt_trades') ?? '[]');
-
-      if (Number.isFinite(storedBalance)) setBalance(storedBalance);
-      if (Array.isArray(storedPositions)) setPositions(storedPositions);
-      if (Array.isArray(storedTrades)) setTrades(storedTrades);
-    } catch {
-      // Corrupt storage — fall back to the $100k defaults instead of crashing.
+      const [me, accounts] = await Promise.all([
+        apiGet<Profile>('/api/me'),
+        apiGet<{ accounts: Account[] }>('/api/accounts'),
+      ]);
+      setProfile(me);
+      const acct = accounts.accounts[0] ?? null;
+      setAccount(acct);
+      setBook(acct ? await apiGet<PositionsResponse>(`/api/accounts/${acct.id}/positions`) : null);
+      setError(null);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
     }
-    setLoaded(true);
   }, []);
 
-  // Save to local storage
   useEffect(() => {
-    if (loaded) {
-      localStorage.setItem('pt_balance', balance.toString());
-      localStorage.setItem('pt_positions', JSON.stringify(positions));
-      localStorage.setItem('pt_trades', JSON.stringify(trades));
-    }
-  }, [balance, positions, trades, loaded]);
+    // Initial load; every later refresh is triggered by an order or a retry.
+    const id = window.setTimeout(() => { void refresh(); }, 0);
+    return () => window.clearTimeout(id);
+  }, [refresh]);
 
-  const executeTrade = (symbol: string, type: 'BUY' | 'SELL', shares: number, price: number) => {
-    const totalCost = shares * price;
+  const placeOrder = useCallback<PortfolioState['placeOrder']>(async (symbol, side, quantity, extra) => {
+    if (!account) throw new Error('No paper account yet.');
+    const result = await apiPost<OrderResult>(`/api/accounts/${account.id}/orders`, {
+      symbol, side, quantity: String(quantity),
+      // One id per submission: a double tap or a retry lands once.
+      client_order_id: crypto.randomUUID(),
+      ...(extra?.stop_price ? { stop_price: String(extra.stop_price) } : {}),
+      ...(extra?.note ? { note: extra.note } : {}),
+    });
+    await refresh();
+    return result;
+  }, [account, refresh]);
 
-    if (type === 'BUY') {
-      if (balance < totalCost) {
-        return { success: false, message: 'Insufficient funds' };
-      }
+  const value = useMemo<PortfolioState>(() => ({
+    loading, error, profile, account, book, refresh, placeOrder,
+    balance: book ? Number(book.cash) : 0,
+    positions: (book?.positions ?? []).map((p) => ({
+      symbol: p.symbol, shares: Number(p.quantity), averagePrice: Number(p.avg_cost),
+    })),
+  }), [loading, error, profile, account, book, refresh, placeOrder]);
 
-      setBalance(prev => prev - totalCost);
-      
-      setPositions(prev => {
-        const existing = prev.find(p => p.symbol === symbol);
-        if (existing) {
-          const newTotalCost = (existing.shares * existing.averagePrice) + totalCost;
-          const newShares = existing.shares + shares;
-          return prev.map(p => p.symbol === symbol ? { ...p, shares: newShares, averagePrice: newTotalCost / newShares } : p);
-        }
-        return [...prev, { symbol, shares, averagePrice: price }];
-      });
-
-    } else if (type === 'SELL') {
-      const existing = positions.find(p => p.symbol === symbol);
-      if (!existing || existing.shares < shares) {
-        return { success: false, message: 'Insufficient shares to sell' };
-      }
-
-      setBalance(prev => prev + totalCost);
-      
-      setPositions(prev => {
-        if (existing.shares === shares) {
-          return prev.filter(p => p.symbol !== symbol); // Remove position if all shares sold
-        }
-        return prev.map(p => p.symbol === symbol ? { ...p, shares: p.shares - shares } : p);
-      });
-    }
-
-    // Record trade
-    const newTrade: Trade = {
-      id: Math.random().toString(36).substring(2, 9),
-      symbol,
-      type,
-      shares,
-      price,
-      timestamp: Date.now()
-    };
-    
-    setTrades(prev => [newTrade, ...prev]);
-    return { success: true, message: `Successfully ${type === 'BUY' ? 'bought' : 'sold'} ${shares} shares of ${symbol}` };
-  };
-
-  const resetPortfolio = () => {
-    setBalance(100000);
-    setPositions([]);
-    setTrades([]);
-  };
-
-  return (
-    <PortfolioContext.Provider value={{ balance, positions, trades, executeTrade, resetPortfolio }}>
-      {children}
-    </PortfolioContext.Provider>
-  );
+  return <PortfolioContext.Provider value={value}>{children}</PortfolioContext.Provider>;
 }
 
 export function usePortfolio() {
-  const context = useContext(PortfolioContext);
-  if (context === undefined) {
-    throw new Error('usePortfolio must be used within a PortfolioProvider');
-  }
-  return context;
+  const ctx = useContext(PortfolioContext);
+  if (!ctx) throw new Error('usePortfolio must be used inside <PortfolioProvider>');
+  return ctx;
 }

@@ -16,7 +16,7 @@ import clsx from 'clsx';
  *   eyebrow     mono uppercase 0.22em - rationed, not on every page
  */
 
-const SHELL = 'mx-auto w-full max-w-[1500px] px-4 pb-20 pt-28 sm:px-6 lg:px-8';
+const SHELL = 'w-full';
 
 export function PageShell({
   children,
@@ -38,6 +38,7 @@ export function PageHeader({
   actions,
   meta,
   className,
+  level = 2,
 }: {
   title: string;
   description?: React.ReactNode;
@@ -49,20 +50,23 @@ export function PageHeader({
   /** Mono status line under the title: timestamps, counts, coverage. */
   meta?: React.ReactNode;
   className?: string;
+  /** 1 for a top-level page; 2 inside a section that already has its h1. */
+  level?: 1 | 2;
 }) {
+  const Heading = level === 1 ? 'h1' : 'h2';
   return (
     <header className={clsx('mb-8', className)}>
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           {eyebrow && (
-            <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.22em] text-textMuted">
+            <p className="mb-1 text-caption text-fg-3">
               {eyebrow}
             </p>
           )}
-          <h1 className="flex items-center gap-3 text-3xl font-black tracking-tight text-textPrimary sm:text-4xl">
+          <Heading className="flex items-center gap-3 text-h3 font-bold text-fg">
             {icon}
             {title}
-          </h1>
+          </Heading>
           {description && (
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-textSecondary">
               {description}
@@ -106,10 +110,10 @@ export function Panel({
       {(title || aside) && (
         <header className="mb-1 flex items-baseline justify-between gap-3">
           {title && (
-            <h2 className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-textSecondary">
+            <h3 className="flex items-center gap-2 text-body-sm font-medium text-fg-2">
               {icon}
               {title}
-            </h2>
+            </h3>
           )}
           {aside && (
             <span className="tabular shrink-0 font-mono text-[11px] text-textMuted">

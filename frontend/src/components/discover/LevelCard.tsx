@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import clsx from 'clsx';
-import { Layers, RefreshCw } from 'lucide-react';
+import { Layers, RefreshCw } from '@/components/ui/icons';
 import type { LevelRow } from '../../types/discover';
 import { fmtPrice } from '../intel/format';
 import Sparkline from './Sparkline';
@@ -16,12 +16,12 @@ import Sparkline from './Sparkline';
 
 const SIDE_STYLES = {
   resistance: {
-    chip: 'border-red-400/30 bg-red-400/10 text-accentRed',
+    chip: 'border-down/30 bg-down/10 text-accentRed',
     rail: 'bg-accentRed',
     label: 'Resistance',
   },
   support: {
-    chip: 'border-emerald-400/30 bg-emerald-400/10 text-accentGreen',
+    chip: 'border-up/30 bg-up/10 text-accentGreen',
     rail: 'bg-accentGreen',
     label: 'Support',
   },
@@ -35,7 +35,7 @@ export default function LevelCard({ row }: { row: LevelRow }) {
 
   return (
     <Link
-      href={`/screener?q=${encodeURIComponent(row.symbol)}`}
+      href={`/s/${encodeURIComponent(row.symbol)}`}
       className="glass-panel relative block overflow-hidden p-4 transition-colors hover:bg-white/[0.04] focus-visible:ring-1 focus-visible:ring-accentCyan/50"
     >
       {/* Side rail: the one place color alone is used, and it is decorative —

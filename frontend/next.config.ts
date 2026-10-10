@@ -36,8 +36,24 @@ const nextConfig: NextConfig = {
   // fails on a self-signed certificate again, point NODE_EXTRA_CA_CERTS at the
   // proxy's root CA instead — the Node-level equivalent of what run.sh does
   // for the backend.
+  // Never publish source maps for the browser bundle.
+  productionBrowserSourceMaps: false,
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
+  },
+  // v1 URLs keep working after the v2 information architecture change.
+  async redirects() {
+    return [
+      { source: "/screener", has: [{ type: "query", key: "q", value: "(?<sym>.+)" }], destination: "/s/:sym", permanent: true },
+      { source: "/screener", destination: "/markets", permanent: true },
+      { source: "/movers", destination: "/markets/movers", permanent: true },
+      { source: "/discover", has: [{ type: "query", key: "tab", value: "(?<tab>ideas|levels|screens)" }], destination: "/markets/:tab", permanent: true },
+      { source: "/discover", destination: "/markets/ideas", permanent: true },
+      { source: "/dashboard", destination: "/home", permanent: true },
+      { source: "/login", destination: "/sign-in", permanent: true },
+      { source: "/geotrade/:path*", destination: "/markets", permanent: true },
+      { source: "/community", destination: "/home", permanent: true },
+    ];
   },
 };
 

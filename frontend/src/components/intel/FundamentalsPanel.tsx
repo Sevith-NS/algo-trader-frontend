@@ -1,11 +1,11 @@
 "use client";
-import { FileSearch, AlertTriangle, CheckCircle2, Scale } from 'lucide-react';
+import { FileSearch, AlertTriangle, CheckCircle2, Scale } from '@/components/ui/icons';
 import clsx from 'clsx';
 import { fmtBig, fmtPrice, gradeColor } from './format';
 
 function ScoreBar({ label, value, max = 25 }: { label: string; value: number; max?: number }) {
   const pct = Math.min(value / max, 1) * 100;
-  const color = pct >= 75 ? '#34D399' : pct >= 50 ? '#60A5FA' : pct >= 30 ? '#FBBF24' : '#F87171';
+  const color = pct >= 75 ? '#2FBF71' : pct >= 50 ? '#A4ACA8' : pct >= 30 ? '#A4ACA8' : '#E5484D';
   return (
     <div className="flex items-center gap-2 py-0.5">
       <span className="w-24 shrink-0 text-[10px] capitalize text-textMuted">{label.replace('_', ' ')}</span>
@@ -39,7 +39,7 @@ export default function FundamentalsPanel({ data, currency }: { data: any; curre
   const gColor = gradeColor(health.grade);
 
   return (
-    <div className="glass-panel p-5" style={{ borderTop: '2px solid #A78BFA' }}>
+    <div className="glass-panel p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
         <h3 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <FileSearch size={15} className="text-accentPurple" /> Fundamental X-Ray
@@ -134,7 +134,7 @@ export default function FundamentalsPanel({ data, currency }: { data: any; curre
               {val.premium_to_own_history_pct !== null && (
                 <span className={clsx(
                   'rounded-md px-1.5 py-0.5 text-[11px] font-bold tabular',
-                  val.premium_to_own_history_pct > 5 ? 'bg-red-400/10 text-accentRed' : val.premium_to_own_history_pct < -5 ? 'bg-emerald-400/10 text-accentGreen' : 'bg-white/5 text-textSecondary'
+                  val.premium_to_own_history_pct > 5 ? 'bg-down/10 text-accentRed' : val.premium_to_own_history_pct < -5 ? 'bg-up/10 text-accentGreen' : 'bg-white/5 text-textSecondary'
                 )}>
                   {val.premium_to_own_history_pct > 0 ? '+' : ''}{val.premium_to_own_history_pct}% vs {val.pe_hist_avg} avg
                 </span>
@@ -164,10 +164,10 @@ export default function FundamentalsPanel({ data, currency }: { data: any; curre
               </div>
               <div className="space-y-1.5">
                 {red_flags.map((f: any, i: number) => (
-                  <div key={i} className="rounded-lg border border-red-400/15 bg-red-400/5 p-2">
+                  <div key={i} className="rounded-lg border border-down/15 bg-down/5 p-2">
                     <div className="flex items-center gap-1.5 text-[11px] font-semibold text-textPrimary">
                       {f.title}
-                      {f.severity === 'high' && <span className="rounded bg-red-400/20 px-1 text-[9px] font-bold uppercase text-accentRed">high</span>}
+                      {f.severity === 'high' && <span className="rounded bg-down/20 px-1 text-[9px] font-bold uppercase text-accentRed">high</span>}
                     </div>
                     <p className="mt-0.5 text-[10px] leading-relaxed text-textSecondary">{f.detail}</p>
                   </div>
@@ -183,7 +183,7 @@ export default function FundamentalsPanel({ data, currency }: { data: any; curre
               </div>
               <div className="space-y-1.5">
                 {green_flags.map((f: any, i: number) => (
-                  <div key={i} className="rounded-lg border border-emerald-400/15 bg-emerald-400/5 p-2">
+                  <div key={i} className="rounded-lg border border-up/15 bg-up/5 p-2">
                     <div className="text-[11px] font-semibold text-textPrimary">{f.title}</div>
                     <p className="mt-0.5 text-[10px] leading-relaxed text-textSecondary">{f.detail}</p>
                   </div>

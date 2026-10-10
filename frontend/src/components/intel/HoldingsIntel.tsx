@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { BrainCircuit, RefreshCw, AlertTriangle, ExternalLink } from 'lucide-react';
+import { BrainCircuit, RefreshCw, AlertTriangle, ExternalLink } from '@/components/ui/icons';
 import clsx from 'clsx';
 import { API_BASE } from '../../lib/api';
 import {
@@ -39,7 +39,7 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
         setError(d.error || 'No intel returned');
       }
     } catch {
-      setError('Holdings intel unavailable. Ensure the Python backend is running.');
+      setError('Holdings intel is unavailable right now. Try again shortly.');
     } finally {
       setLoading(false);
     }
@@ -53,7 +53,7 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
   if (positions.length === 0) return null;
 
   return (
-    <section className="glass-panel mb-6 p-5" style={{ borderTop: '2px solid #A78BFA' }}>
+    <section className="glass-panel mb-6 p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <BrainCircuit size={15} className="text-accentPurple" /> Holdings Intelligence
@@ -122,7 +122,7 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
                   {h.valuation_premium_pct !== null && h.valuation_premium_pct !== undefined && (
                     <span className={clsx(
                       'rounded-md px-1.5 py-0.5 text-[10px] font-semibold tabular',
-                      h.valuation_premium_pct > 5 ? 'bg-red-400/10 text-accentRed' : h.valuation_premium_pct < -5 ? 'bg-emerald-400/10 text-accentGreen' : 'bg-white/5 text-textSecondary'
+                      h.valuation_premium_pct > 5 ? 'bg-down/10 text-accentRed' : h.valuation_premium_pct < -5 ? 'bg-up/10 text-accentGreen' : 'bg-white/5 text-textSecondary'
                     )}>
                       P/E {h.valuation_premium_pct > 0 ? '+' : ''}{h.valuation_premium_pct}% vs hist
                     </span>
@@ -177,7 +177,7 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
 
                 <div className="mt-auto pt-3">
                   <Link
-                    href={`/screener?q=${encodeURIComponent(h.symbol)}`}
+                    href={`/s/${encodeURIComponent(h.symbol)}`}
                     className="text-[11px] font-medium text-accentBlue hover:underline"
                   >
                     Full teardown →

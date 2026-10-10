@@ -1,7 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
-import { TrendingUp, TrendingDown, Swords, Quote, Crosshair, Handshake, Hourglass } from 'lucide-react';
+import { TrendingUp, TrendingDown, Swords, Quote, Crosshair, Handshake, Hourglass } from '@/components/ui/icons';
 import type { DebateEvent } from '../../types/agents';
 import { sideColor } from './deskFormat';
 import { MicroLabel, SeatError } from './DeskAtoms';
@@ -86,7 +86,7 @@ export default function DebateTranscript({
   }
 
   return (
-    <div className="glass-panel p-5" style={{ borderTop: '2px solid #A78BFA' }}>
+    <div className="glass-panel p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
         <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <Swords size={15} className="text-accentPurple" /> Research Debate

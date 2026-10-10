@@ -6,7 +6,6 @@ import {
 } from 'lightweight-charts';
 import { ema, bollinger, macd, rsi } from '../lib/indicators';
 import { CHART_INTERACTION_FREE, DrawingHint, DrawingRail, useChartDrawings } from './ChartDrawings';
-import { migrateLegacyStorageKeys } from '../lib/legacyStorage';
 
 // ---------------------------------------------------------------------------
 // Indicator configuration
@@ -41,17 +40,18 @@ const clampPeriod = (v: number) =>
   Math.min(PERIOD_MAX, Math.max(PERIOD_MIN, Math.round(v)));
 const clampMult = (v: number) => Math.min(MULT_MAX, Math.max(MULT_MIN, v));
 
-// One accent per indicator so the toolbar chip, its overlay, and its pane all
-// read as the same object (colors from tailwind.config.js accents).
+// Indicators are drawn in white and greys, never in green or red: in Flint
+// those two colours mean direction and nothing else. Lines are told apart by
+// weight and dash, and each toolbar chip carries its line's swatch.
 const CHIP_META: { key: IndicatorKey; label: string; color: string }[] = [
-  { key: 'ema', label: 'EMA', color: '#FBBF24' },      // accentAmber
-  { key: 'ribbon', label: 'EMA Ribbon', color: '#34D399' }, // accentGreen
-  { key: 'bb', label: 'Bollinger', color: '#22D3EE' },  // accentCyan
-  { key: 'macd', label: 'MACD', color: '#60A5FA' },     // accentBlue
-  { key: 'rsi', label: 'RSI', color: '#A78BFA' },       // accentPurple
+  { key: 'ema', label: 'EMA', color: '#F2F4F3' },
+  { key: 'ribbon', label: 'EMA Ribbon', color: '#C9CFCC' },
+  { key: 'bb', label: 'Bollinger', color: '#A4ACA8' },
+  { key: 'macd', label: 'MACD', color: '#F2F4F3' },
+  { key: 'rsi', label: 'RSI', color: '#F2F4F3' },
 ];
 
-const RIBBON_COLORS = ['#34D399', '#60A5FA', '#A78BFA', '#F87171'];
+const RIBBON_COLORS = ['#F2F4F3', '#C9CFCC', '#A4ACA8', '#7E8682'];
 
 // ---------------------------------------------------------------------------
 // Wheel-to-zoom (TradingView behaviour)
@@ -77,7 +77,6 @@ function wheelPixels(delta: number, mode: number): number {
 
 function loadStoredConfig(): IndicatorConfig {
   try {
-    migrateLegacyStorageKeys();
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_CONFIG;
     const p = JSON.parse(raw);
@@ -277,13 +276,13 @@ export default function Chart({
 
   const {
     backgroundColor = 'transparent',
-    textColor = '#94A3B8',
-    upColor = '#00FF88',
-    downColor = '#FF3366',
-    borderUpColor = '#00FF88',
-    borderDownColor = '#FF3366',
-    wickUpColor = '#00FF88',
-    wickDownColor = '#FF3366',
+    textColor = '#848C88',
+    upColor = '#2FBF71',
+    downColor = '#E5484D',
+    borderUpColor = '#2FBF71',
+    borderDownColor = '#E5484D',
+    wickUpColor = '#2FBF71',
+    wickDownColor = '#E5484D',
   } = colors;
 
   useEffect(() => {
@@ -293,6 +292,8 @@ export default function Chart({
       layout: {
         background: { type: ColorType.Solid, color: backgroundColor },
         textColor,
+        fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+        fontSize: 11,
       },
       // autoSize: the chart runs its own ResizeObserver on the container, so
       // it tracks react-grid-layout widget resizes, not just window resizes.
@@ -301,14 +302,14 @@ export default function Chart({
       autoSize: true,
       height,
       grid: {
-        vertLines: { color: 'rgba(255, 255, 255, 0.05)' },
-        horzLines: { color: 'rgba(255, 255, 255, 0.05)' },
+        vertLines: { visible: false },
+        horzLines: { color: '#181B1A' },
       },
       timeScale: {
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderColor: '#242927',
       },
       rightPriceScale: {
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderColor: '#242927',
       },
       // Wheel zoom is driven by our own handler on the wrapper (see the wheel
       // effect below) rather than by the library. The library binds its
@@ -359,7 +360,7 @@ export default function Chart({
     // ---- Pane 0 overlays ----
     if (config.ema.on) {
       addOverlayLine(toLineData(ema(closes, config.ema.period)), {
-        color: '#FBBF24', lineWidth: 2, title: `EMA ${config.ema.period}`,
+        color: '#F2F4F3', lineWidth: 2, title: `EMA ${config.ema.period}`,
       });
     }
 
@@ -373,7 +374,7 @@ export default function Chart({
 
     if (config.bb.on) {
       const bands = bollinger(closes, config.bb.period, config.bb.mult);
-      const bbColor = 'rgba(34, 211, 238, 0.6)'; // accentCyan @ 60%
+      const bbColor = 'rgba(164, 172, 168, 0.7)'; // fg-2 @ 70%
       addOverlayLine(toLineData(bands.upper), { color: bbColor, lineWidth: 1 });
       addOverlayLine(toLineData(bands.middle), { color: bbColor, lineWidth: 1, lineStyle: LineStyle.Dashed });
       addOverlayLine(toLineData(bands.lower), { color: bbColor, lineWidth: 1 });
@@ -389,14 +390,14 @@ export default function Chart({
       const rsiPoints = toLineData(rsi(closes, config.rsi.period));
       if (rsiPoints.length > 0) {
         const rsiSeries = addOverlayLine(rsiPoints, {
-          color: '#A78BFA', lineWidth: 2, title: `RSI ${config.rsi.period}`,
+          color: '#F2F4F3', lineWidth: 2, title: `RSI ${config.rsi.period}`,
           lastValueVisible: true,
         }, nextPane++);
         // Overbought/oversold guides drawn as price lines on the RSI series.
         for (const level of [30, 70]) {
           rsiSeries.createPriceLine({
             price: level,
-            color: 'rgba(167, 139, 250, 0.45)',
+            color: 'rgba(132, 140, 136, 0.6)',
             lineWidth: 1,
             lineStyle: LineStyle.Dashed,
             axisLabelVisible: false,
@@ -423,13 +424,13 @@ export default function Chart({
             histData.push({
               time: data[i].time,
               value: v,
-              color: v >= 0 ? 'rgba(52, 211, 153, 0.55)' : 'rgba(248, 113, 113, 0.55)',
+              color: v >= 0 ? 'rgba(47, 191, 113, 0.55)' : 'rgba(229, 72, 77, 0.55)',
             });
           }
         });
         histSeries.setData(histData);
-        addOverlayLine(macdPoints, { color: '#60A5FA', lineWidth: 2, title: 'MACD', lastValueVisible: true }, macdPane);
-        addOverlayLine(toLineData(result.signal), { color: '#FBBF24', lineWidth: 1, title: 'Signal' }, macdPane);
+        addOverlayLine(macdPoints, { color: '#F2F4F3', lineWidth: 2, title: 'MACD', lastValueVisible: true }, macdPane);
+        addOverlayLine(toLineData(result.signal), { color: '#848C88', lineWidth: 1, title: 'Signal' }, macdPane);
       }
     }
 

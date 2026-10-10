@@ -4,13 +4,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import {
   Building2, Play, Square, WifiOff, Brain, CircleDot, Check, Timer, BookOpen, Shuffle,
-} from 'lucide-react';
+} from '@/components/ui/icons';
 import type {
   AnalystEvent, ContextEvent, DebateEvent, DeskEvent, DeskStage, JudgeEvent,
   RiskEvent, TradePlanEvent, VerdictEvent,
 } from '../../types/agents';
 import { streamDesk, DeskRateLimited } from '../../lib/agentsDesk';
 import { usePortfolio } from '../../context/PortfolioContext';
+import { errorMessage } from '../../lib/api';
 import AnalystCards from './AnalystCards';
 import DebateTranscript from './DebateTranscript';
 import ThesisPanel from './ThesisPanel';
@@ -106,7 +107,7 @@ export default function TradingDeskSection({
   const [showJournal, setShowJournal] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
-  const { balance, positions, executeTrade } = usePortfolio();
+  const { balance, positions, placeOrder } = usePortfolio();
 
   // A run is tied to the symbol it was opened on — switching tickers has to
   // abort it, or a later event would land in the wrong stock's transcript.
@@ -198,7 +199,7 @@ export default function TradingDeskSection({
   return (
     <div className="space-y-5">
       {/* ---- Header and controls ---- */}
-      <div className="glass-panel p-5" style={{ borderTop: '2px solid #A78BFA' }}>
+      <div className="glass-panel p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <h3 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-textPrimary">
@@ -310,7 +311,7 @@ export default function TradingDeskSection({
       {/* The desk changed provider mid-run. Not an error — the run continued —
           but the reader deserves to know which model answered which seat. */}
       {state.failover && (
-        <div className="glass-panel flex items-start gap-3 p-4" style={{ borderLeft: '2px solid #FBBF24' }}>
+        <div className="glass-panel flex items-start gap-3 p-4">
           <Shuffle size={15} className="mt-0.5 shrink-0 text-accentAmber" />
           <div className="min-w-0">
             <p className="text-[13px] leading-relaxed text-textSecondary">{state.failover}</p>
@@ -349,8 +350,14 @@ export default function TradingDeskSection({
           verdict={verdict}
           symbol={symbol}
           currency={currency}
-          onExecute={(shares, price) =>
-            executeTrade(symbol, verdict.action === 'SELL' ? 'SELL' : 'BUY', shares, price)}
+          onExecute={async (shares) => {
+            try {
+              await placeOrder(symbol, verdict.action === 'SELL' ? 'sell' : 'buy', shares);
+              return { success: true, message: 'Filled at the live price.' };
+            } catch (err) {
+              return { success: false, message: errorMessage(err) };
+            }
+          }}
         />
       )}
 

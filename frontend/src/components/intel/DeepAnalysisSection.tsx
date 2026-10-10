@@ -4,7 +4,7 @@ import {
   Microscope, Sparkles, Hourglass, Quote, Gavel,
   Building2, Receipt, Scale, Swords, Users,
   CandlestickChart, CalendarClock, TrendingUp, TrendingDown, Calculator, WifiOff,
-} from 'lucide-react';
+} from '@/components/ui/icons';
 import clsx from 'clsx';
 import { API_BASE } from '../../lib/api';
 import FundamentalsPanel from './FundamentalsPanel';
@@ -156,7 +156,7 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
   return (
     <div className="space-y-5">
       {/* ---- Verdict banner ---- */}
-      <div className="glass-panel p-5" style={{ borderTop: `2px solid ${callColor(verdict.long_term.call)}` }}>
+      <div className="glass-panel p-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
           <h3 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
             <Microscope size={15} className="text-accentPurple" /> Analyst Verdict
@@ -225,7 +225,7 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
       <FundamentalsPanel data={fundamentals} currency={currency} />
 
       {/* ---- AI research note ---- */}
-      <div className="glass-panel p-5" style={{ borderTop: '2px solid #22D3EE' }}>
+      <div className="glass-panel p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <h3 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
             <Sparkles size={15} className="text-accentCyan" /> AI Deep Dive
@@ -337,7 +337,7 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
               {(bull || bear) && (
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   {bull && (
-                    <div className="rounded-xl border border-accentGreen/25 bg-emerald-400/5 p-4">
+                    <div className="rounded-xl border border-accentGreen/25 bg-up/5 p-4">
                       <h4 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold font-mono uppercase tracking-wider text-accentGreen">
                         <TrendingUp size={12} /> Bull case
                       </h4>
@@ -345,7 +345,7 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
                     </div>
                   )}
                   {bear && (
-                    <div className="rounded-xl border border-accentRed/25 bg-red-400/5 p-4">
+                    <div className="rounded-xl border border-accentRed/25 bg-down/5 p-4">
                       <h4 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold font-mono uppercase tracking-wider text-accentRed">
                         <TrendingDown size={12} /> Bear case
                       </h4>

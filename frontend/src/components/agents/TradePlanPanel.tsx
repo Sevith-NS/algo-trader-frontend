@@ -1,6 +1,6 @@
 'use client';
 
-import { Briefcase, OctagonX } from 'lucide-react';
+import { Briefcase, OctagonX } from '@/components/ui/icons';
 import type { TradePlanEvent } from '../../types/agents';
 import { fmtPrice } from '../intel/format';
 import { actionColor } from './deskFormat';
@@ -32,7 +32,7 @@ export default function TradePlanPanel({
   const levels = plan.levels;
 
   return (
-    <div className="glass-panel p-5" style={{ borderTop: `2px solid ${color}` }}>
+    <div className="glass-panel p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
         <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <Briefcase size={15} style={{ color }} /> Trade Plan
@@ -51,10 +51,10 @@ export default function TradePlanPanel({
       {levels ? (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Level label="Entry" value={levels.entry} currency={currency} color="#22D3EE" />
-            <Level label="Stop" value={levels.stop_loss} currency={currency} color="#F87171" />
-            <Level label="Target 1" value={levels.target_1} currency={currency} color="#34D399" />
-            <Level label="Target 2" value={levels.target_2} currency={currency} color="#34D399" />
+            <Level label="Entry" value={levels.entry} currency={currency} color="#A4ACA8" />
+            <Level label="Stop" value={levels.stop_loss} currency={currency} color="#E5484D" />
+            <Level label="Target 1" value={levels.target_1} currency={currency} color="#2FBF71" />
+            <Level label="Target 2" value={levels.target_2} currency={currency} color="#2FBF71" />
           </div>
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 border-t border-borderSubtle pt-3 text-[11px] text-textMuted">
             <span><span className="tabular text-textSecondary">{levels.r_multiple_1.toFixed(2)}</span>R to target 1</span>

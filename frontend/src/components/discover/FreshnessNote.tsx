@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from '@/components/ui/icons';
 import type { Freshness } from '../../types/discover';
 
 /**

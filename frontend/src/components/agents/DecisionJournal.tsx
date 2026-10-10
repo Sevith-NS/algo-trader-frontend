@@ -4,17 +4,18 @@ import { useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import {
   History, Trash2, RefreshCw, Target, TrendingUp, TrendingDown, WifiOff,
-} from 'lucide-react';
+} from '@/components/ui/icons';
 import type { JournalEntry, JournalStats } from '../../types/agents';
-import { deleteJournalEntry, fetchJournal } from '../../lib/agentsDesk';
+import { deleteJournalEntry, fetchJournal, restoreJournalEntry } from '../../lib/agentsDesk';
+import { useToast } from '@/components/ui/Toast';
 import { actionColor, gradeColor, GRADE_LABELS, pct, rawPct, relativeDay } from './deskFormat';
 import { Chip, MicroLabel } from './DeskAtoms';
 
 function Scorecard({ stats }: { stats: JournalStats }) {
-  const hitColor = stats.hit_rate === null ? '#72809A'
-    : stats.hit_rate >= 50 ? '#34D399' : '#F87171';
-  const alphaColor = stats.avg_signed_alpha_pct === null ? '#72809A'
-    : stats.avg_signed_alpha_pct >= 0 ? '#34D399' : '#F87171';
+  const hitColor = stats.hit_rate === null ? '#848C88'
+    : stats.hit_rate >= 50 ? '#2FBF71' : '#E5484D';
+  const alphaColor = stats.avg_signed_alpha_pct === null ? '#848C88'
+    : stats.avg_signed_alpha_pct >= 0 ? '#2FBF71' : '#E5484D';
 
   return (
     <div className="grid grid-cols-2 gap-4 rounded-xl border border-borderSubtle bg-white/[0.02] p-4 sm:grid-cols-4">
@@ -127,6 +128,7 @@ export default function DecisionJournal({
   const [scope, setScope] = useState<'symbol' | 'all'>(symbol ? 'symbol' : 'all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const toast = useToast();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -151,13 +153,18 @@ export default function DecisionJournal({
     try {
       await deleteJournalEntry(id);
       load();
+      // Deletes are soft on the server, so offer the way back right here.
+      toast.show({
+        message: 'Decision removed from the journal',
+        action: { label: 'Undo', onClick: () => { void restoreJournalEntry(id).then(load); } },
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not delete that decision.');
     }
   };
 
   return (
-    <div className="glass-panel p-5" style={{ borderTop: '2px solid #60A5FA' }}>
+    <div className="glass-panel p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
         <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <History size={15} className="text-accentBlue" /> Decision Journal

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
 import {
   ChevronDown, FlaskConical, History, Play, RotateCw, Settings2, ShieldCheck, Square,
-} from 'lucide-react';
+} from '@/components/ui/icons';
 import type { BacktestResult, StrategyInfo } from '../../types/backtest';
 import {
   BACKTEST_INTERVALS, BacktestRequest, fetchStrategies, runBacktest,
@@ -207,7 +207,7 @@ export default function BacktestSection({ symbol, currency }: {
   return (
     <div className="space-y-5">
       {/* ---- Header and controls ---- */}
-      <div className="glass-panel p-5" style={{ borderTop: '2px solid #22D3EE' }}>
+      <div className="glass-panel p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <h3 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-textPrimary">

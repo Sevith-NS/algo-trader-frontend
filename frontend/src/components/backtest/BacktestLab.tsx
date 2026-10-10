@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
-import { FlaskConical, Footprints, Play, Square } from 'lucide-react';
+import { FlaskConical, Footprints, Play, Square } from '@/components/ui/icons';
 import type {
   Fold, OptimizeEvent, StrategyInfo, SweepRow, WalkForwardEvent, Curve, Verdict,
 } from '../../types/backtest';
