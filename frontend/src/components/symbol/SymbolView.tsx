@@ -22,6 +22,7 @@ import { exchangeFor, sessionState } from '@/lib/sessions';
 import { sizeByRisk } from '@/lib/sizing';
 import { useApi } from '@/lib/useApi';
 import type { Quote, Watchlist } from '@/types/api';
+import type { Failed, NewsIntel } from '@/types/intel';
 import type { MlInsights, QuantSignals } from '@/types/quant';
 import { ChartPanel } from './ChartPanel';
 import { OrderTicket } from './OrderTicket';
@@ -61,7 +62,7 @@ export function SymbolView({ symbol }: { symbol: string }) {
   const quoteApi = useApi<Quote>(`/api/quote?symbol=${enc}`, { refreshMs: 30_000 });
   const quantApi = useApi<QuantSignals>(`/api/quant-signals?symbol=${enc}`);
   const mlApi = useApi<MlInsights>(tab === 'plan' ? `/api/ml-insights?symbol=${enc}` : null);
-  const newsApi = useApi<unknown>(tab === 'news' ? `/api/news-intel?symbol=${enc}` : null);
+  const newsApi = useApi<NewsIntel | Failed>(tab === 'news' ? `/api/news-intel?symbol=${enc}` : null);
 
   const { profile, book } = usePortfolio();
   const { price, currency } = normalizeQuote(quoteApi.data);
@@ -167,8 +168,7 @@ export function SymbolView({ symbol }: { symbol: string }) {
           {tab === 'news' && (
             newsApi.loading && !newsApi.data ? <LoadingBlock lines={6} label="Loading news" />
               : newsApi.error ? <ErrorState error={newsApi.error} onRetry={newsApi.reload} />
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              : <NewsIntelPanel data={newsApi.data as any} />
+              : <NewsIntelPanel data={newsApi.data} />
           )}
         </div>
       )}

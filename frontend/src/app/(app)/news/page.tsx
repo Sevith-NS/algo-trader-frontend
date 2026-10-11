@@ -1,15 +1,16 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { RefreshCw, ExternalLink, TrendingUp, TrendingDown, Minus } from '@/components/ui/icons';
 import clsx from 'clsx';
 import { PageShell, PageHeader } from '@/components/PageHeader';
 import { ErrorState, LoadingBlock } from '@/components/ui/States';
-import { apiGet } from '@/lib/api';
+import { useApi } from '@/lib/useApi';
 
 interface Article {
   title: string;
-  link: string;
+  /** Null when the feed's link wasn't plain http(s). */
+  link: string | null;
   source: string | null;
   published: string | null;
   sentiment_score: number;
@@ -99,23 +100,8 @@ function timeAgo(iso: string | null): string {
 }
 
 export default function NewsPage() {
-  const [data, setData] = useState<NewsData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data, error, loading, reload: fetchNews } = useApi<NewsData>('/api/news');
   const [activeCategory, setActiveCategory] = useState<string>('all');
-
-  const fetchNews = async () => {
-    setLoading(true);
-    try {
-      const json = await apiGet<NewsData>('/api/news');
-      if (!(json as any).error) setData(json);
-    } catch (e) {
-      console.error('Failed to fetch news', e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { fetchNews(); }, []);
 
   const articles = useMemo(() => {
     if (!data) return [];
@@ -144,7 +130,7 @@ export default function NewsPage() {
         {loading && !data ? (
           <LoadingBlock lines={8} label="Loading news" />
         ) : !data ? (
-          <ErrorState error={null} title="Couldn't load the news" onRetry={fetchNews} />
+          <ErrorState error={error} title="Couldn't load the news" onRetry={fetchNews} />
         ) : (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
             {/* Left rail: mood gauge + category moods */}
@@ -206,7 +192,7 @@ export default function NewsPage() {
                 {articles.map((a, i) => (
                   <a
                     key={`${a.link}-${i}`}
-                    href={a.link}
+                    href={a.link ?? undefined}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="glass-panel hover-lift group flex items-start justify-between gap-4 p-4"

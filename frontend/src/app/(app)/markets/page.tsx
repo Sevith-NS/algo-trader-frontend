@@ -26,7 +26,7 @@ const MARKETS = [
 ] as const;
 
 /** 429 message with Retry-After from the header, or the JSON body as fallback. */
-function rateLimitMessage(res: Response, body: any): string {
+function rateLimitMessage(res: Response, body: { retry_after_seconds?: number } | null): string {
   const retryAfter = res.headers.get('Retry-After')
     || (body?.retry_after_seconds != null ? String(Math.ceil(body.retry_after_seconds)) : null);
   return `Rate limited. Too many requests. Try again in ${retryAfter || 'a few'} seconds.`;
@@ -173,7 +173,7 @@ export default function MarketsPage() {
     return () => { cancelled = true; };
   }, [market, retryNonce]);
 
-  const cards = data?.cards ?? [];
+  const cards = useMemo(() => data?.cards ?? [], [data]);
 
   // Movers: factual top/bottom of the day. Fewer than 10 symbols with change
   // data (12-symbol universes, partial outages) would make fixed slices of 5

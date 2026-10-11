@@ -56,7 +56,7 @@ export function ChartPanel({ symbol, levels }: { symbol: string; levels?: QuantL
       { price: levels.stop_loss, color: '#E5484D', lineStyle: 3, lineWidth: 2, title: 'Stop' },
       { price: levels.target_1, color: '#2FBF71', lineStyle: 3, lineWidth: 1, title: 'T1' },
       { price: levels.target_2, color: '#2FBF71', lineStyle: 3, lineWidth: 2, title: 'T2' },
-    ];
+    ] as const;
     return lines.filter((l) => l.price != null).map((l) => ({ ...l, axisLabelVisible: true }));
   }, [levels, showPlan]);
 

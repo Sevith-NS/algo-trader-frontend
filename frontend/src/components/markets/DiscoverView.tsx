@@ -41,7 +41,7 @@ const LEVEL_SIDES: { id: LevelSide | 'all'; label: string }[] = [
 ];
 
 /** 429 message with Retry-After from the header, or the JSON body as fallback. */
-function rateLimitMessage(res: Response, body: any): string {
+function rateLimitMessage(res: Response, body: { retry_after_seconds?: number } | null): string {
   const retryAfter = res.headers.get('Retry-After')
     || (body?.retry_after_seconds != null ? String(Math.ceil(body.retry_after_seconds)) : null);
   return `Rate limited. Too many requests. Try again in ${retryAfter || 'a few'} seconds.`;
@@ -259,7 +259,7 @@ function DiscoverContent() {
   }, [tab, selectedScreen, universe, screensError]);
 
   // ---- Ideas derivations ----
-  const cards = discover?.cards ?? [];
+  const cards = useMemo(() => discover?.cards ?? [], [discover]);
   const tagCounts = useMemo(() => {
     const counts = {} as Record<HorizonTagId, number>;
     for (const card of cards) {

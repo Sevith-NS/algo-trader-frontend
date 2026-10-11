@@ -23,7 +23,7 @@ export const fmtBig = (val: number | null | undefined, currency = 'USD') => {
   return `$${Math.round(val).toLocaleString('en-US')}`;
 };
 
-export const stanceColor = (stance: string | undefined) =>
+export const stanceColor = (stance: string | null | undefined) =>
   stance === 'bullish' ? '#2FBF71' : stance === 'bearish' ? '#E5484D' : '#A4ACA8';
 
 export const callColor = (call: string | undefined) =>
@@ -45,7 +45,7 @@ export const PHASE_LABELS: Record<string, string> = {
   transition: 'Transition · no regime',
 };
 
-export const phaseColor = (phase: string | undefined) =>
+export const phaseColor = (phase: string | null | undefined) =>
   phase === 'markup' ? '#2FBF71'
   : phase === 'markdown' ? '#E5484D'
   : phase === 'accumulation' ? '#A4ACA8'

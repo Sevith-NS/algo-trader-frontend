@@ -144,7 +144,11 @@ export default function DecisionJournal({
     }
   }, [scope, symbol]);
 
-  useEffect(() => { load(); }, [load, refreshKey]);
+  useEffect(() => {
+    // Run as a task, not inside the effect: load() sets loading state first.
+    const id = window.setTimeout(() => { void load(); }, 0);
+    return () => window.clearTimeout(id);
+  }, [load, refreshKey]);
 
   const handleDelete = async (id: string) => {
     // Optimistic: the row is gone from the user's view either way, and a failed

@@ -3,15 +3,16 @@ import { useState } from 'react';
 import { Newspaper, TrendingUp, TrendingDown, Minus, ExternalLink, ChevronDown } from '@/components/ui/icons';
 import clsx from 'clsx';
 import { stanceColor } from './format';
+import type { Failed, NewsIntel } from '../../types/intel';
 
 /**
  * Multi-source news intelligence panel: every headline the sweep found across
  * Google News / Bing / Yahoo feeds, each scored, plus the aggregate stance
  * (bullish / bearish / neutral), 0-100 rating and confidence.
  */
-export default function NewsIntelPanel({ data }: { data: any }) {
+export default function NewsIntelPanel({ data }: { data: NewsIntel | Failed | null | undefined }) {
   const [expanded, setExpanded] = useState(false);
-  if (!data || data.error || !data.articles) return null;
+  if (!data || 'error' in data || !data.articles) return null;
 
   const color = stanceColor(data.stance);
   const Icon = data.stance === 'bullish' ? TrendingUp : data.stance === 'bearish' ? TrendingDown : Minus;
@@ -63,7 +64,7 @@ export default function NewsIntelPanel({ data }: { data: any }) {
 
       {/* Headlines */}
       <div className="space-y-2.5">
-        {shown.map((a: any, i: number) => {
+        {shown.map((a, i) => {
           const body = (
             <div className="flex items-start gap-2">
               <span

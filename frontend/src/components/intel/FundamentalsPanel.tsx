@@ -2,6 +2,7 @@
 import { FileSearch, AlertTriangle, CheckCircle2, Scale } from '@/components/ui/icons';
 import clsx from 'clsx';
 import { fmtBig, fmtPrice, gradeColor } from './format';
+import type { Failed, Fundamentals } from '../../types/intel';
 
 function ScoreBar({ label, value, max = 25 }: { label: string; value: number; max?: number }) {
   const pct = Math.min(value / max, 1) * 100;
@@ -22,9 +23,9 @@ function ScoreBar({ label, value, max = 25 }: { label: string; value: number; ma
  * flags, and valuation computed from raw statements vs the stock's own history.
  * Honest footer states what is NOT covered (concalls, MD&A, pledge data).
  */
-export default function FundamentalsPanel({ data, currency }: { data: any; currency: string }) {
+export default function FundamentalsPanel({ data, currency }: { data: Fundamentals | Failed | null | undefined; currency: string }) {
   if (!data) return null;
-  if (data.error) {
+  if ('error' in data) {
     return (
       <div className="glass-panel p-5">
         <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-textPrimary">
@@ -84,7 +85,7 @@ export default function FundamentalsPanel({ data, currency }: { data: any; curre
                 </tr>
               </thead>
               <tbody>
-                {years.map((y: any) => (
+                {years.map((y) => (
                   <tr key={y.fiscal_year} className="border-b border-white/[0.03]">
                     <td className="py-1.5 pr-2 font-semibold text-textPrimary">{y.fiscal_year}</td>
                     <td className="py-1.5 pr-2 tabular text-textSecondary">{fmtBig(y.revenue, currency)}</td>
@@ -163,7 +164,7 @@ export default function FundamentalsPanel({ data, currency }: { data: any; curre
                 <AlertTriangle size={11} /> Red flags
               </div>
               <div className="space-y-1.5">
-                {red_flags.map((f: any, i: number) => (
+                {red_flags.map((f, i) => (
                   <div key={i} className="rounded-lg border border-down/15 bg-down/5 p-2">
                     <div className="flex items-center gap-1.5 text-[11px] font-semibold text-textPrimary">
                       {f.title}
@@ -182,7 +183,7 @@ export default function FundamentalsPanel({ data, currency }: { data: any; curre
                 <CheckCircle2 size={11} /> Green flags
               </div>
               <div className="space-y-1.5">
-                {green_flags.map((f: any, i: number) => (
+                {green_flags.map((f, i) => (
                   <div key={i} className="rounded-lg border border-up/15 bg-up/5 p-2">
                     <div className="text-[11px] font-semibold text-textPrimary">{f.title}</div>
                     <p className="mt-0.5 text-[10px] leading-relaxed text-textSecondary">{f.detail}</p>

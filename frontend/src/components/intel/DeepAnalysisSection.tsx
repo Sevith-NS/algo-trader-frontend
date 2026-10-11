@@ -1,24 +1,19 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   Microscope, Sparkles, Hourglass, Quote, Gavel,
   Building2, Receipt, Scale, Swords, Users,
   CandlestickChart, CalendarClock, TrendingUp, TrendingDown, Calculator, WifiOff,
 } from '@/components/ui/icons';
 import clsx from 'clsx';
-import { API_BASE } from '../../lib/api';
+import { apiGet, errorMessage } from '../../lib/api';
+import { useApi } from '../../lib/useApi';
+import type { DeepAnalysis, HorizonVerdict, Narrative } from '../../types/intel';
 import FundamentalsPanel from './FundamentalsPanel';
 import { fmtPrice, callColor, phaseColor, PHASE_LABELS } from './format';
 
 // The model is instructed to return strings, but a partial or mis-shaped JSON
 // response must never take down the page — coerce arrays to prose, drop the rest.
-/** 429 message with Retry-After from the header, or the JSON body as fallback. */
-function rateLimitMessage(res: Response, body: any): string {
-  const retryAfter = res.headers.get('Retry-After')
-    || (body?.retry_after_seconds != null ? String(Math.ceil(body.retry_after_seconds)) : null);
-  return `Rate limited. Too many requests. Try again in ${retryAfter || 'a few'} seconds.`;
-}
-
 const asText = (v: unknown): string | null =>
   typeof v === 'string' && v.trim()
     ? v
@@ -46,7 +41,7 @@ function PillarBar({ label, value }: { label: string; value: number }) {
   );
 }
 
-function VerdictChip({ horizon, verdict }: { horizon: string; verdict: any }) {
+function VerdictChip({ horizon, verdict }: { horizon: string; verdict: HorizonVerdict }) {
   const color = callColor(verdict.call);
   return (
     <div className="min-w-0 flex-1 rounded-xl border border-borderSubtle bg-white/[0.02] p-3">
@@ -70,65 +65,31 @@ function VerdictChip({ horizon, verdict }: { horizon: string; verdict: any }) {
  * with an explicit BUY/HOLD/AVOID call checked against the deterministic verdict.
  */
 export default function DeepAnalysisSection({ symbol, currency }: { symbol: string; currency: string }) {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [narrative, setNarrative] = useState<any>(null);
+  const { data, error, loading } = useApi<DeepAnalysis>(`/api/deep-analysis?symbol=${encodeURIComponent(symbol)}`);
+  // The AI teardown belongs to the symbol it was written for; switching
+  // tickers drops it rather than showing one company's story under another.
+  const [ai, setAi] = useState<{ symbol: string; narrative?: Narrative; error?: string } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
-  const [aiError, setAiError] = useState('');
-
-  useEffect(() => {
-    let cancelled = false;
-    setData(null);
-    setNarrative(null);
-    setError('');
-    setAiError('');
-    setLoading(true);
-    (async () => {
-      try {
-        const res = await fetch(`${API_BASE}/api/deep-analysis?symbol=${encodeURIComponent(symbol)}`);
-        const d = await res.json().catch(() => null);
-        if (cancelled) return;
-        // A 429 or 5xx must not silently unmount the section — surface why
-        // the teardown is missing instead of rendering nothing.
-        if (res.status === 429) {
-          setError(rateLimitMessage(res, d));
-        } else if (!res.ok || d?.error) {
-          setError(d?.error || `Deep analysis failed (${res.status}).`);
-        } else {
-          setData(d);
-        }
-      } catch {
-        if (!cancelled) setError('Deep analysis unavailable. Is the backend running?');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [symbol]);
+  const narrative = ai?.symbol === symbol ? ai.narrative ?? null : null;
+  const aiError = ai?.symbol === symbol ? ai.error ?? '' : '';
 
   const runAiTeardown = async () => {
+    const forSymbol = symbol;
     setAiLoading(true);
-    setAiError('');
+    setAi(null);
     try {
-      const res = await fetch(`${API_BASE}/api/deep-analysis?symbol=${encodeURIComponent(symbol)}&ai=1`);
-      const d = await res.json().catch(() => null);
-      if (res.status === 429) {
-        // Not a key problem — say when to try again instead of misdiagnosing.
-        setAiError(rateLimitMessage(res, d));
-      } else if (d?.narrative) {
-        setNarrative(d.narrative);
-      } else {
-        setAiError('AI narrative unavailable. Check GEMINI_API_KEY in backend/.env');
-      }
-    } catch {
-      setAiError('AI narrative failed. Is the backend running?');
+      const d = await apiGet<DeepAnalysis>(`/api/deep-analysis?symbol=${encodeURIComponent(forSymbol)}&ai=1`);
+      setAi(d.narrative
+        ? { symbol: forSymbol, narrative: d.narrative }
+        : { symbol: forSymbol, error: 'The AI teardown is unavailable right now. The numbers above still stand.' });
+    } catch (err) {
+      setAi({ symbol: forSymbol, error: errorMessage(err) });
     } finally {
       setAiLoading(false);
     }
   };
 
-  if (loading) {
+  if (loading && !data) {
     return (
       <div className="glass-panel flex items-center gap-3 p-5">
         <Hourglass size={16} className="animate-pulse-soft text-accentPurple" />
@@ -138,19 +99,21 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
       </div>
     );
   }
+  // A 429 or 5xx must not silently unmount the section: say why it's missing.
   if (error) {
     return (
       <div className="glass-panel flex items-center gap-3 p-5">
         <WifiOff size={16} className="shrink-0 text-accentAmber" />
-        <p className="text-sm leading-relaxed text-textSecondary">{error}</p>
+        <p className="text-sm leading-relaxed text-textSecondary">{errorMessage(error)}</p>
       </div>
     );
   }
   // Only vanish when there is genuinely nothing to show and nothing to explain.
   if (!data) return null;
 
-  const { verdict, technical: tech, fundamentals } = data;
-  const hasTech = tech && !tech.error;
+  const { verdict, fundamentals } = data;
+  const tech = 'error' in data.technical ? null : data.technical;
+  const hasTech = tech !== null;
   const pColor = phaseColor(tech?.phase);
 
   return (

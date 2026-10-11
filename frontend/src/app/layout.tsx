@@ -43,7 +43,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        <ClerkProvider appearance={clerkAppearance}>{children}</ClerkProvider>
+        {/* dynamic: render per request so the CSP nonce from proxy.ts reaches
+            Next's scripts and Clerk's. A prerendered page has no nonce and
+            the policy would block its scripts. */}
+        <ClerkProvider appearance={clerkAppearance} dynamic>{children}</ClerkProvider>
       </body>
     </html>
   );

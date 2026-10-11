@@ -1,10 +1,12 @@
 "use client";
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { CreatePriceLineOptions } from 'lightweight-charts';
 import {
   createChart, ColorType, IChartApi, ISeriesApi, IPriceLine, LineStyle,
   CandlestickSeries, LineSeries, HistogramSeries, LineSeriesPartialOptions, Time,
 } from 'lightweight-charts';
 import { ema, bollinger, macd, rsi } from '../lib/indicators';
+import { readStorage, useBrowserValue, writeStorage } from '../lib/browser';
 import { CHART_INTERACTION_FREE, DrawingHint, DrawingRail, useChartDrawings } from './ChartDrawings';
 
 // ---------------------------------------------------------------------------
@@ -75,9 +77,8 @@ function wheelPixels(delta: number, mode: number): number {
   return delta;                        // DOM_DELTA_PIXEL
 }
 
-function loadStoredConfig(): IndicatorConfig {
+function parseStoredConfig(raw: string | null): IndicatorConfig {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_CONFIG;
     const p = JSON.parse(raw);
     // Deep-merge over defaults so a stale or hand-edited payload can never
@@ -197,7 +198,8 @@ interface ChartProps {
     borderDownColor?: string;
     wickUpColor?: string;
     wickDownColor?: string;
-    priceLines?: any[];
+    /** Lines without a price yet (a level still loading) are skipped. */
+    priceLines?: (Omit<CreatePriceLineOptions, 'price'> & { price: number | null })[];
   };
 }
 
@@ -211,31 +213,17 @@ export default function Chart({
   const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const priceLineRefs = useRef<IPriceLine[]>([]);
 
-  const [config, setConfig] = useState<IndicatorConfig>(DEFAULT_CONFIG);
+  // Saved indicators are read from storage as a browser-only value (defaults
+  // on the server and first render, so the HTML matches); an edit wins after.
+  const storedConfig = useBrowserValue(() => readStorage(STORAGE_KEY), null);
+  const [editedConfig, setEditedConfig] = useState<IndicatorConfig | null>(null);
+  const config = useMemo(() => editedConfig ?? parseStoredConfig(storedConfig), [editedConfig, storedConfig]);
+  const [openPopover, setOpenPopover] = useState<IndicatorKey | null>(null);
   // Bumped after every chart rebuild so the price-line effect re-applies its
   // lines to the FRESH candlestick series — without this, quant levels
   // (ENTRY/STOP/T1/T2) vanish on any indicator toggle/param edit because the
   // rebuild replaces the series but [colors.priceLines, data] never changed.
   const [rebuildEpoch, setRebuildEpoch] = useState(0);
-  // Rehydration happens in an effect (not a lazy initializer) so the server
-  // and first client render agree — reading localStorage during render would
-  // make the chip styling mismatch the SSR HTML.
-  const [hydrated, setHydrated] = useState(false);
-  const [openPopover, setOpenPopover] = useState<IndicatorKey | null>(null);
-
-  useEffect(() => {
-    setConfig(loadStoredConfig());
-    setHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    // Guard on hydrated so the pre-rehydration default state can't clobber
-    // what the user previously saved.
-    if (!hydrated) return;
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-    } catch { /* storage full or blocked — config just won't persist */ }
-  }, [config, hydrated]);
 
   // Close the open popover on outside click / Escape. Clicks inside the open
   // chip group (its popover, its settings button) are left alone so the
@@ -257,8 +245,11 @@ export default function Chart({
     };
   }, [openPopover]);
 
-  const setIndicator = <K extends IndicatorKey>(key: K, patch: Partial<IndicatorConfig[K]>) =>
-    setConfig(prev => ({ ...prev, [key]: { ...prev[key], ...patch } }));
+  const setIndicator = <K extends IndicatorKey>(key: K, patch: Partial<IndicatorConfig[K]>) => {
+    const next = { ...config, [key]: { ...config[key], ...patch } };
+    setEditedConfig(next);
+    writeStorage(STORAGE_KEY, JSON.stringify(next));
+  };
 
   // The drawing layer reads chartRef/seriesRef per frame rather than holding
   // them, so it rides out the chart rebuilds that indicator edits trigger;
@@ -475,7 +466,6 @@ export default function Chart({
     // resetting the user's pan/zoom while they typed in the trade form.
     // `config` IS included: a toggle/param change rebuilds the chart, which is
     // the accepted behavior (same as the old SMA button).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, visibleBars, height, backgroundColor, textColor, upColor, downColor, borderUpColor, borderDownColor, wickUpColor, wickDownColor, config]);
 
   // ---- Wheel: zoom the chart, never the page ----------------------------
@@ -553,7 +543,7 @@ export default function Chart({
       try { series.removePriceLine(line); } catch { /* series torn down */ }
     });
     priceLineRefs.current = (colors.priceLines ?? [])
-      .filter(line => line && line.price !== null && line.price !== undefined)
+      .filter((line): line is CreatePriceLineOptions => line?.price != null)
       .map(line => series.createPriceLine(line));
   }, [colors.priceLines, data, rebuildEpoch]);
 

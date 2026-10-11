@@ -128,21 +128,17 @@ export default function BacktestSection({ symbol, currency }: {
     return () => { live = false; };
   }, []);
 
-  // Parameters belong to a strategy, so switching strategy clears them rather
-  // than carrying a stale `fast=10` onto something with no `fast` at all.
-  useEffect(() => { setParams({}); }, [strategyName]);
-
   // A result is tied to the symbol it was run on; switching tickers has to
   // drop it, or the report would describe a different stock than the chart.
-  useEffect(() => {
-    abortRef.current?.abort();
-    abortRef.current = null;
+  const [runSymbol, setRunSymbol] = useState(symbol);
+  if (runSymbol !== symbol) {
+    setRunSymbol(symbol);
     setResult(null);
     setError('');
     setRunning(false);
-  }, [symbol]);
-
-  useEffect(() => () => abortRef.current?.abort(), []);
+  }
+  // ...and abort the old symbol's run (also on unmount).
+  useEffect(() => () => { abortRef.current?.abort(); abortRef.current = null; }, [symbol]);
 
   const buildRequest = useCallback((): BacktestRequest => {
     const preset = RANGES.find((r) => r.id === rangeId);
@@ -250,7 +246,12 @@ export default function BacktestSection({ symbol, currency }: {
           <Field label="Strategy" hint={strategy?.doc}>
             <select
               value={strategyName}
-              onChange={(e) => setStrategyName(e.target.value)}
+              onChange={(e) => {
+                setStrategyName(e.target.value);
+                // Parameters belong to a strategy: never carry a stale
+                // `fast=10` onto something with no `fast` at all.
+                setParams({});
+              }}
               className={inputClass}
             >
               {strategies.map((s) => (
@@ -473,7 +474,7 @@ export default function BacktestSection({ symbol, currency }: {
           )}
 
           {tab === 'lab' && strategy && (
-            <BacktestLab base={buildRequest()} strategy={strategy} />
+            <BacktestLab key={strategy.name} base={buildRequest()} strategy={strategy} />
           )}
         </>
       )}

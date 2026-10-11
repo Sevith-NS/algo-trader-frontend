@@ -1,9 +1,11 @@
 "use client";
-import { useEffect, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { BrainCircuit, RefreshCw, AlertTriangle, ExternalLink } from '@/components/ui/icons';
 import clsx from 'clsx';
-import { API_BASE } from '../../lib/api';
+import { apiPost, errorMessage } from '../../lib/api';
+import { usePostQuery } from '../../lib/useApi';
+import type { HoldingIntel } from '../../types/intel';
 import {
   stanceColor, callColor, gradeColor, phaseColor, PHASE_LABELS,
 } from './format';
@@ -14,41 +16,16 @@ import {
  * and the two-horizon verdict, so a deteriorating holding surfaces itself.
  */
 export default function HoldingsIntel({ positions }: { positions: { symbol: string }[] }) {
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  // Re-run only when the set of symbols changes, not on every price tick.
   const symbolsKey = positions.map(p => p.symbol).sort().join(',');
-  const lastFetched = useRef('');
-
-  const fetchIntel = async (force = false) => {
-    if (!symbolsKey) { setData([]); return; }
-    if (!force && lastFetched.current === symbolsKey) return;
-    setLoading(true);
-    setError('');
-    try {
-      const res = await fetch(`${API_BASE}/api/holdings-intel`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ positions: positions.map(p => ({ symbol: p.symbol })) }),
-      });
-      const d = await res.json();
-      if (d.holdings) {
-        setData(d.holdings);
-        lastFetched.current = symbolsKey;
-      } else {
-        setError(d.error || 'No intel returned');
-      }
-    } catch {
-      setError('Holdings intel is unavailable right now. Try again shortly.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchIntel();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [symbolsKey]);
+  const body = useMemo(
+    () => (symbolsKey ? { positions: symbolsKey.split(',').map(symbol => ({ symbol })) } : null),
+    [symbolsKey],
+  );
+  const { data: res, error: err, loading, reload } = usePostQuery<{ holdings: HoldingIntel[] }>(
+    body ? '/api/holdings-intel' : null, body, apiPost);
+  const data = res?.holdings ?? [];
+  const error = err ? errorMessage(err) : '';
 
   if (positions.length === 0) return null;
 
@@ -62,7 +39,7 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
           </span>
         </h2>
         <button
-          onClick={() => fetchIntel(true)}
+          onClick={reload}
           disabled={loading}
           className="flex items-center gap-1.5 rounded-lg border border-borderSubtle px-3 py-1.5 text-[11px] text-textSecondary transition-colors hover:bg-white/[0.03] hover:text-textPrimary disabled:opacity-50"
         >
@@ -79,8 +56,8 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
         <p className="text-sm text-accentRed">{error}</p>
       ) : (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {data.map((h: any) => {
-            if (h.error) {
+          {data.map((h) => {
+            if ('error' in h) {
               return (
                 <div key={h.symbol} className="rounded-xl border border-borderSubtle bg-white/[0.02] p-4">
                   <div className="ticker text-textPrimary">{h.symbol}</div>
@@ -153,7 +130,7 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
                 {h.top_red_flag && (
                   <div className="mt-2 flex items-center gap-1.5 text-[10px] text-accentAmber">
                     <AlertTriangle size={10} className="shrink-0" />
-                    <span className="truncate">{h.top_red_flag}{h.red_flag_count > 1 ? ` +${h.red_flag_count - 1} more` : ''}</span>
+                    <span className="truncate">{h.top_red_flag}{(h.red_flag_count ?? 0) > 1 ? ` +${(h.red_flag_count ?? 0) - 1} more` : ''}</span>
                   </div>
                 )}
 

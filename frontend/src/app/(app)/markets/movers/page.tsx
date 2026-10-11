@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import clsx from 'clsx';
 import {
@@ -17,7 +17,8 @@ import {
 
 import { PageShell, PageHeader, Panel } from '@/components/PageHeader';
 import Sparkline from '@/components/discover/Sparkline';
-import { API_BASE } from '@/lib/api';
+import { errorMessage } from '@/lib/api';
+import { useApi } from '@/lib/useApi';
 import type {
   CircuitSections,
   IntradaySection,
@@ -636,52 +637,15 @@ export default function MoversPage() {
   // index constituent, so opening on an index would hide the headline rows.
   const [scope, setScope] = useState('allnse');
   const [minMove, setMinMove] = useState(5);
-  const [data, setData] = useState<MoversResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  // Guards a slow response for an abandoned scope from overwriting a newer one.
-  const requestIdRef = useRef(0);
-
-  const load = useCallback(
-    async (opts: { showLoading: boolean }) => {
-      const id = ++requestIdRef.current;
-      if (opts.showLoading) setLoading(true);
-      try {
-        const res = await fetch(
-          `${API_BASE}/api/movers?scope=${encodeURIComponent(scope)}` +
-            `&min_move=${minMove}&limit=${ROWS_PER_SIDE}`,
-        );
-        const json = await res.json();
-        if (id !== requestIdRef.current) return; // a newer request superseded this
-        if (!res.ok || json.error) {
-          setError(json.error || `Request failed (${res.status})`);
-        } else {
-          setData(json as MoversResponse);
-          setError(null);
-        }
-      } catch {
-        if (id !== requestIdRef.current) return;
-        setError('Market data is temporarily unavailable. Please try again shortly.');
-      } finally {
-        if (id === requestIdRef.current) setLoading(false);
-      }
-    },
-    [scope, minMove],
-  );
-
-  useEffect(() => {
-    load({ showLoading: true });
-  }, [load]);
-
   // While the backend warms its price cache the board is genuinely partial, so
   // poll until coverage settles instead of presenting a fraction of the market
-  // as if it were the whole thing.
-  useEffect(() => {
-    if (!data?.warming) return;
-    const t = setTimeout(() => load({ showLoading: false }), POLL_MS);
-    return () => clearTimeout(t);
-  }, [data, load]);
+  // as if it were the whole thing. A newer scope aborts the older request.
+  const [warming, setWarming] = useState(false);
+  const { data, error, loading, reload } = useApi<MoversResponse>(
+    `/api/movers?scope=${encodeURIComponent(scope)}&min_move=${minMove}&limit=${ROWS_PER_SIDE}`,
+    { refreshMs: warming ? POLL_MS : undefined },
+  );
+  if (Boolean(data?.warming) !== warming) setWarming(Boolean(data?.warming));
 
   const scopes = data?.scopes ?? [];
   const indexScopes = scopes.filter((s) => s.group === 'index');
@@ -838,14 +802,14 @@ export default function MoversPage() {
           </div>
         )}
 
-        {error && (
+        {Boolean(error) && (
           <div className="mb-6 flex items-start gap-2 rounded-lg border border-accentRed/30 bg-down/[0.06] px-4 py-3 text-sm text-textSecondary">
             <AlertTriangle size={14} className="mt-0.5 shrink-0 text-accentRed" />
             <div>
-              <p className="text-textPrimary">{error}</p>
+              <p className="text-textPrimary">{errorMessage(error)}</p>
               <button
                 type="button"
-                onClick={() => load({ showLoading: true })}
+                onClick={reload}
                 className="mt-1 text-xs text-accentGreen underline underline-offset-4"
               >
                 Retry

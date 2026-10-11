@@ -77,7 +77,18 @@ export default function BacktestLab({ base, strategy }: {
     [strategy],
   );
 
-  const [sweeps, setSweeps] = useState<Record<string, Sweep>>({});
+  // Defaults follow the strategy: a grid built for ema_cross means nothing on
+  // swingpro_in. The parent keys this component by strategy, so a switch
+  // starts a fresh lab instead of sweeping the wrong knobs.
+  const [sweeps, setSweeps] = useState<Record<string, Sweep>>(() => {
+    const next: Record<string, Sweep> = {};
+    numericParams.forEach((p, i) => {
+      const sweep = defaultSweep(Number(p.default), p.type === 'int');
+      // Pre-arm the first two so the panel is usable without configuring it.
+      next[p.name] = { ...sweep, on: i < 2 && numericParams.length <= 12 };
+    });
+    return next;
+  });
   const [error, setError] = useState('');
 
   // Optimizer
@@ -95,19 +106,6 @@ export default function BacktestLab({ base, strategy }: {
   const [foldCount, setFoldCount] = useState(5);
 
   const abortRef = useRef<AbortController | null>(null);
-
-  // Defaults follow the strategy: a grid built for ema_cross means nothing on
-  // swingpro_in, and silently carrying it over would sweep the wrong knobs.
-  useEffect(() => {
-    const next: Record<string, Sweep> = {};
-    numericParams.forEach((p, i) => {
-      const sweep = defaultSweep(Number(p.default), p.type === 'int');
-      // Pre-arm the first two so the panel is usable without configuring it.
-      next[p.name] = { ...sweep, on: i < 2 && numericParams.length <= 12 };
-    });
-    setSweeps(next);
-    setOptRows([]); setOptVerdict(null); setFolds([]); setWfDone(null); setError('');
-  }, [strategy.name, numericParams]);
 
   useEffect(() => () => abortRef.current?.abort(), []);
 

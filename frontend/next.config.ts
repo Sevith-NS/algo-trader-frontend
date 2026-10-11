@@ -3,13 +3,8 @@ import type { NextConfig } from "next";
 /**
  * Baseline security headers, applied to every route.
  *
- * No Content-Security-Policy here, deliberately. This app renders inline
- * <style> blocks (dashboard/page.tsx), compiles WebGL shaders at runtime
- * (Galaxy, SplashCursor, the globe) and animates with GSAP/framer-motion, so
- * any CSP strict enough to be worth setting needs a nonce threaded through the
- * document and the shader paths audited first. A wide policy full of
- * 'unsafe-inline' and 'unsafe-eval' would only look like protection. Worth
- * doing properly as its own change — start with Report-Only to see what fires.
+ * The Content-Security-Policy is not here: it needs a fresh nonce per request,
+ * so src/proxy.ts sets it.
  */
 const securityHeaders = [
   // Stop the browser second-guessing a declared Content-Type: a JSON or text

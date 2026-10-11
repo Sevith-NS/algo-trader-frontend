@@ -110,16 +110,16 @@ export default function TradingDeskSection({
   const { balance, positions, placeOrder } = usePortfolio();
 
   // A run is tied to the symbol it was opened on — switching tickers has to
-  // abort it, or a later event would land in the wrong stock's transcript.
-  useEffect(() => {
-    abortRef.current?.abort();
-    abortRef.current = null;
+  // clear it, or a later event would land in the wrong stock's transcript.
+  const [runSymbol, setRunSymbol] = useState(symbol);
+  if (runSymbol !== symbol) {
+    setRunSymbol(symbol);
     setState(EMPTY);
     setError('');
     setRunning(false);
-  }, [symbol]);
-
-  useEffect(() => () => abortRef.current?.abort(), []);
+  }
+  // ...and abort the old symbol's run (also on unmount).
+  useEffect(() => () => { abortRef.current?.abort(); abortRef.current = null; }, [symbol]);
 
   const apply = useCallback((event: DeskEvent) => {
     setState((prev) => {
