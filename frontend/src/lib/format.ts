@@ -43,7 +43,8 @@ export function formatPct(value: number | string | null | undefined, digits = 2)
   const n = toNumber(value);
   if (n === null) return '–';
   const s = Math.abs(n).toFixed(digits);
-  return n > 0 ? `+${s}%` : n < 0 ? `${MINUS}${s}%` : `${s}%`;
+  const dir = direction(n, digits);
+  return dir === 'up' ? `+${s}%` : dir === 'down' ? `${MINUS}${s}%` : `${s}%`;
 }
 
 /** Signed money change: +₹38.20 / −$1.10. */
@@ -51,7 +52,8 @@ export function formatSignedMoney(value: number | string | null | undefined, cur
   const n = toNumber(value);
   if (n === null) return '–';
   const s = formatMoney(Math.abs(n), currency, digits);
-  return n > 0 ? `+${s}` : n < 0 ? `${MINUS}${s}` : s;
+  const dir = direction(n, digits);
+  return dir === 'up' ? `+${s}` : dir === 'down' ? `${MINUS}${s}` : s;
 }
 
 /** Compact large numbers: 1.2K, 3.4M, 5.6B. */
@@ -61,9 +63,13 @@ export function formatCompact(value: number | string | null | undefined): string
   return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
 }
 
-export function direction(value: number | string | null | undefined): 'up' | 'down' | 'flat' {
+/**
+ * Direction of a change as it will be displayed: anything that rounds to zero
+ * at `digits` places is flat, so "−0.00%" never shows as a red loss.
+ */
+export function direction(value: number | string | null | undefined, digits = 2): 'up' | 'down' | 'flat' {
   const n = toNumber(value);
-  if (n === null || n === 0) return 'flat';
+  if (n === null || Math.abs(n) < 0.5 * 10 ** -digits) return 'flat';
   return n > 0 ? 'up' : 'down';
 }
 

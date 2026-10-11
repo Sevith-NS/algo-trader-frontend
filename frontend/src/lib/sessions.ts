@@ -25,7 +25,10 @@ export function sessionState(ex: Exchange, now = new Date()): { open: boolean; l
   const fmt = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
   if (ex.days.includes(day) && minutes >= o && minutes < c) return { open: true, label: `Closes ${fmt(c)} local` };
   if (ex.days.includes(day) && minutes < o) return { open: false, label: `Opens ${fmt(o)} local` };
-  return { open: false, label: 'Closed' };
+  // After the close or on a non-trading day: name the next session's day.
+  const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const next = [1, 2, 3, 4, 5, 6, 7].map((k) => (day + k) % 7).find((d) => ex.days.includes(d));
+  return { open: false, label: next === undefined ? 'Closed' : `Opens ${names[next]} ${fmt(o)} local` };
 }
 
 /** Best guess of a symbol's exchange from its Yahoo suffix. */

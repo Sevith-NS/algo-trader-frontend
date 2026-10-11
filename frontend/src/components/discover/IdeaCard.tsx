@@ -14,7 +14,7 @@ export default function IdeaCard({ card }: { card: DiscoverCard }) {
   return (
     <Link
       href={`/s/${encodeURIComponent(card.symbol)}`}
-      className="glass-panel block p-4 transition-colors hover:bg-white/[0.04] focus-visible:ring-1 focus-visible:ring-accentCyan/50"
+      className="glass-panel block p-4 transition-colors hover:bg-ink-2 focus-visible:ring-1 focus-visible:ring-accentCyan/50"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
@@ -40,7 +40,7 @@ export default function IdeaCard({ card }: { card: DiscoverCard }) {
           <span
             key={tag.id}
             className={clsx(
-              'rounded border px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wider',
+              'rounded border px-1.5 py-0.5 text-caption',
               TAG_STYLES[tag.id].chip,
             )}
           >
@@ -53,7 +53,7 @@ export default function IdeaCard({ card }: { card: DiscoverCard }) {
         {card.tags.map((tag) => (
           <div key={tag.id} className="flex items-start gap-1.5">
             <span className={clsx('mt-1 h-1.5 w-1.5 shrink-0 rounded-full', TAG_STYLES[tag.id].dot)} />
-            <span className="text-[11px] leading-snug text-textMuted">{tag.reason}</span>
+            <span className="text-caption leading-snug text-textMuted">{tag.reason}</span>
           </div>
         ))}
       </div>

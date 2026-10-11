@@ -39,20 +39,20 @@ function rateLimitMessage(res: Response, body: { retry_after_seconds?: number } 
  * without hue.
  */
 function heatClass(change: number | null): string {
-  if (change === null) return 'bg-white/[0.06]';
+  if (change === null) return 'bg-ink-2';
   if (change >= 5) return 'bg-up/80';
   if (change >= 2) return 'bg-up/60';
   if (change > 0) return 'bg-up/40';
   if (change <= -5) return 'bg-down/80';
   if (change <= -2) return 'bg-down/60';
   if (change < 0) return 'bg-down/40';
-  return 'bg-white/10'; // exactly flat
+  return 'bg-line'; // exactly flat
 }
 
 function SectionHeading({ title, hint }: { title: string; hint?: string }) {
   return (
     <div className="mb-3 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-      <h2 className="text-sm font-semibold font-mono uppercase tracking-wider text-textSecondary">{title}</h2>
+      <h2 className="text-sm font-semibold text-textSecondary">{title}</h2>
       {hint && <span className="text-xs text-textMuted">{hint}</span>}
     </div>
   );
@@ -81,7 +81,7 @@ function MoverList({ title, accent, items }: {
             <Link
               key={c.symbol}
               href={`/s/${encodeURIComponent(c.symbol)}`}
-              className="flex items-center justify-between gap-3 rounded p-2 transition-colors hover:bg-white/5 focus-visible:ring-1 focus-visible:ring-accentCyan/50"
+              className="flex items-center justify-between gap-3 rounded p-2 transition-colors hover:bg-ink-2 focus-visible:ring-1 focus-visible:ring-accentCyan/50"
             >
               <div className="min-w-0">
                 <div className="ticker text-textPrimary">{c.symbol}</div>
@@ -224,7 +224,7 @@ export default function MarketsPage() {
                     'inline-flex min-h-9 items-center rounded-lg border px-3 text-xs font-medium transition-colors duration-150',
                     m.id === market
                       ? 'border-accentGreen/40 bg-accentGreen/10 text-accentGreen'
-                      : 'border-borderSubtle text-textSecondary hover:bg-white/5 hover:text-textPrimary'
+                      : 'border-borderSubtle text-textSecondary hover:bg-ink-2 hover:text-textPrimary'
                   )}
                 >
                   {m.label}
@@ -237,7 +237,7 @@ export default function MarketsPage() {
           </div>
 
           {market === 'bonds' && (
-            <p className="mb-5 rounded-lg border border-borderSubtle bg-white/[0.03] px-3 py-2 text-xs text-textMuted">
+            <p className="mb-5 rounded-lg border border-borderSubtle bg-ink-2 px-3 py-2 text-xs text-textMuted">
               US-listed bond ETFs stand in here. The Indian G-Sec series has no reliable keyless source yet (PRD A11).
             </p>
           )}
@@ -246,12 +246,12 @@ export default function MarketsPage() {
             <div className="space-y-8">
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
                 {Array.from({ length: 16 }).map((_, i) => (
-                  <div key={i} className="h-[92px] rounded-md bg-white/5 motion-safe:animate-pulse" />
+                  <div key={i} className="h-[92px] rounded-md bg-ink-2 skeleton" />
                 ))}
               </div>
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                <div className="glass-panel h-64 motion-safe:animate-pulse" />
-                <div className="glass-panel h-64 motion-safe:animate-pulse" />
+                <div className="glass-panel h-64 skeleton" />
+                <div className="glass-panel h-64 skeleton" />
               </div>
             </div>
           ) : error ? (
@@ -260,7 +260,7 @@ export default function MarketsPage() {
               <p className="max-w-md text-sm leading-relaxed text-textSecondary">{error}</p>
               <button
                 onClick={() => { setError(''); setRetryNonce((n) => n + 1); }}
-                className="mt-1 flex items-center gap-1.5 rounded-lg border border-borderSubtle px-3 py-1.5 text-xs font-medium text-textSecondary transition-colors hover:bg-white/5 hover:text-textPrimary"
+                className="mt-1 flex items-center gap-1.5 rounded-lg border border-borderSubtle px-3 py-1.5 text-xs font-medium text-textSecondary transition-colors hover:bg-ink-2 hover:text-textPrimary"
               >
                 <RotateCw size={12} /> Retry
               </button>
@@ -276,7 +276,7 @@ export default function MarketsPage() {
                 // Belt-and-braces: outage payloads aren't cached, but drop any
                 // entry for this market anyway before refetching.
                 onClick={() => { delete cacheRef.current[market]; setRetryNonce((n) => n + 1); }}
-                className="mt-1 flex items-center gap-1.5 rounded-lg border border-borderSubtle px-3 py-1.5 text-xs font-medium text-textSecondary transition-colors hover:bg-white/5 hover:text-textPrimary"
+                className="mt-1 flex items-center gap-1.5 rounded-lg border border-borderSubtle px-3 py-1.5 text-xs font-medium text-textSecondary transition-colors hover:bg-ink-2 hover:text-textPrimary"
               >
                 <RotateCw size={12} /> Retry
               </button>
@@ -307,7 +307,7 @@ export default function MarketsPage() {
                         </div>
                         <div className="text-xs font-bold tabular text-white/80">
                           {c.change_1d_pct === null
-                            ? '—'
+                            ? '–'
                             : `${c.change_1d_pct >= 0 ? '+' : ''}${c.change_1d_pct.toFixed(2)}%`}
                         </div>
                       </div>
@@ -331,23 +331,23 @@ export default function MarketsPage() {
                   Two places to find the same setups meant neither felt
                   authoritative. Heat is what this page is for, so the setups
                   now live only on Ideas, and what stays here is the count plus
-                  the door — enough to know the setups exist and which tags
+                  the door: enough to know the setups exist and which tags
                   fired, without re-rendering the grid. */}
               <section>
                 <Link
                   href="/markets/ideas"
-                  className="group glass-panel flex flex-wrap items-center justify-between gap-x-6 gap-y-3 p-5 transition-colors hover:border-white/20"
+                  className="group glass-panel flex flex-wrap items-center justify-between gap-x-6 gap-y-3 p-5 transition-colors hover:border-line-strong"
                 >
                   <div className="min-w-0">
                     <h2 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
                       Horizon setups
-                      <span className="tabular rounded bg-white/[0.06] px-1.5 py-0.5 text-[11px] text-textSecondary">
+                      <span className="tabular rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textSecondary">
                         {tagged.length}
                       </span>
                     </h2>
                     <p className="mt-1 max-w-xl text-xs leading-relaxed text-textMuted">
                       {tagged.length === 0
-                        ? `Nothing tagged in ${data?.universe_label ?? 'this market'} right now — tags re-evaluate as cached data refreshes (~30 min).`
+                        ? `Nothing tagged in ${data?.universe_label ?? 'this market'} right now. Tags re-evaluate as cached data refreshes, about every 30 minutes.`
                         : `${tagged.length} names in ${data?.universe_label ?? 'this market'} carry a descriptive tag with the numbers that fired. Candidates, not calls.`}
                     </p>
                   </div>
@@ -360,7 +360,7 @@ export default function MarketsPage() {
                           <span
                             key={id}
                             className={clsx(
-                              'rounded border px-2 py-0.5 text-[11px] font-mono uppercase tracking-wider',
+                              'rounded border px-2 py-0.5 text-caption',
                               TAG_STYLES[id].chip,
                             )}
                           >
@@ -368,7 +368,7 @@ export default function MarketsPage() {
                           </span>
                         ))}
                         {presentTags.length > 4 && (
-                          <span className="tabular text-[11px] text-textMuted">
+                          <span className="tabular text-caption text-textMuted">
                             +{presentTags.length - 4}
                           </span>
                         )}

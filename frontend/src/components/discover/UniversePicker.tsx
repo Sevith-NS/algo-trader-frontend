@@ -46,14 +46,14 @@ export default function UniversePicker({
 
   return (
     <div className="flex items-center gap-2">
-      <label htmlFor={id} className="text-[10px] font-mono uppercase tracking-wider text-textMuted">
+      <label htmlFor={id} className="text-caption text-textMuted">
         Universe
       </label>
       <select
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="min-w-[190px] rounded-lg border border-borderSubtle bg-black/30 px-3 py-1.5 text-sm text-textPrimary transition-colors focus:border-accentCyan/50"
+        className="min-w-[190px] rounded-lg border border-borderSubtle bg-ink-0 px-3 py-1.5 text-sm text-textPrimary transition-colors focus:border-accentCyan/50"
       >
         {groups.map(({ group, items }) => (
           <optgroup key={group} label={group}>
@@ -61,7 +61,7 @@ export default function UniversePicker({
               <option key={u.id} value={u.id} disabled={u.available === false}>
                 {u.label}
                 {u.available === false
-                  ? ' — unavailable'
+                  ? ' (unavailable)'
                   : u.count > 0 && ` (${u.count})`}
               </option>
             ))}

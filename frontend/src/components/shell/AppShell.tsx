@@ -90,7 +90,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         {children}
       </main>
 
-      <footer className="mx-auto hidden w-full max-w-[1440px] flex-wrap items-center justify-between gap-2 border-t border-line px-8 py-4 text-caption text-fg-3 lg:flex">
+      {/* Links sit left: the bottom-right corner belongs to the Ask Flint button. */}
+      <footer className="mx-auto hidden w-full max-w-[1440px] flex-wrap items-center gap-x-6 gap-y-2 border-t border-line px-8 py-4 text-caption text-fg-3 lg:flex">
         <span>Paper trading. Educational, not investment advice.</span>
         <span className="flex gap-4">
           <Link href="/legal/privacy" className="hover:text-fg-2">Privacy</Link>

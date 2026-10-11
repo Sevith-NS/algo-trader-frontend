@@ -69,7 +69,10 @@ module.exports = {
       },
       fontFamily: {
         sans: ['"Helvetica Neue"', "Helvetica", "Arial", "sans-serif"],
-        display: ["Coolvetica", '"Helvetica Neue"', "Helvetica", "Arial", "sans-serif"],
+        // Same stack as the UI. Coolvetica was dropped: its free licence
+        // excludes web embedding, and relying on a local install rendered a
+        // faux bold on machines that had it and Arial on those that didn't.
+        display: ['"Helvetica Neue"', "Helvetica", "Arial", "sans-serif"],
         // No monospace face in v2: numbers use tabular figures of the UI face.
         mono: ['"Helvetica Neue"', "Helvetica", "Arial", "sans-serif"],
       },

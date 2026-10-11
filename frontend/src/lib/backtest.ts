@@ -114,16 +114,16 @@ export const streamWalkForward = (
 
 export const pct = (v: number | null | undefined, digits = 2) =>
   v === null || v === undefined || !Number.isFinite(v)
-    ? '—'
+    ? '–'
     : `${v >= 0 ? '' : ''}${(v * 100).toFixed(digits)}%`;
 
 export const signedPct = (v: number | null | undefined, digits = 2) =>
   v === null || v === undefined || !Number.isFinite(v)
-    ? '—'
+    ? '–'
     : `${v > 0 ? '+' : ''}${(v * 100).toFixed(digits)}%`;
 
 export const num = (v: number | null | undefined, digits = 2) =>
-  v === null || v === undefined || !Number.isFinite(v) ? '—' : v.toFixed(digits);
+  v === null || v === undefined || !Number.isFinite(v) ? '–' : v.toFixed(digits);
 
 /** An infinite profit factor is a real result (no losing trades), not an error. */
 export const ratio = (v: number | null | undefined, digits = 2) =>
@@ -131,13 +131,13 @@ export const ratio = (v: number | null | undefined, digits = 2) =>
 
 export const money = (v: number | null | undefined, currency = 'USD') =>
   v === null || v === undefined || !Number.isFinite(v)
-    ? '—'
+    ? '–'
     : new Intl.NumberFormat('en-US', {
         style: 'currency', currency, maximumFractionDigits: 0,
       }).format(v);
 
 export const shortDate = (iso: string | null | undefined) =>
-  iso ? iso.slice(0, 10) : '—';
+  iso ? iso.slice(0, 10) : '–';
 
 /** Green above zero, red below, muted at exactly nothing. */
 export const toneFor = (v: number | null | undefined) =>
@@ -146,14 +146,14 @@ export const toneFor = (v: number | null | undefined) =>
     : v > 0 ? 'text-accentGreen' : v < 0 ? 'text-accentRed' : 'text-textSecondary';
 
 export const VERDICT_COLOR: Record<string, string> = {
-  good: '#34D399',
-  warn: '#FBBF24',
-  bad: '#F87171',
+  good: '#2FBF71',
+  warn: '#D9A23A',
+  bad: '#E5484D',
 };
 
 /** Timeframes the backtester accepts, with the history each one reaches. */
 export const BACKTEST_INTERVALS = [
-  { id: '1d', label: '1D', coverage: 'Full history — decades' },
+  { id: '1d', label: '1D', coverage: 'Full history, decades' },
   { id: '1wk', label: '1W', coverage: 'Full history, slower signals' },
   { id: '1mo', label: '1M', coverage: 'Full history, long horizon' },
   { id: '60m', label: '1H', coverage: 'Last ~2 years' },

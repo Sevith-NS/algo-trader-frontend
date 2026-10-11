@@ -2,7 +2,7 @@
 
 export const fmtPrice = (val: number | null | undefined, currency = 'USD') =>
   val === null || val === undefined
-    ? '—'
+    ? '–'
     : new Intl.NumberFormat(currency === 'INR' ? 'en-IN' : 'en-US', {
         style: 'currency',
         currency,
@@ -10,7 +10,7 @@ export const fmtPrice = (val: number | null | undefined, currency = 'USD') =>
 
 /** Large statement figures: ₹ Cr / L Cr for INR, $B/$M elsewhere. */
 export const fmtBig = (val: number | null | undefined, currency = 'USD') => {
-  if (val === null || val === undefined) return '—';
+  if (val === null || val === undefined) return '–';
   const abs = Math.abs(val);
   if (currency === 'INR') {
     if (abs >= 1e12) return `₹${(val / 1e12).toFixed(2)} L Cr`;

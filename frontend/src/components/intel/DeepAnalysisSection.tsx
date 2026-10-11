@@ -26,15 +26,15 @@ function PillarBar({ label, value }: { label: string; value: number }) {
   const pct = Math.min(Math.abs(value), 1) * 50;
   return (
     <div className="flex items-center gap-2 py-0.5">
-      <span className="w-24 shrink-0 text-[10px] capitalize text-textMuted">{label.replace('_', ' ')}</span>
-      <div className="relative h-1.5 flex-1 rounded-full bg-white/5">
-        <div className="absolute left-1/2 top-0 h-full w-px bg-white/20" />
+      <span className="w-24 shrink-0 text-caption capitalize text-textMuted">{label.replace('_', ' ')}</span>
+      <div className="relative h-1.5 flex-1 bg-ink-2">
+        <div className="absolute left-1/2 top-0 h-full w-px bg-line-strong" />
         <div
-          className={clsx('absolute top-0 h-full rounded-full', value >= 0 ? 'bg-accentGreen' : 'bg-accentRed')}
+          className={clsx('absolute top-0 h-full', value >= 0 ? 'bg-accentGreen' : 'bg-accentRed')}
           style={value >= 0 ? { left: '50%', width: `${pct}%` } : { right: '50%', width: `${pct}%` }}
         />
       </div>
-      <span className={clsx('w-10 text-right text-[10px] tabular', value >= 0 ? 'text-accentGreen' : 'text-accentRed')}>
+      <span className={clsx('w-10 text-right text-caption tabular', value >= 0 ? 'text-accentGreen' : 'text-accentRed')}>
         {value >= 0 ? '+' : ''}{value.toFixed(2)}
       </span>
     </div>
@@ -44,14 +44,14 @@ function PillarBar({ label, value }: { label: string; value: number }) {
 function VerdictChip({ horizon, verdict }: { horizon: string; verdict: HorizonVerdict }) {
   const color = callColor(verdict.call);
   return (
-    <div className="min-w-0 flex-1 rounded-xl border border-borderSubtle bg-white/[0.02] p-3">
-      <div className="text-[10px] font-mono uppercase tracking-wider text-textMuted">{horizon}</div>
+    <div className="min-w-0 flex-1 rounded-xl border border-borderSubtle bg-ink-2 p-3">
+      <div className="text-caption text-textMuted">{horizon}</div>
       <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-        <span className="text-xl font-black tracking-tight" style={{ color }}>{verdict.call}</span>
-        <span className="whitespace-nowrap text-[11px] tabular text-textSecondary">conviction {verdict.conviction_10}/10</span>
+        <span className="text-xl font-bold tracking-tight" style={{ color }}>{verdict.call}</span>
+        <span className="whitespace-nowrap text-caption tabular text-textSecondary">conviction {verdict.conviction_10}/10</span>
       </div>
-      <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/5">
-        <div className="h-full rounded-full" style={{ width: `${verdict.conviction_10 * 10}%`, background: color }} />
+      <div className="mt-1.5 h-1.5 w-full overflow-hidden bg-ink-2">
+        <div className="h-full" style={{ width: `${verdict.conviction_10 * 10}%`, background: color }} />
       </div>
     </div>
   );
@@ -92,7 +92,7 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
   if (loading && !data) {
     return (
       <div className="glass-panel flex items-center gap-3 p-5">
-        <Hourglass size={16} className="animate-pulse-soft text-accentPurple" />
+        <Hourglass size={16} className="text-accentPurple" />
         <p className="text-sm text-textSecondary">
           Running deep analysis for {symbol}: statements, valuation history, phase &amp; news sweep…
         </p>
@@ -123,13 +123,13 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
           <h3 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
             <Microscope size={15} className="text-accentPurple" /> Analyst Verdict
-            <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide text-textMuted">
+            <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
               fundamentals · valuation · technicals · news
             </span>
           </h3>
           {hasTech && (
             <span
-              className="rounded-md px-2 py-1 text-[11px] font-semibold font-mono uppercase tracking-wide"
+              className="rounded-md px-2 py-1 text-caption font-semibold"
               style={{ color: pColor, background: `${pColor}1a` }}
             >
               {PHASE_LABELS[tech.phase] || tech.phase}
@@ -144,7 +144,7 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
             <VerdictChip horizon="Short term (weeks)" verdict={verdict.short_term} />
           </div>
           <div>
-            <h4 className="mb-1 text-[11px] font-semibold font-mono uppercase tracking-wider text-textMuted">Pillar attribution</h4>
+            <h4 className="mb-1 text-caption font-semibold text-textMuted">Pillar attribution</h4>
             {Object.entries(verdict.pillars).map(([k, v]) => (
               <PillarBar key={k} label={k} value={v as number} />
             ))}
@@ -153,34 +153,34 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
 
         <div className="mt-4 grid grid-cols-2 gap-3 border-t border-borderSubtle pt-3 sm:grid-cols-4">
           <div>
-            <div className="text-[10px] font-mono uppercase tracking-wider text-textMuted">Gets interesting at</div>
+            <div className="text-caption text-textMuted">Gets interesting at</div>
             <div className="text-base font-bold tabular text-accentCyan">
-              {verdict.interesting_price ? fmtPrice(verdict.interesting_price, currency) : '—'}
+              {verdict.interesting_price ? fmtPrice(verdict.interesting_price, currency) : '–'}
             </div>
           </div>
           {hasTech && (
             <>
               <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-textMuted">Support / Resistance</div>
+                <div className="text-caption text-textMuted">Support / Resistance</div>
                 <div className="text-sm font-semibold tabular text-textPrimary">
                   {fmtPrice(tech.support?.near, currency)} · {fmtPrice(tech.resistance?.near, currency)}
                 </div>
               </div>
               <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-textMuted">Volume</div>
+                <div className="text-caption text-textMuted">Volume</div>
                 <div className={clsx('text-sm font-semibold', tech.volume_read === 'confirming' ? 'text-accentGreen' : 'text-accentAmber')}>
                   {tech.volume_read}
                 </div>
               </div>
               <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-textMuted">52-week position</div>
+                <div className="text-caption text-textMuted">52-week position</div>
                 <div className="text-sm font-semibold tabular text-textPrimary">{Math.round((tech.pos_52w ?? 0) * 100)}%</div>
               </div>
             </>
           )}
         </div>
         {hasTech && (
-          <p className="mt-2 text-[11px] leading-relaxed text-textSecondary">{tech.phase_note} {tech.volume_note}</p>
+          <p className="mt-2 text-caption leading-relaxed text-textSecondary">{tech.phase_note} {tech.volume_note}</p>
         )}
       </div>
 
@@ -192,7 +192,7 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <h3 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
             <Sparkles size={15} className="text-accentCyan" /> AI Deep Dive
-            <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide text-textMuted">
+            <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
               figures from computed data · context from model knowledge
             </span>
           </h3>
@@ -258,16 +258,16 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span
-                        className="rounded-md px-2.5 py-0.5 text-lg font-black tracking-tight"
+                        className="rounded-md px-2.5 py-0.5 text-lg font-bold tracking-tight"
                         style={{ color: aiColor, background: `${aiColor}1a` }}
                       >
                         {aiCall}
                       </span>
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-textMuted">
+                      <span className="text-caption text-textMuted">
                         AI call · long horizon
                       </span>
                       {verdict?.long_term?.call && (
-                        <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-textMuted">
+                        <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
                           vs computed:{' '}
                           <span className="font-semibold" style={{ color: callColor(verdict.long_term.call) }}>
                             {verdict.long_term.call}
@@ -287,7 +287,7 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   {sections.map((s, i) => (
                     <div key={i}>
-                      <h4 className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold font-mono uppercase tracking-wider text-textMuted">
+                      <h4 className="mb-1 flex items-center gap-1.5 text-caption font-semibold text-textMuted">
                         {s.icon} {s.title}
                       </h4>
                       <p className="text-xs leading-relaxed text-textSecondary">{s.text}</p>
@@ -301,7 +301,7 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   {bull && (
                     <div className="rounded-xl border border-accentGreen/25 bg-up/5 p-4">
-                      <h4 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold font-mono uppercase tracking-wider text-accentGreen">
+                      <h4 className="mb-1.5 flex items-center gap-1.5 text-caption font-semibold text-accentGreen">
                         <TrendingUp size={12} /> Bull case
                       </h4>
                       <p className="text-xs leading-relaxed text-textSecondary">{bull}</p>
@@ -309,7 +309,7 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
                   )}
                   {bear && (
                     <div className="rounded-xl border border-accentRed/25 bg-down/5 p-4">
-                      <h4 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold font-mono uppercase tracking-wider text-accentRed">
+                      <h4 className="mb-1.5 flex items-center gap-1.5 text-caption font-semibold text-accentRed">
                         <TrendingDown size={12} /> Bear case
                       </h4>
                       <p className="text-xs leading-relaxed text-textSecondary">{bear}</p>
@@ -320,7 +320,7 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
 
               {valuation && (
                 <div>
-                  <h4 className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold font-mono uppercase tracking-wider text-textMuted">
+                  <h4 className="mb-1 flex items-center gap-1.5 text-caption font-semibold text-textMuted">
                     <Calculator size={13} /> Valuation
                   </h4>
                   <p className="text-xs leading-relaxed text-textSecondary">{valuation}</p>
@@ -330,7 +330,7 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
           );
         })()}
 
-        <p className="mt-4 border-t border-borderSubtle pt-2 text-[10px] leading-relaxed text-textMuted">
+        <p className="mt-4 border-t border-borderSubtle pt-2 text-caption leading-relaxed text-textMuted">
           Figures are grounded in the computed data above. Qualitative context, including business model,
           competitors and catalysts, comes from the model&apos;s general knowledge of the company:
           verify it independently. Educational analysis on a paper-trading platform, not

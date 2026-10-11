@@ -10,6 +10,7 @@
  * pixel projection is supplied per frame by a `Projector`.
  */
 import type { Time } from 'lightweight-charts';
+import { readStorage, removeStorage, writeStorage } from './browser';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -259,9 +260,10 @@ export function sanitizeDrawings(raw: unknown): Drawing[] {
   return out;
 }
 
+/** Drawings belong to the signed-in user (see lib/browser for the namespacing). */
 export function loadDrawings(key: string): Drawing[] {
   try {
-    const raw = window.localStorage.getItem(key);
+    const raw = readStorage(key);
     return raw ? sanitizeDrawings(JSON.parse(raw)) : [];
   } catch {
     return [];
@@ -269,10 +271,8 @@ export function loadDrawings(key: string): Drawing[] {
 }
 
 export function saveDrawings(key: string, list: Drawing[]): void {
-  try {
-    if (list.length === 0) window.localStorage.removeItem(key);
-    else window.localStorage.setItem(key, JSON.stringify(list));
-  } catch { /* storage blocked or full — drawings just won't survive reload */ }
+  if (list.length === 0) removeStorage(key);
+  else writeStorage(key, JSON.stringify(list));
 }
 
 // ---------------------------------------------------------------------------

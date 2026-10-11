@@ -34,19 +34,67 @@ export function useNow(intervalMs = 60_000): Date | null {
   return now;
 }
 
-/** Read a localStorage key safely; storage can be missing or blocked. */
+/*
+ * Browser storage is per user. Several people can sign in on one browser, so
+ * every key Flint stores is namespaced by the signed-in Clerk user id (set by
+ * <UserStorage> before the app renders), and entries left by anyone else are
+ * removed on sign-in. Nothing here is a secret: it is recent searches, chart
+ * drawings and display preferences, all of which still must not leak.
+ */
+let storageUser: string | null = null;
+
+/** Called by <UserStorage> while rendering, so children read the right namespace. */
+export function setStorageUser(userId: string) {
+  if (typeof window !== 'undefined') storageUser = userId;
+}
+
+const PREFIX = 'flint:u:';
+const scoped = (key: string) => (storageUser ? `${PREFIX}${storageUser}:${key}` : null);
+
+/** Read a stored value for the signed-in user; storage can be missing or blocked. */
 export function readStorage(key: string): string | null {
+  const k = scoped(key);
+  if (!k) return null;
   try {
-    return window.localStorage.getItem(key);
+    return window.localStorage.getItem(k);
   } catch {
     return null;
   }
 }
 
 export function writeStorage(key: string, value: string) {
+  const k = scoped(key);
+  if (!k) return;
   try {
-    window.localStorage.setItem(key, value);
+    window.localStorage.setItem(k, value);
   } catch {
-    /* preference only */
+    /* convenience only */
+  }
+}
+
+export function removeStorage(key: string) {
+  const k = scoped(key);
+  if (!k) return;
+  try {
+    window.localStorage.removeItem(k);
+  } catch {
+    /* convenience only */
+  }
+}
+
+/** Drop every Flint entry that is not the signed-in user's, including pre-scoping keys. */
+export function purgeOtherUsers() {
+  if (!storageUser) return;
+  const own = `${PREFIX}${storageUser}:`;
+  try {
+    const store = window.localStorage;
+    const stale: string[] = [];
+    for (let i = 0; i < store.length; i++) {
+      const k = store.key(i);
+      if (k && (k.startsWith('flint') || k.startsWith(PREFIX)) && !k.startsWith(own)) stale.push(k);
+    }
+    stale.forEach((k) => store.removeItem(k));
+  } catch {
+    /* storage blocked: nothing was stored either */
   }
 }

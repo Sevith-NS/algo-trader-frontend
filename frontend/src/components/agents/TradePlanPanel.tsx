@@ -13,7 +13,7 @@ function Level({ label, value, currency, color }: {
     <div>
       <MicroLabel>{label}</MicroLabel>
       <div className="mt-0.5 text-sm font-bold tabular" style={color ? { color } : undefined}>
-        {value === undefined ? '—' : fmtPrice(value, currency)}
+        {value === undefined ? '–' : fmtPrice(value, currency)}
       </div>
     </div>
   );
@@ -36,7 +36,7 @@ export default function TradePlanPanel({
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
         <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <Briefcase size={15} style={{ color }} /> Trade Plan
-          <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide text-textMuted">
+          <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
             levels from the quant engine, not the model
           </span>
         </h4>
@@ -56,7 +56,7 @@ export default function TradePlanPanel({
             <Level label="Target 1" value={levels.target_1} currency={currency} color="#2FBF71" />
             <Level label="Target 2" value={levels.target_2} currency={currency} color="#2FBF71" />
           </div>
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 border-t border-borderSubtle pt-3 text-[11px] text-textMuted">
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 border-t border-borderSubtle pt-3 text-caption text-textMuted">
             <span><span className="tabular text-textSecondary">{levels.r_multiple_1.toFixed(2)}</span>R to target 1</span>
             <span><span className="tabular text-textSecondary">{(levels.fill_probability * 100).toFixed(0)}%</span> fill in 5d</span>
             <span><span className="tabular text-textSecondary">{(levels.win_probability * 100).toFixed(0)}%</span> hit before stop</span>
@@ -66,7 +66,7 @@ export default function TradePlanPanel({
         </>
       ) : (
         <p className="text-[12px] text-textMuted">
-          No solved levels for this symbol — the trader worked without an executable plan.
+          No solved levels for this symbol, so the trader worked without an executable plan.
         </p>
       )}
 

@@ -12,6 +12,7 @@ import type {
 import { streamDesk, DeskRateLimited } from '../../lib/agentsDesk';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { errorMessage } from '../../lib/api';
+import { formatMoney } from '../../lib/format';
 import AnalystCards from './AnalystCards';
 import DebateTranscript from './DebateTranscript';
 import ThesisPanel from './ThesisPanel';
@@ -52,7 +53,7 @@ function StageRail({ stage, message, running }: {
 }) {
   const currentIndex = stage ? STAGE_ORDER.indexOf(stage) : -1;
   return (
-    <div className="rounded-xl border border-borderSubtle bg-white/[0.02] p-4">
+    <div className="rounded-xl border border-borderSubtle bg-ink-2 p-4">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
         {STAGE_ORDER.map((key, i) => {
           const done = i < currentIndex || (!running && currentIndex === STAGE_ORDER.length - 1 && i <= currentIndex);
@@ -61,14 +62,14 @@ function StageRail({ stage, message, running }: {
             <div key={key} className="flex items-center gap-2">
               <span
                 className={clsx(
-                  'flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-[10px] font-mono uppercase tracking-wide transition-colors',
+                  'flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-caption transition-colors',
                   active ? 'bg-accentPurple/15 text-accentPurple'
                     : done ? 'text-accentGreen'
                     : 'text-textMuted',
                 )}
               >
                 {done ? <Check size={10} />
-                  : active ? <CircleDot size={10} className="animate-pulse-soft" />
+                  : active ? <CircleDot size={10} className="" />
                   : <CircleDot size={10} className="opacity-40" />}
                 {STAGE_LABELS[key]}
               </span>
@@ -107,7 +108,7 @@ export default function TradingDeskSection({
   const [showJournal, setShowJournal] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
-  const { balance, positions, placeOrder } = usePortfolio();
+  const { balance, positions, placeOrder, account } = usePortfolio();
 
   // A run is tied to the symbol it was opened on — switching tickers has to
   // clear it, or a later event would land in the wrong stock's transcript.
@@ -204,7 +205,7 @@ export default function TradingDeskSection({
           <div className="min-w-0">
             <h3 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-textPrimary">
               <Building2 size={15} className="text-accentPurple" /> Trading Desk
-              <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide text-textMuted">
+              <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
                 analysts · debate · risk · sign-off
               </span>
             </h3>
@@ -227,7 +228,7 @@ export default function TradingDeskSection({
                     onClick={() => setRounds(option)}
                     disabled={running}
                     className={clsx(
-                      'min-h-8 px-2.5 font-mono text-[11px] font-semibold tabular transition-colors disabled:opacity-50',
+                      'min-h-8 px-2.5 text-caption font-semibold tabular transition-colors disabled:opacity-50',
                       rounds === option
                         ? 'bg-accentPurple/15 text-accentPurple'
                         : 'text-textMuted hover:text-textSecondary',
@@ -259,7 +260,7 @@ export default function TradingDeskSection({
 
         {/* ---- Live context strip ---- */}
         {context && (
-          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-borderSubtle pt-3 text-[11px] text-textMuted">
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-borderSubtle pt-3 text-caption text-textMuted">
             <span>
               <span className="ticker text-textSecondary">{context.symbol}</span>
               {context.company !== context.symbol && ` · ${context.company}`}
@@ -277,7 +278,7 @@ export default function TradingDeskSection({
               book{' '}
               <span className="tabular text-textSecondary">
                 {context.portfolio.has_book
-                  ? `$${context.portfolio.total_equity.toLocaleString()}`
+                  ? formatMoney(context.portfolio.total_equity, account?.currency, 0)
                   : 'not connected'}
               </span>
             </span>
@@ -316,7 +317,7 @@ export default function TradingDeskSection({
           <div className="min-w-0">
             <p className="text-[13px] leading-relaxed text-textSecondary">{state.failover}</p>
             {state.fallbackCalls > 0 && (
-              <p className="mt-1 text-[11px] text-textMuted">
+              <p className="mt-1 text-caption text-textMuted">
                 <span className="tabular">{state.fallbackCalls}</span> of this run&apos;s seats were
                 served by the fallback.
               </p>
@@ -370,7 +371,7 @@ export default function TradingDeskSection({
           className="glass-panel flex w-full items-center justify-center gap-2 p-4 text-xs font-semibold text-textSecondary transition-colors hover:text-textPrimary"
         >
           <BookOpen size={14} className="text-accentBlue" />
-          Show the decision journal — every past call, scored on alpha vs the S&amp;P
+          Show the decision journal: every past call, scored on alpha vs the S&amp;P
         </button>
       )}
     </div>

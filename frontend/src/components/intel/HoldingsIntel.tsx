@@ -34,23 +34,23 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <BrainCircuit size={15} className="text-accentPurple" /> Holdings Intelligence
-          <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide text-textMuted">
+          <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
             news sweep · fundamentals · phase · verdict
           </span>
         </h2>
         <button
           onClick={reload}
           disabled={loading}
-          className="flex items-center gap-1.5 rounded-lg border border-borderSubtle px-3 py-1.5 text-[11px] text-textSecondary transition-colors hover:bg-white/[0.03] hover:text-textPrimary disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-lg border border-borderSubtle px-3 py-1.5 text-caption text-textSecondary transition-colors hover:bg-ink-2 hover:text-textPrimary disabled:opacity-50"
         >
-          <RefreshCw size={11} className={clsx(loading && 'animate-spin')} /> Refresh
+          <RefreshCw size={11} /> Refresh
         </button>
       </div>
 
       {loading && data.length === 0 ? (
         <p className="text-sm text-textSecondary">
-          Sweeping news sources and statements for {positions.length} holding{positions.length > 1 ? 's' : ''} —
-          the first run takes ~10s per symbol, cached after that…
+          Sweeping news sources and statements for {positions.length} holding{positions.length > 1 ? 's' : ''}.
+          The first run takes about 10 seconds per symbol; later runs are cached.
         </p>
       ) : error ? (
         <p className="text-sm text-accentRed">{error}</p>
@@ -59,7 +59,7 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
           {data.map((h) => {
             if ('error' in h) {
               return (
-                <div key={h.symbol} className="rounded-xl border border-borderSubtle bg-white/[0.02] p-4">
+                <div key={h.symbol} className="rounded-xl border border-borderSubtle bg-ink-2 p-4">
                   <div className="ticker text-textPrimary">{h.symbol}</div>
                   <p className="mt-1 text-xs text-textMuted">Intel unavailable: {h.error}</p>
                 </div>
@@ -70,15 +70,15 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
             const lt = h.verdict?.long_term;
             const st = h.verdict?.short_term;
             return (
-              <div key={h.symbol} className="flex flex-col rounded-xl border border-borderSubtle bg-white/[0.02] p-4">
+              <div key={h.symbol} className="flex flex-col rounded-xl border border-borderSubtle bg-ink-2 p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="ticker text-textPrimary">{h.symbol}</div>
-                    <div className="truncate text-[10px] text-textMuted">{h.company}</div>
+                    <div className="truncate text-caption text-textMuted">{h.company}</div>
                   </div>
                   {h.health_grade && (
                     <span
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-black"
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold"
                       style={{ color: gradeColor(h.health_grade), background: `${gradeColor(h.health_grade)}1a` }}
                       title={`Fundamental health ${h.health_score}/100`}
                     >
@@ -88,18 +88,18 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
                 </div>
 
                 <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                  <span className="rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase" style={{ color: sColor, background: `${sColor}1a` }}>
+                  <span className="rounded-md px-1.5 py-0.5 text-caption font-bold" style={{ color: sColor, background: `${sColor}1a` }}>
                     {h.news_stance} {h.news_rating}/100
                   </span>
                   {h.phase && (
-                    <span className="rounded-md px-1.5 py-0.5 text-[10px] font-semibold" style={{ color: pColor, background: `${pColor}1a` }}>
+                    <span className="rounded-md px-1.5 py-0.5 text-caption font-semibold" style={{ color: pColor, background: `${pColor}1a` }}>
                       {(PHASE_LABELS[h.phase] || h.phase).split(' ·')[0]}
                     </span>
                   )}
                   {h.valuation_premium_pct !== null && h.valuation_premium_pct !== undefined && (
                     <span className={clsx(
-                      'rounded-md px-1.5 py-0.5 text-[10px] font-semibold tabular',
-                      h.valuation_premium_pct > 5 ? 'bg-down/10 text-accentRed' : h.valuation_premium_pct < -5 ? 'bg-up/10 text-accentGreen' : 'bg-white/5 text-textSecondary'
+                      'rounded-md px-1.5 py-0.5 text-caption font-semibold tabular',
+                      h.valuation_premium_pct > 5 ? 'bg-down/10 text-accentRed' : h.valuation_premium_pct < -5 ? 'bg-up/10 text-accentGreen' : 'bg-ink-2 text-textSecondary'
                     )}>
                       P/E {h.valuation_premium_pct > 0 ? '+' : ''}{h.valuation_premium_pct}% vs hist
                     </span>
@@ -109,18 +109,18 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
                 {(lt || st) && (
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     {lt && (
-                      <div className="rounded-lg bg-white/[0.03] p-2">
-                        <div className="text-[9px] font-mono uppercase tracking-wider text-textMuted">Long term</div>
-                        <div className="text-sm font-black" style={{ color: callColor(lt.call) }}>
-                          {lt.call} <span className="text-[10px] font-medium text-textMuted">{lt.conviction_10}/10</span>
+                      <div className="rounded-lg bg-ink-2 p-2">
+                        <div className="text-caption text-textMuted">Long term</div>
+                        <div className="text-sm font-bold" style={{ color: callColor(lt.call) }}>
+                          {lt.call} <span className="text-caption font-medium text-textMuted">{lt.conviction_10}/10</span>
                         </div>
                       </div>
                     )}
                     {st && (
-                      <div className="rounded-lg bg-white/[0.03] p-2">
-                        <div className="text-[9px] font-mono uppercase tracking-wider text-textMuted">Short term</div>
-                        <div className="text-sm font-black" style={{ color: callColor(st.call) }}>
-                          {st.call} <span className="text-[10px] font-medium text-textMuted">{st.conviction_10}/10</span>
+                      <div className="rounded-lg bg-ink-2 p-2">
+                        <div className="text-caption text-textMuted">Short term</div>
+                        <div className="text-sm font-bold" style={{ color: callColor(st.call) }}>
+                          {st.call} <span className="text-caption font-medium text-textMuted">{st.conviction_10}/10</span>
                         </div>
                       </div>
                     )}
@@ -128,7 +128,7 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
                 )}
 
                 {h.top_red_flag && (
-                  <div className="mt-2 flex items-center gap-1.5 text-[10px] text-accentAmber">
+                  <div className="mt-2 flex items-center gap-1.5 text-caption text-accentAmber">
                     <AlertTriangle size={10} className="shrink-0" />
                     <span className="truncate">{h.top_red_flag}{(h.red_flag_count ?? 0) > 1 ? ` +${(h.red_flag_count ?? 0) - 1} more` : ''}</span>
                   </div>
@@ -141,13 +141,13 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
                     rel="noopener noreferrer"
                     className="group mt-2 block border-t border-borderSubtle pt-2"
                   >
-                    <p className="line-clamp-2 text-[11px] leading-snug text-textSecondary transition-colors group-hover:text-textPrimary">
+                    <p className="line-clamp-2 text-caption leading-snug text-textSecondary transition-colors group-hover:text-textPrimary">
                       {h.top_headline.title}
                       <ExternalLink size={9} className="ml-1 inline opacity-0 group-hover:opacity-60" />
                     </p>
                   </a>
                 ) : (
-                  <p className="mt-2 line-clamp-2 border-t border-borderSubtle pt-2 text-[11px] leading-snug text-textSecondary">
+                  <p className="mt-2 line-clamp-2 border-t border-borderSubtle pt-2 text-caption leading-snug text-textSecondary">
                     {h.top_headline.title}
                   </p>
                 ))}
@@ -155,7 +155,7 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
                 <div className="mt-auto pt-3">
                   <Link
                     href={`/s/${encodeURIComponent(h.symbol)}`}
-                    className="text-[11px] font-medium text-accentBlue hover:underline"
+                    className="text-caption font-medium text-accentBlue hover:underline"
                   >
                     Full teardown →
                   </Link>
@@ -166,7 +166,7 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
         </div>
       )}
 
-      <p className="mt-3 border-t border-borderSubtle pt-2 text-[10px] text-textMuted">
+      <p className="mt-3 border-t border-borderSubtle pt-2 text-caption text-textMuted">
         Same engine as the Terminal teardown, batched across your book. Educational paper-trading
         research, not investment advice.
       </p>

@@ -18,7 +18,7 @@
   --amber: #D9A23A;
 
   --font-ui: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-display: Coolvetica, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   /* Legacy names still read by CSS modules and inline styles. */
   --bg-primary: var(--ink-0);
@@ -109,10 +109,14 @@ select {
 ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--control); }
 
-/* One focus treatment everywhere: 2px green ring with a 2px gap. */
-:focus-visible {
-  outline: 2px solid var(--green);
-  outline-offset: 2px;
+/* One focus treatment everywhere: 2px green ring with a 2px gap. In the base
+   layer so a component that shows focus its own way (outline-none plus a
+   visible alternative) can override it. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
 }
 
 /* ------------------------------------------------------------------ data -- */

@@ -163,7 +163,7 @@ Rules: green and red are never the only signal. Every change carries a sign (+/â
 
 | Role | Family | Notes |
 |---|---|---|
-| Display | Coolvetica (self-hosted) | Wordmark, landing headlines, page titles of 32px and up only. The licence must be checked before shipping; fallback is the UI stack at weight 700. |
+| Display | Same UI stack at weight 700 | Wordmark, landing headlines, page titles of 32px and up. Coolvetica was dropped on 2026-10-11: its free licence excludes web embedding (a paid MyFonts webfont licence is required). |
 | UI and body | `"Helvetica Neue", Helvetica, Arial, sans-serif` | System fonts: zero download, crisp. Renders as Helvetica on Apple devices and Arial on Windows and Android. |
 | Numbers | Same stack, `font-variant-numeric: tabular-nums` | Figures align in columns without a monospace font. |
 
@@ -330,6 +330,6 @@ Advanced features will sit behind paid tiers once the core is stable. Planned no
 
 ## 15. Resolved questions (defaults, override any time)
 
-1. **Coolvetica licence.** Confirm web embedding against the Typodermic licence before shipping. If it fails, display uses the UI stack at 700.
+1. **Coolvetica licence.** Resolved 2026-10-11: the free licence excludes website embedding, so Coolvetica is not used. Display type is the UI stack at 700.
 2. **Invites.** Sent by the owner from the Clerk dashboard (restricted sign-up). A public waitlist can come later.
 3. **Starting paper balance.** Chosen in onboarding, defaulting to â‚¹10,00,000 or the $100,000 equivalent in the base currency.

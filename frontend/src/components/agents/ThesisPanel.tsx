@@ -27,7 +27,7 @@ export default function ThesisPanel({ judge }: { judge: JudgeEvent }) {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
         <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <Gavel size={15} style={{ color: stanceColor }} /> Desk Thesis
-          <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide text-textMuted">
+          <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
             research manager
           </span>
         </h4>
@@ -46,8 +46,8 @@ export default function ThesisPanel({ judge }: { judge: JudgeEvent }) {
           <MicroLabel>vs computed engine</MicroLabel>
           <div className="mt-0.5 flex items-center gap-1.5">
             <Chip label={judge.computed_call} color={callColor(judge.computed_call)} />
-            <span className={judge.agrees_with_engine ? 'text-[11px] text-accentGreen' : 'text-[11px] text-accentAmber'}>
-              {judge.agrees_with_engine ? 'agrees' : 'disagrees — read the thesis'}
+            <span className={judge.agrees_with_engine ? 'text-caption text-accentGreen' : 'text-caption text-accentAmber'}>
+              {judge.agrees_with_engine ? 'agrees' : 'disagrees, so read the thesis'}
             </span>
           </div>
         </div>
@@ -73,7 +73,7 @@ export default function ThesisPanel({ judge }: { judge: JudgeEvent }) {
         <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
           {judge.key_risk && (
             <div className="rounded-xl border border-accentAmber/25 bg-accentAmber/[0.06] p-3.5">
-              <h5 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold font-mono uppercase tracking-wider text-accentAmber">
+              <h5 className="mb-1.5 flex items-center gap-1.5 text-caption font-semibold text-accentAmber">
                 <ShieldAlert size={12} /> Key risk
               </h5>
               <p className="text-[12px] leading-relaxed text-textSecondary">{judge.key_risk}</p>
@@ -81,7 +81,7 @@ export default function ThesisPanel({ judge }: { judge: JudgeEvent }) {
           )}
           {judge.invalidation && (
             <div className="rounded-xl border border-accentRed/25 bg-down/[0.06] p-3.5">
-              <h5 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold font-mono uppercase tracking-wider text-accentRed">
+              <h5 className="mb-1.5 flex items-center gap-1.5 text-caption font-semibold text-accentRed">
                 <Ban size={12} /> Thesis is wrong if
               </h5>
               <p className="text-[12px] leading-relaxed text-textSecondary">{judge.invalidation}</p>

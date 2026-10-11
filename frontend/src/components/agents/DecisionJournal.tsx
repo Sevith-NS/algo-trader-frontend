@@ -18,13 +18,13 @@ function Scorecard({ stats }: { stats: JournalStats }) {
     : stats.avg_signed_alpha_pct >= 0 ? '#2FBF71' : '#E5484D';
 
   return (
-    <div className="grid grid-cols-2 gap-4 rounded-xl border border-borderSubtle bg-white/[0.02] p-4 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-4 rounded-xl border border-borderSubtle bg-ink-2 p-4 sm:grid-cols-4">
       <div>
         <MicroLabel>Hit rate</MicroLabel>
         <div className="text-2xl font-bold tabular" style={{ color: hitColor }}>
-          {stats.hit_rate === null ? '—' : `${stats.hit_rate.toFixed(0)}%`}
+          {stats.hit_rate === null ? '–' : `${stats.hit_rate.toFixed(0)}%`}
         </div>
-        <div className="text-[10px] text-textMuted">
+        <div className="text-caption text-textMuted">
           {stats.hits}/{stats.directional} directional calls
         </div>
       </div>
@@ -33,19 +33,19 @@ function Scorecard({ stats }: { stats: JournalStats }) {
         <div className="text-2xl font-bold tabular" style={{ color: alphaColor }}>
           {pct(stats.avg_signed_alpha_pct)}
         </div>
-        <div className="text-[10px] text-textMuted">vs S&amp;P 500, per call</div>
+        <div className="text-caption text-textMuted">vs S&amp;P 500, per call</div>
       </div>
       <div>
         <MicroLabel>Stood aside</MicroLabel>
         <div className="text-2xl font-bold tabular text-textPrimary">{stats.stand_aside}</div>
-        <div className="text-[10px] text-textMuted">
+        <div className="text-caption text-textMuted">
           {stats.dodged} dodged · {stats.missed_moves} missed
         </div>
       </div>
       <div>
         <MicroLabel>Decisions</MicroLabel>
         <div className="text-2xl font-bold tabular text-textPrimary">{stats.total}</div>
-        <div className="text-[10px] text-textMuted">{stats.graded} scored so far</div>
+        <div className="text-caption text-textMuted">{stats.graded} scored so far</div>
       </div>
     </div>
   );
@@ -64,7 +64,7 @@ function Row({ entry, onDelete }: { entry: JournalEntry; onDelete: (id: string) 
       </div>
 
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-textMuted">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-caption text-textMuted">
           <span>{entry.date}</span>
           <span>{relativeDay(outcome?.days_held)}</span>
           <span>conviction <span className="tabular text-textSecondary">{entry.conviction_10}/10</span></span>
@@ -88,9 +88,9 @@ function Row({ entry, onDelete }: { entry: JournalEntry; onDelete: (id: string) 
               <span className="text-sm font-bold tabular" style={{ color: gColor }}>
                 {pct(outcome.alpha_pct)}
               </span>
-              <span className="text-[10px] text-textMuted">alpha</span>
+              <span className="text-caption text-textMuted">alpha</span>
             </div>
-            <div className="mt-0.5 text-[10px] tabular text-textMuted">
+            <div className="mt-0.5 text-caption tabular text-textMuted">
               {pct(outcome.return_pct)} vs SPX {pct(outcome.benchmark_return_pct)}
             </div>
             <div className="mt-1 flex justify-end">
@@ -98,7 +98,7 @@ function Row({ entry, onDelete }: { entry: JournalEntry; onDelete: (id: string) 
             </div>
           </div>
         ) : (
-          <span className="text-[11px] text-textMuted">too fresh to score</span>
+          <span className="text-caption text-textMuted">too fresh to score</span>
         )}
         <button
           onClick={() => onDelete(entry.id)}
@@ -172,7 +172,7 @@ export default function DecisionJournal({
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
         <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <History size={15} className="text-accentBlue" /> Decision Journal
-          <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide text-textMuted">
+          <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
             scored on alpha · feeds the next run
           </span>
         </h4>
@@ -184,9 +184,9 @@ export default function DecisionJournal({
                   key={option}
                   onClick={() => setScope(option)}
                   className={clsx(
-                    'px-2.5 py-1 font-mono text-[10px] uppercase tracking-wide transition-colors',
+                    'px-2.5 py-1 text-caption transition-colors',
                     scope === option
-                      ? 'bg-white/10 text-textPrimary'
+                      ? 'bg-line text-textPrimary'
                       : 'text-textMuted hover:text-textSecondary',
                   )}
                 >
@@ -201,7 +201,7 @@ export default function DecisionJournal({
             aria-label="Rescore the journal"
             className="rounded-lg border border-borderSubtle px-2 py-1.5 text-textMuted transition-colors hover:text-textPrimary disabled:opacity-50"
           >
-            <RefreshCw size={13} className={loading ? 'animate-spin' : undefined} />
+            <RefreshCw size={13} />
           </button>
         </div>
       </div>

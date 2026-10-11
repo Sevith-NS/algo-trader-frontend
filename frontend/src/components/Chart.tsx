@@ -146,7 +146,7 @@ function ParamInput({ label, value, min, max, step, onCommit }: {
   };
   return (
     <label className="flex items-center justify-between gap-3 py-1">
-      <span className="text-[11px] text-textSecondary">{label}</span>
+      <span className="text-caption text-textSecondary">{label}</span>
       <input
         type="number"
         defaultValue={value}
@@ -155,7 +155,7 @@ function ParamInput({ label, value, min, max, step, onCommit }: {
         step={step ?? 1}
         onBlur={(e) => commit(e.currentTarget)}
         onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-        className="w-20 rounded border border-borderSubtle bg-black/30 px-2 py-1 text-right text-xs tabular text-textPrimary focus:border-white/30"
+        className="w-20 rounded border border-borderSubtle bg-ink-0 px-2 py-1 text-right text-xs tabular text-textPrimary focus:border-line-strong"
       />
     </label>
   );
@@ -561,7 +561,7 @@ export default function Chart({
                   if (active && openPopover === key) setOpenPopover(null);
                 }}
                 className={`rounded border px-2 py-1 text-xs transition-colors ${
-                  active ? '' : 'border-borderSubtle bg-black/40 text-textSecondary hover:text-textPrimary'
+                  active ? '' : 'border-borderSubtle bg-ink-0 text-textSecondary hover:text-textPrimary'
                 }`}
                 style={active ? { borderColor: color, backgroundColor: `${color}1a`, color } : undefined}
               >
@@ -570,7 +570,7 @@ export default function Chart({
               {active && (
                 <button
                   onClick={() => setOpenPopover(openPopover === key ? null : key)}
-                  className="rounded border border-borderSubtle bg-black/40 px-1.5 py-1 text-[10px] tabular text-textMuted transition-colors hover:text-textPrimary"
+                  className="rounded border border-borderSubtle bg-ink-0 px-1.5 py-1 text-caption tabular text-textMuted transition-colors hover:text-textPrimary"
                   title={`${label} settings`}
                 >
                   {chipSummary(key, config)}
@@ -578,7 +578,7 @@ export default function Chart({
               )}
               {openPopover === key && (
                 <div className="glass-panel absolute left-0 top-full z-20 mt-2 w-52 p-3">
-                  <div className="mb-1 text-[11px] font-semibold font-mono uppercase tracking-wider text-textMuted">
+                  <div className="mb-1 text-caption font-semibold text-textMuted">
                     {label}
                   </div>
                   {key === 'ema' && (

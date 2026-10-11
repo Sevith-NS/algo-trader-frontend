@@ -47,13 +47,13 @@ function Field({ label, children, hint }: {
     <div>
       <MicroLabel className="mb-1">{label}</MicroLabel>
       {children}
-      {hint && <p className="mt-0.5 text-[10px] text-textMuted">{hint}</p>}
+      {hint && <p className="mt-0.5 text-caption text-textMuted">{hint}</p>}
     </div>
   );
 }
 
 const inputClass =
-  'min-h-9 w-full rounded-lg border border-borderSubtle bg-black/30 px-2.5 text-[12px] tabular text-textPrimary transition-colors hover:border-borderStrong focus:border-accentCyan/50';
+  'min-h-9 w-full rounded-lg border border-borderSubtle bg-ink-0 px-2.5 text-[12px] tabular text-textPrimary transition-colors hover:border-borderStrong focus:border-accentCyan/50';
 
 function NumberField({ label, value, onChange, step = 1, placeholder, hint }: {
   label: string; value: number | null; onChange: (v: number | null) => void;
@@ -208,12 +208,12 @@ export default function BacktestSection({ symbol, currency }: {
           <div className="min-w-0">
             <h3 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-textPrimary">
               <History size={15} className="text-accentCyan" /> Backtest
-              <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide text-textMuted">
+              <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
                 full history · costs · walk-forward
               </span>
             </h3>
             <p className="mt-1.5 max-w-2xl text-xs leading-relaxed text-textSecondary">
-              Runs on every bar Yahoo has for {symbol} — decades on daily. Signals form at a
+              Runs on every bar Yahoo has for {symbol}, decades on daily. Signals form at a
               bar&apos;s close and fill at the next open, commission and slippage are charged on
               both sides, and when one bar holds both a stop and a target the stop is assumed to
               have hit first.
@@ -275,7 +275,7 @@ export default function BacktestSection({ symbol, currency }: {
           <Field
             label="Date range"
             hint={result?.range_clamped
-              ? `Clamped to ${result.range} — the interval cannot reach further back`
+              ? `Clamped to ${result.range} ; the interval cannot reach further back`
               : undefined}
           >
             <div className="flex overflow-hidden rounded-lg border border-borderSubtle">
@@ -285,7 +285,7 @@ export default function BacktestSection({ symbol, currency }: {
                   type="button"
                   onClick={() => setRangeId(r.id)}
                   className={clsx(
-                    'min-h-9 flex-1 px-1.5 font-mono text-[10px] font-semibold transition-colors',
+                    'min-h-9 flex-1 px-1.5 text-caption font-semibold transition-colors',
                     rangeId === r.id ? 'bg-accentCyan/15 text-accentCyan'
                       : 'text-textMuted hover:text-textSecondary',
                   )}
@@ -304,7 +304,7 @@ export default function BacktestSection({ symbol, currency }: {
                   type="button"
                   onClick={() => setOosFrac(f)}
                   className={clsx(
-                    'min-h-9 flex-1 font-mono text-[10px] font-semibold transition-colors',
+                    'min-h-9 flex-1 text-caption font-semibold transition-colors',
                     oosFrac === f ? 'bg-accentCyan/15 text-accentCyan'
                       : 'text-textMuted hover:text-textSecondary',
                   )}
@@ -334,14 +334,14 @@ export default function BacktestSection({ symbol, currency }: {
           <button
             type="button"
             onClick={() => setShowCosts((v) => !v)}
-            className="flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider text-textMuted transition-colors hover:text-textSecondary"
+            className="flex items-center gap-1.5 text-caption text-textMuted transition-colors hover:text-textSecondary"
           >
             <Settings2 size={12} />
             Costs, sizing and stops
             <ChevronDown size={12} className={clsx('transition-transform', showCosts && 'rotate-180')} />
           </button>
           {showCosts && (
-            <div className="mt-2 grid grid-cols-2 gap-3 rounded-xl border border-borderSubtle bg-white/[0.02] p-3 sm:grid-cols-4">
+            <div className="mt-2 grid grid-cols-2 gap-3 rounded-xl border border-borderSubtle bg-ink-2 p-3 sm:grid-cols-4">
               <NumberField label="Capital" value={capital} step={1000}
                            onChange={(v) => setCapital(v ?? 100_000)} placeholder="100000" />
               <NumberField
@@ -364,11 +364,11 @@ export default function BacktestSection({ symbol, currency }: {
               <label className="col-span-2 flex items-center gap-2 pt-1 sm:col-span-4">
                 <input type="checkbox" checked={allowShort} className="h-3.5 w-3.5 accent-accentCyan"
                        onChange={(e) => setAllowShort(e.target.checked)} />
-                <span className="text-[11px] text-textSecondary">Allow short entries</span>
+                <span className="text-caption text-textSecondary">Allow short entries</span>
                 <span className="ml-4 flex items-center gap-2">
                   <input type="checkbox" checked={monteCarlo} className="h-3.5 w-3.5 accent-accentCyan"
                          onChange={(e) => setMonteCarlo(e.target.checked)} />
-                  <span className="text-[11px] text-textSecondary">Monte Carlo resample</span>
+                  <span className="text-caption text-textSecondary">Monte Carlo resample</span>
                 </span>
               </label>
             </div>
@@ -381,14 +381,14 @@ export default function BacktestSection({ symbol, currency }: {
             <button
               type="button"
               onClick={() => setShowParams((v) => !v)}
-              className="flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider text-textMuted transition-colors hover:text-textSecondary"
+              className="flex items-center gap-1.5 text-caption text-textMuted transition-colors hover:text-textSecondary"
             >
               <Settings2 size={12} />
               {strategy.name} parameters ({strategy.params.length})
               <ChevronDown size={12} className={clsx('transition-transform', showParams && 'rotate-180')} />
             </button>
             {showParams && (
-              <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl border border-borderSubtle bg-white/[0.02] p-3 sm:grid-cols-4 xl:grid-cols-6">
+              <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl border border-borderSubtle bg-ink-2 p-3 sm:grid-cols-4 xl:grid-cols-6">
                 {strategy.params.map((p) => (
                   <div key={p.name}>
                     <MicroLabel className="mb-0.5 truncate" >{p.name}</MicroLabel>
@@ -403,11 +403,11 @@ export default function BacktestSection({ symbol, currency }: {
                         else next[p.name] = p.type === 'string' ? e.target.value : Number(e.target.value);
                         return next;
                       })}
-                      className="min-h-8 w-full rounded border border-borderSubtle bg-black/30 px-1.5 text-[11px] tabular text-textPrimary focus:border-accentCyan/50"
+                      className="min-h-8 w-full rounded border border-borderSubtle bg-ink-0 px-1.5 text-caption tabular text-textPrimary focus:border-accentCyan/50"
                     />
                   </div>
                 ))}
-                <p className="col-span-2 text-[10px] text-textMuted sm:col-span-4 xl:col-span-6">
+                <p className="col-span-2 text-caption text-textMuted sm:col-span-4 xl:col-span-6">
                   Blank uses the default shown. Booleans take 1 or 0.
                 </p>
               </div>
@@ -423,13 +423,13 @@ export default function BacktestSection({ symbol, currency }: {
 
         {running && (
           <p className="mt-3 flex items-center gap-2 text-[12px] text-textSecondary">
-            <RotateCw size={13} className="animate-spin" />
+            <RotateCw size={13} className="" />
             Pulling history and simulating every bar…
           </p>
         )}
 
         {result && !running && (
-          <p className="mt-3 border-t border-borderSubtle pt-3 text-[11px] text-textMuted">
+          <p className="mt-3 border-t border-borderSubtle pt-3 text-caption text-textMuted">
             {result.bars.toLocaleString()} bars · {result.summary.n_trades} trades ·{' '}
             {result.config.commission_bps as number} + {result.config.slippage_bps as number} bps
             per side · simulated in {result.elapsed_ms.toLocaleString()} ms
@@ -447,7 +447,7 @@ export default function BacktestSection({ symbol, currency }: {
                 type="button"
                 onClick={() => setTab(t.id)}
                 className={clsx(
-                  'flex min-h-9 items-center gap-1.5 rounded-lg border px-3 text-[11px] font-semibold transition-colors',
+                  'flex min-h-9 items-center gap-1.5 rounded-lg border px-3 text-caption font-semibold transition-colors',
                   tab === t.id
                     ? 'border-accentCyan/30 bg-accentCyan/10 text-accentCyan'
                     : 'border-borderSubtle text-textMuted hover:text-textSecondary',

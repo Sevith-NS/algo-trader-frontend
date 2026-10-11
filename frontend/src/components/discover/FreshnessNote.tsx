@@ -37,7 +37,7 @@ export default function FreshnessNote({
       title="The upstream feed has not returned a newer bar. Cached data is being served."
     >
       <AlertTriangle size={12} />
-      Data stale — newest bar is {asOf}
+      Stale data: newest bar is {asOf}
       {age != null && <span className="tabular">({age}d old)</span>}
     </span>
   );

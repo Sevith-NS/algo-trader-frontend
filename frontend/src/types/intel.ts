@@ -67,13 +67,16 @@ export type NewsArticle = {
   link: string | null;
   source: string | null;
   sentiment: Stance;
+  /** Headline tone from the sentiment model, −1 to +1. */
+  sentiment_score: number;
+  published: string | null;
   age_days: number;
 };
 
 export type NewsIntel = {
   stance: Stance;
   rating: number;
-  confidence: number;
+  confidence: 'high' | 'medium' | 'low';
   article_count: number;
   distinct_outlets: number;
   breakdown: Record<Stance, number>;

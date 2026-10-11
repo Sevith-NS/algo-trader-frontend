@@ -7,7 +7,7 @@ import { scoreColor } from './deskFormat';
 /** The small mono caps used for every field label across the desk panels. */
 export function MicroLabel({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={clsx('text-[10px] font-mono uppercase tracking-wider text-textMuted', className)}>
+    <div className={clsx('text-caption text-textMuted', className)}>
       {children}
     </div>
   );
@@ -22,10 +22,10 @@ export function ScoreBar({ score, height = 6 }: { score: number; height?: number
   const width = Math.min(Math.abs(score), 1) * 50;
   const color = scoreColor(score);
   return (
-    <div className="relative w-full rounded-full bg-white/5" style={{ height }}>
-      <div className="absolute left-1/2 top-0 h-full w-px bg-white/20" />
+    <div className="relative w-full bg-ink-2" style={{ height }}>
+      <div className="absolute left-1/2 top-0 h-full w-px bg-line-strong" />
       <div
-        className="absolute top-0 rounded-full"
+        className="absolute top-0"
         style={{
           height,
           background: color,
@@ -40,13 +40,13 @@ export function ScoreBar({ score, height = 6 }: { score: number; height?: number
 export function ConvictionMeter({ value, color }: { value: number; color: string }) {
   return (
     <div className="flex items-center gap-2">
-      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-white/5">
+      <div className="h-1.5 w-20 overflow-hidden bg-ink-2">
         <div
-          className="h-full rounded-full"
+          className="h-full"
           style={{ width: `${Math.max(0, Math.min(10, value)) * 10}%`, background: color }}
         />
       </div>
-      <span className="text-[11px] tabular text-textSecondary">{value}/10</span>
+      <span className="text-caption tabular text-textSecondary">{value}/10</span>
     </div>
   );
 }
@@ -60,7 +60,7 @@ export function Chip({
       title={title}
       className={clsx(
         'inline-block whitespace-nowrap rounded-md font-semibold',
-        size === 'lg' ? 'px-2.5 py-0.5 text-lg font-black tracking-tight' : 'px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide',
+        size === 'lg' ? 'px-2.5 py-0.5 text-lg font-bold tracking-tight' : 'px-1.5 py-0.5 text-caption',
       )}
       style={{ color, background: `${color}1a` }}
     >
@@ -92,7 +92,7 @@ export function SeatError({ message }: { message: string }) {
   return (
     <div className="flex items-start gap-2 rounded-lg border border-accentAmber/25 bg-accentAmber/[0.06] p-2.5">
       <AlertTriangle size={13} className="mt-0.5 shrink-0 text-accentAmber" />
-      <p className="text-[11px] leading-relaxed text-textSecondary">{message}</p>
+      <p className="text-caption leading-relaxed text-textSecondary">{message}</p>
     </div>
   );
 }
@@ -103,7 +103,7 @@ export function DeskStat({
 }: { label: string; value: React.ReactNode; valueClass?: string; title?: string }) {
   return (
     <div className="flex items-baseline justify-between gap-3 py-1" title={title}>
-      <span className="text-[11px] text-textMuted">{label}</span>
+      <span className="text-caption text-textMuted">{label}</span>
       <span className={clsx('text-[13px] font-medium tabular text-textPrimary', valueClass)}>{value}</span>
     </div>
   );

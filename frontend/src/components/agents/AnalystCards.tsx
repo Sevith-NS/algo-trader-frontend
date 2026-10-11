@@ -23,7 +23,7 @@ const REMITS: Record<string, string> = {
 function AnalystCard({ card }: { card: AnalystEvent }) {
   const color = scoreColor(card.score);
   return (
-    <div className="flex flex-col rounded-xl border border-borderSubtle bg-white/[0.02] p-3.5">
+    <div className="flex flex-col rounded-xl border border-borderSubtle bg-ink-2 p-3.5">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 text-[12px] font-semibold text-textPrimary">
@@ -39,7 +39,7 @@ function AnalystCard({ card }: { card: AnalystEvent }) {
 
       <div className="mt-2.5">
         <ScoreBar score={card.score} />
-        <div className="mt-1 flex justify-between text-[10px] text-textMuted">
+        <div className="mt-1 flex justify-between text-caption text-textMuted">
           <span>bearish</span>
           <span className="tabular">confidence {(card.confidence * 100).toFixed(0)}%</span>
           <span>bullish</span>
@@ -58,7 +58,7 @@ function AnalystCard({ card }: { card: AnalystEvent }) {
           {card.key_points.length > 0 && (
             <ul className="mt-3 space-y-1.5">
               {card.key_points.map((point, i) => (
-                <li key={i} className="flex gap-1.5 text-[11px] leading-relaxed text-textSecondary">
+                <li key={i} className="flex gap-1.5 text-caption leading-relaxed text-textSecondary">
                   <span className="mt-[3px] h-1 w-1 shrink-0 rounded-full" style={{ background: color }} />
                   {point}
                 </li>
@@ -70,7 +70,7 @@ function AnalystCard({ card }: { card: AnalystEvent }) {
               <MicroLabel>Would change my mind</MicroLabel>
               <ul className="mt-1 space-y-1">
                 {card.flags.map((flag, i) => (
-                  <li key={i} className="text-[11px] leading-relaxed text-textMuted">— {flag}</li>
+                  <li key={i} className="text-caption leading-relaxed text-textMuted">{flag}</li>
                 ))}
               </ul>
             </div>
@@ -104,17 +104,17 @@ export default function AnalystCards({
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
         <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <Users2 size={15} className="text-accentCyan" /> Analyst Team
-          <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide text-textMuted">
+          <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
             four specialists · one slice each
           </span>
         </h4>
         {spread !== null && (
-          <span className="text-[11px] text-textMuted">
+          <span className="text-caption text-textMuted">
             Spread{' '}
             <span className={clsx('font-semibold tabular', spread > 0.8 ? 'text-accentAmber' : 'text-textSecondary')}>
               {spread.toFixed(2)}
             </span>
-            {spread > 0.8 ? ' — the desk is genuinely divided' : ' — broadly aligned'}
+            {spread > 0.8 ? ': the desk is genuinely divided' : ': broadly aligned'}
           </span>
         )}
       </div>
@@ -124,10 +124,10 @@ export default function AnalystCards({
         {pending && ANALYST_ORDER.filter((r) => !cards.some((c) => c.role === r)).map((role) => (
           <div
             key={role}
-            className="flex min-h-[140px] items-center justify-center rounded-xl border border-dashed border-borderSubtle bg-white/[0.01] p-3.5"
+            className="flex min-h-[140px] items-center justify-center rounded-xl border border-dashed border-borderSubtle bg-ink-2 p-3.5"
           >
-            <span className="flex items-center gap-2 text-[11px] text-textMuted">
-              <Hourglass size={12} className="animate-pulse-soft" /> reading {role}…
+            <span className="flex items-center gap-2 text-caption text-textMuted">
+              <Hourglass size={12} className="" /> reading {role}…
             </span>
           </div>
         ))}

@@ -14,7 +14,7 @@ function Turn({ turn }: { turn: DebateEvent }) {
       <div className={clsx('min-w-0 max-w-full lg:max-w-[85%]', bull ? 'lg:mr-auto' : 'lg:ml-auto')}>
         <div className={clsx('mb-1.5 flex items-center gap-1.5', !bull && 'lg:justify-end')}>
           <span style={{ color }}>{bull ? <TrendingUp size={13} /> : <TrendingDown size={13} />}</span>
-          <span className="text-[11px] font-semibold" style={{ color }}>{turn.label}</span>
+          <span className="text-caption font-semibold" style={{ color }}>{turn.label}</span>
         </div>
 
         <div
@@ -32,7 +32,7 @@ function Turn({ turn }: { turn: DebateEvent }) {
                   <Quote size={12} className="mt-0.5 shrink-0" style={{ color }} />
                   <div className="min-w-0">
                     <MicroLabel>Standing on</MicroLabel>
-                    <p className="mt-0.5 text-[11px] leading-relaxed text-textSecondary">{turn.evidence}</p>
+                    <p className="mt-0.5 text-caption leading-relaxed text-textSecondary">{turn.evidence}</p>
                   </div>
                 </div>
               )}
@@ -41,10 +41,10 @@ function Turn({ turn }: { turn: DebateEvent }) {
                 <div className="mt-2.5 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                   {turn.rebuts && (
                     <div className="flex gap-2">
-                      <Crosshair size={12} className="mt-0.5 shrink-0 text-accentAmber" />
+                      <Crosshair size={12} className="mt-0.5 shrink-0 text-fg-3" />
                       <div className="min-w-0">
                         <MicroLabel>Attacking</MicroLabel>
-                        <p className="mt-0.5 text-[11px] leading-relaxed text-textMuted">{turn.rebuts}</p>
+                        <p className="mt-0.5 text-caption leading-relaxed text-textMuted">{turn.rebuts}</p>
                       </div>
                     </div>
                   )}
@@ -53,7 +53,7 @@ function Turn({ turn }: { turn: DebateEvent }) {
                       <Handshake size={12} className="mt-0.5 shrink-0 text-textMuted" />
                       <div className="min-w-0">
                         <MicroLabel>Concedes</MicroLabel>
-                        <p className="mt-0.5 text-[11px] leading-relaxed text-textMuted">{turn.concedes}</p>
+                        <p className="mt-0.5 text-caption leading-relaxed text-textMuted">{turn.concedes}</p>
                       </div>
                     </div>
                   )}
@@ -90,11 +90,11 @@ export default function DebateTranscript({
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
         <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <Swords size={15} className="text-accentPurple" /> Research Debate
-          <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide text-textMuted">
+          <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
             {rounds} {rounds === 1 ? 'round' : 'rounds'} · rebuttal required
           </span>
         </h4>
-        <div className="flex items-center gap-3 text-[11px] text-textMuted">
+        <div className="flex items-center gap-3 text-caption text-textMuted">
           <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-accentGreen" /> Bull</span>
           <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-accentRed" /> Bear</span>
         </div>
@@ -104,7 +104,7 @@ export default function DebateTranscript({
         {[...byRound.entries()].map(([round, roundTurns]) => (
           <div key={round} className="space-y-3">
             <div className="flex items-center gap-3">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-textMuted">
+              <span className="text-caption text-textMuted">
                 Round {round} of {rounds}
               </span>
               <div className="h-px flex-1 bg-borderSubtle" />
@@ -114,8 +114,8 @@ export default function DebateTranscript({
         ))}
 
         {pending && (
-          <div className="flex items-center gap-2 text-[11px] text-textMuted">
-            <Hourglass size={12} className="animate-pulse-soft" />
+          <div className="flex items-center gap-2 text-caption text-textMuted">
+            <Hourglass size={12} className="" />
             the next speaker is composing their argument…
           </div>
         )}

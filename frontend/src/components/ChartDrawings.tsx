@@ -540,7 +540,7 @@ export function DrawingRail({
       role="toolbar"
       aria-orientation="vertical"
       aria-label="Drawing tools"
-      className="flex w-10 shrink-0 flex-col items-center gap-1 border-r border-borderSubtle bg-black/20 py-2"
+      className="flex w-10 shrink-0 flex-col items-center gap-1 border-r border-borderSubtle bg-ink-0 py-2"
     >
       {TOOLS.map(t => (
         <button
@@ -554,7 +554,7 @@ export function DrawingRail({
             'flex h-8 w-8 items-center justify-center rounded-md transition-colors',
             activeTool === t.id
               ? 'bg-accentBlue/20 text-accentBlue'
-              : 'text-textMuted hover:bg-white/5 hover:text-textPrimary',
+              : 'text-textMuted hover:bg-ink-2 hover:text-textPrimary',
           )}
         >
           {t.icon}
@@ -587,7 +587,7 @@ export function DrawingRail({
         title="Clear all drawings"
         aria-label="Clear all drawings"
         onClick={onClearAll}
-        className="flex h-8 w-8 items-center justify-center rounded-md text-textMuted transition-colors hover:bg-white/5 hover:text-accentAmber"
+        className="flex h-8 w-8 items-center justify-center rounded-md text-textMuted transition-colors hover:bg-ink-2 hover:text-accentAmber"
       >
         <Eraser size={15} />
       </button>
@@ -602,7 +602,7 @@ export function DrawingRail({
 export function DrawingHint({ tool }: { tool: ToolId }) {
   if (tool === 'cursor') return null;
   return (
-    <div className="pointer-events-none absolute bottom-10 left-1/2 z-20 -translate-x-1/2 rounded-md border border-accentBlue/30 bg-black/70 px-3 py-1.5 font-mono text-[11px] text-accentBlue">
+    <div className="pointer-events-none absolute bottom-10 left-1/2 z-20 -translate-x-1/2 rounded-md border border-accentBlue/30 bg-ink-0 px-3 py-1.5 text-caption text-accentBlue">
       {tool === 'hline'
         ? 'Click to place line · Esc to cancel'
         : 'Click start and end points · Esc to cancel'}

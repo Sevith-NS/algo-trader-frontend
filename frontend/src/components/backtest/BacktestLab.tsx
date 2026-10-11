@@ -46,13 +46,13 @@ function ProgressBar({ done, total, label }: { done: number; total: number; labe
   const percent = total > 0 ? Math.min(100, (done / total) * 100) : 0;
   return (
     <div>
-      <div className="mb-1 flex justify-between text-[10px] text-textMuted">
+      <div className="mb-1 flex justify-between text-caption text-textMuted">
         <span>{label}</span>
         <span className="tabular">{done.toLocaleString()} / {total.toLocaleString()}</span>
       </div>
-      <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
+      <div className="h-1.5 overflow-hidden bg-ink-2">
         <div
-          className="h-full rounded-full bg-accentCyan transition-[width] duration-200"
+          className="h-full bg-accentCyan transition-[width] duration-200"
           style={{ width: `${percent}%` }}
         />
       </div>
@@ -178,14 +178,14 @@ export default function BacktestLab({ base, strategy }: {
   return (
     <div className="space-y-4">
       {/* ---- Grid builder ---- */}
-      <div className="rounded-xl border border-borderSubtle bg-white/[0.02] p-4">
+      <div className="rounded-xl border border-borderSubtle bg-ink-2 p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-borderSubtle pb-2">
-          <h4 className="flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider text-textMuted">
+          <h4 className="flex items-center gap-1.5 text-caption text-textMuted">
             <FlaskConical size={12} /> Parameter grid
           </h4>
-          <span className={clsx('text-[10px] tabular', combos > 2000 ? 'text-accentRed' : 'text-textMuted')}>
+          <span className={clsx('text-caption tabular', combos > 2000 ? 'text-accentRed' : 'text-textMuted')}>
             {armed ? `${combos.toLocaleString()} combinations` : 'nothing selected'}
-            {combos > 2000 && ' — over the 2,000 cap'}
+            {combos > 2000 && ', over the 2,000 cap'}
           </span>
         </div>
 
@@ -209,8 +209,8 @@ export default function BacktestLab({ base, strategy }: {
                     onChange={(e) => setSweep(p.name, { on: e.target.checked })}
                     className="h-3.5 w-3.5 accent-accentCyan"
                   />
-                  <span className="font-mono text-[11px] text-textSecondary">{p.name}</span>
-                  <span className="ml-auto text-[10px] text-textMuted">default {String(p.default)}</span>
+                  <span className="text-caption text-textSecondary">{p.name}</span>
+                  <span className="ml-auto text-caption text-textMuted">default {String(p.default)}</span>
                 </label>
                 {s.on && (
                   <div className="mt-2 grid grid-cols-3 gap-1.5">
@@ -223,7 +223,7 @@ export default function BacktestLab({ base, strategy }: {
                           disabled={busy}
                           step={p.type === 'int' ? 1 : 'any'}
                           onChange={(e) => setSweep(p.name, { [field]: Number(e.target.value) })}
-                          className="min-h-8 w-full rounded border border-borderSubtle bg-black/30 px-1.5 text-[11px] tabular text-textPrimary focus:border-accentCyan/50"
+                          className="min-h-8 w-full rounded border border-borderSubtle bg-ink-0 px-1.5 text-caption tabular text-textPrimary focus:border-accentCyan/50"
                         />
                       </div>
                     ))}
@@ -271,7 +271,7 @@ export default function BacktestLab({ base, strategy }: {
                       type="button"
                       onClick={() => setFoldCount(f)}
                       className={clsx(
-                        'min-h-8 px-2 font-mono text-[11px] tabular transition-colors',
+                        'min-h-8 px-2 text-caption tabular transition-colors',
                         foldCount === f ? 'bg-accentPurple/15 text-accentPurple'
                           : 'text-textMuted hover:text-textSecondary',
                       )}
@@ -295,12 +295,12 @@ export default function BacktestLab({ base, strategy }: {
             <ProgressBar
               done={wfProgress.done}
               total={wfProgress.total}
-              label={`Fold ${wfProgress.fold} of ${wfProgress.folds} — fitting`}
+              label={`Fold ${wfProgress.fold} of ${wfProgress.folds} · fitting`}
             />
           </div>
         )}
         {error && (
-          <p className="mt-3 rounded-lg border border-accentRed/25 bg-accentRed/[0.06] p-2 text-[11px] text-accentRed">
+          <p className="mt-3 rounded-lg border border-accentRed/25 bg-accentRed/[0.06] p-2 text-caption text-accentRed">
             {error}
           </p>
         )}
@@ -308,17 +308,17 @@ export default function BacktestLab({ base, strategy }: {
 
       {/* ---- Sweep results ---- */}
       {optRows.length > 0 && (
-        <div className="rounded-xl border border-borderSubtle bg-white/[0.02] p-4">
-          <h4 className="mb-2 flex flex-wrap items-center gap-2 border-b border-borderSubtle pb-2 text-[11px] font-mono uppercase tracking-wider text-textMuted">
+        <div className="rounded-xl border border-borderSubtle bg-ink-2 p-4">
+          <h4 className="mb-2 flex flex-wrap items-center gap-2 border-b border-borderSubtle pb-2 text-caption text-textMuted">
             <FlaskConical size={12} /> Top parameters by Sharpe
             <span className="normal-case tracking-normal text-textMuted/70">
               {optRows.length} usable of {optProgress.total}
             </span>
           </h4>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[560px] text-[11px] tabular">
+            <table className="w-full min-w-[560px] text-caption tabular">
               <thead>
-                <tr className="border-b border-borderSubtle text-left font-mono text-[10px] uppercase tracking-wider text-textMuted">
+                <tr className="border-b border-borderSubtle text-left text-caption text-textMuted">
                   {optKeys.map((k) => <th key={k} className="py-1.5 pr-2 text-right font-normal">{k}</th>)}
                   <th className="py-1.5 pr-2 text-right font-normal">Sharpe</th>
                   <th className="py-1.5 pr-2 text-right font-normal">CAGR</th>
@@ -336,7 +336,7 @@ export default function BacktestLab({ base, strategy }: {
                                     i === 0 && 'bg-accentCyan/[0.05]')}
                   >
                     {optKeys.map((k) => (
-                      <td key={k} className="py-1.5 pr-2 text-right font-mono text-accentCyan">
+                      <td key={k} className="py-1.5 pr-2 text-right text-accentCyan">
                         {r.params[k]}
                       </td>
                     ))}
@@ -357,8 +357,8 @@ export default function BacktestLab({ base, strategy }: {
 
       {/* ---- Walk-forward ---- */}
       {(folds.length > 0 || wfDone) && (
-        <div className="rounded-xl border border-borderSubtle bg-white/[0.02] p-4">
-          <h4 className="mb-2 flex flex-wrap items-center gap-2 border-b border-borderSubtle pb-2 text-[11px] font-mono uppercase tracking-wider text-textMuted">
+        <div className="rounded-xl border border-borderSubtle bg-ink-2 p-4">
+          <h4 className="mb-2 flex flex-wrap items-center gap-2 border-b border-borderSubtle pb-2 text-caption text-textMuted">
             <Footprints size={12} /> Walk-forward
             {wfDone && (
               <span className="normal-case tracking-normal text-textMuted/70">
@@ -371,9 +371,9 @@ export default function BacktestLab({ base, strategy }: {
           </h4>
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] text-[11px] tabular">
+            <table className="w-full min-w-[640px] text-caption tabular">
               <thead>
-                <tr className="border-b border-borderSubtle text-left font-mono text-[10px] uppercase tracking-wider text-textMuted">
+                <tr className="border-b border-borderSubtle text-left text-caption text-textMuted">
                   <th className="py-1.5 pr-2 font-normal">Fold</th>
                   <th className="py-1.5 pr-2 font-normal">Chosen on training</th>
                   <th className="py-1.5 pr-2 text-right font-normal">IS Sharpe</th>
@@ -387,11 +387,11 @@ export default function BacktestLab({ base, strategy }: {
                 {folds.map((f) => (
                   <tr key={f.fold} className="border-b border-borderSubtle/50">
                     <td className="py-1.5 pr-2 text-textMuted">{f.fold}</td>
-                    <td className="py-1.5 pr-2 font-mono text-[10px] text-accentCyan">
+                    <td className="py-1.5 pr-2 text-caption text-accentCyan">
                       {Object.entries(f.params).map(([k, v]) => `${k}=${v}`).join(' ')}
                     </td>
                     <td className="py-1.5 pr-2 text-right text-textSecondary">{num(f.in_sample.sharpe)}</td>
-                    <td className="py-1.5 pr-2 text-[10px] text-textMuted">
+                    <td className="py-1.5 pr-2 text-caption text-textMuted">
                       {shortDate(f.out_of_sample.start)} → {shortDate(f.out_of_sample.end)}
                     </td>
                     <td className={clsx('py-1.5 pr-2 text-right font-semibold', toneFor(f.out_of_sample.cagr))}>
@@ -407,9 +407,9 @@ export default function BacktestLab({ base, strategy }: {
 
           {wfDone && (
             <>
-              <div className="mt-3 rounded-lg border border-borderSubtle bg-black/20 p-2">
+              <div className="mt-3 rounded-lg border border-borderSubtle bg-ink-0 p-2">
                 <MicroLabel className="mb-1 px-1">
-                  Stitched out-of-sample equity — every bar here was traded on parameters fitted
+                  Stitched out-of-sample equity: every bar here was traded on parameters fitted
                   before it
                 </MicroLabel>
                 <EquityChart

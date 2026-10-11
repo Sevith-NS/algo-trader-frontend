@@ -21,7 +21,7 @@ export function VerdictBanner({ verdict }: { verdict: Verdict }) {
 
 function Column({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-borderSubtle bg-white/[0.02] p-3">
+    <div className="rounded-lg border border-borderSubtle bg-ink-2 p-3">
       <MicroLabel className="mb-1.5">{label}</MicroLabel>
       {children}
     </div>
@@ -31,7 +31,7 @@ function Column({ label, children }: { label: string; children: React.ReactNode 
 function Row({ label, value, tone }: { label: string; value: React.ReactNode; tone?: string }) {
   return (
     <div className="flex items-baseline justify-between gap-3 py-0.5">
-      <span className="text-[11px] text-textMuted">{label}</span>
+      <span className="text-caption text-textMuted">{label}</span>
       <span className={clsx('text-[12px] font-medium tabular', tone ?? 'text-textPrimary')}>{value}</span>
     </div>
   );
@@ -47,11 +47,11 @@ function Row({ label, value, tone }: { label: string; value: React.ReactNode; to
 export function OosPanel({ oos }: { oos: OosResult }) {
   if (!oos.available) {
     return (
-      <div className="rounded-xl border border-borderSubtle bg-white/[0.02] p-4">
-        <h4 className="mb-2 flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider text-textMuted">
+      <div className="rounded-xl border border-borderSubtle bg-ink-2 p-4">
+        <h4 className="mb-2 flex items-center gap-1.5 text-caption text-textMuted">
           <SplitSquareHorizontal size={12} /> In-sample vs out-of-sample
         </h4>
-        <p className="text-[11px] text-textMuted">{oos.reason}</p>
+        <p className="text-caption text-textMuted">{oos.reason}</p>
       </div>
     );
   }
@@ -62,8 +62,8 @@ export function OosPanel({ oos }: { oos: OosResult }) {
   ];
 
   return (
-    <div className="rounded-xl border border-borderSubtle bg-white/[0.02] p-4">
-      <h4 className="mb-3 flex flex-wrap items-center gap-2 border-b border-borderSubtle pb-2 text-[11px] font-mono uppercase tracking-wider text-textMuted">
+    <div className="rounded-xl border border-borderSubtle bg-ink-2 p-4">
+      <h4 className="mb-3 flex flex-wrap items-center gap-2 border-b border-borderSubtle pb-2 text-caption text-textMuted">
         <SplitSquareHorizontal size={12} /> In-sample vs out-of-sample
         <span className="normal-case tracking-normal text-textMuted/70">
           last {pct(oos.fraction, 0)} held back
@@ -75,13 +75,13 @@ export function OosPanel({ oos }: { oos: OosResult }) {
           const s = side?.summary;
           return (
             <Column key={key} label={label}>
-              <div className="mb-1 text-[10px] text-textMuted">
+              <div className="mb-1 text-caption text-textMuted">
                 {shortDate(s?.start)} → {shortDate(s?.end)}
               </div>
               <Row label="CAGR" value={signedPct(s?.cagr)} tone={toneFor(s?.cagr)} />
               <Row label="Sharpe" value={num(s?.sharpe)} />
               <Row label="Max drawdown" value={pct(s?.max_dd)} tone="text-accentRed" />
-              <Row label="Trades" value={s?.n_trades ?? '—'} />
+              <Row label="Trades" value={s?.n_trades ?? '–'} />
               <Row label="Win rate" value={pct(s?.win_rate, 1)} />
             </Column>
           );
@@ -103,11 +103,11 @@ export function OosPanel({ oos }: { oos: OosResult }) {
 export function MonteCarloPanel({ mc }: { mc: MonteCarlo }) {
   if (!mc.paths) {
     return (
-      <div className="rounded-xl border border-borderSubtle bg-white/[0.02] p-4">
-        <h4 className="mb-2 flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider text-textMuted">
+      <div className="rounded-xl border border-borderSubtle bg-ink-2 p-4">
+        <h4 className="mb-2 flex items-center gap-1.5 text-caption text-textMuted">
           <Dices size={12} /> Monte Carlo
         </h4>
-        <p className="text-[11px] text-textMuted">{mc.note}</p>
+        <p className="text-caption text-textMuted">{mc.note}</p>
       </div>
     );
   }
@@ -115,8 +115,8 @@ export function MonteCarloPanel({ mc }: { mc: MonteCarlo }) {
   const ruinHigh = (mc.prob_ruin ?? 0) > 0.05;
 
   return (
-    <div className="rounded-xl border border-borderSubtle bg-white/[0.02] p-4">
-      <h4 className="mb-3 flex flex-wrap items-center gap-2 border-b border-borderSubtle pb-2 text-[11px] font-mono uppercase tracking-wider text-textMuted">
+    <div className="rounded-xl border border-borderSubtle bg-ink-2 p-4">
+      <h4 className="mb-3 flex flex-wrap items-center gap-2 border-b border-borderSubtle pb-2 text-caption text-textMuted">
         <Dices size={12} /> Monte Carlo
         <span className="normal-case tracking-normal text-textMuted/70">
           {mc.paths.toLocaleString()} resamples of {mc.trades_resampled} trades
@@ -148,10 +148,10 @@ export function MonteCarloPanel({ mc }: { mc: MonteCarlo }) {
         </Column>
       </div>
 
-      <p className="mt-2.5 text-[10px] leading-relaxed text-textMuted">
+      <p className="mt-2.5 text-caption leading-relaxed text-textMuted">
         Trades are resampled with replacement, so this holds each trade&apos;s size and outcome
         and asks what a different run of luck would have looked like. It assumes trades are
-        independent — losses that cluster in one regime give a fatter real tail than this
+        independent. Losses that cluster in one regime give a fatter real tail than this
         shows, so read the bad path as the optimistic version of bad.
       </p>
     </div>

@@ -1,10 +1,13 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { RefreshCw, ExternalLink, TrendingUp, TrendingDown, Minus } from '@/components/ui/icons';
 import clsx from 'clsx';
-import { PageShell, PageHeader } from '@/components/PageHeader';
-import { ErrorState, LoadingBlock } from '@/components/ui/States';
+import { useState } from 'react';
+import { Button } from '@/components/ui/Button';
+import { ExternalLink, RefreshCw } from '@/components/ui/icons';
+import { EmptyState, ErrorState, LoadingBlock } from '@/components/ui/States';
+import { Tabs } from '@/components/ui/Tabs';
+import { Tone } from '@/components/ui/Tone';
+import { timeAgo } from '@/lib/format';
 import { useApi } from '@/lib/useApi';
 
 interface Article {
@@ -42,189 +45,138 @@ const CATEGORY_LABELS: Record<string, string> = {
   tech: 'Tech',
 };
 
-function SentimentBadge({ sentiment, score }: { sentiment: string; score: number }) {
-  const bullish = sentiment.includes('bullish');
-  const bearish = sentiment.includes('bearish');
+const label = (key: string) => CATEGORY_LABELS[key] ?? key;
+
+/** Tone index on 0 to 100, where 50 is neutral. */
+function moodWord(index: number) {
+  return index >= 55 ? 'Positive' : index <= 45 ? 'Negative' : 'Neutral';
+}
+
+/** Feeds append " - Outlet" to titles; the outlet is already shown beside it. */
+function cleanTitle(a: Article) {
+  return a.source && a.title.endsWith(` - ${a.source}`) ? a.title.slice(0, -(a.source.length + 3)) : a.title;
+}
+
+function MoodBar({ index }: { index: number }) {
+  const word = moodWord(index);
   return (
-    <span className={clsx(
-      'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold tabular',
-      bullish && 'bg-up/10 text-accentGreen',
-      bearish && 'bg-down/10 text-accentRed',
-      !bullish && !bearish && 'bg-white/5 text-textMuted',
-    )}>
-      {bullish ? <TrendingUp size={11} /> : bearish ? <TrendingDown size={11} /> : <Minus size={11} />}
-      {score > 0 ? '+' : ''}{score.toFixed(2)}
+    <span aria-hidden="true" className="relative h-1.5 w-full bg-ink-2">
+      <span className={clsx('absolute inset-y-0 left-0',
+        word === 'Positive' ? 'bg-up' : word === 'Negative' ? 'bg-down' : 'bg-fg-3')}
+            style={{ width: `${Math.max(0, Math.min(100, index))}%` }} />
+      <span className="absolute inset-y-0 left-1/2 w-px bg-fg-3" />
     </span>
   );
 }
 
-function MoodGauge({ value, label }: { value: number; label: string }) {
-  const color = value >= 60 ? '#34D399' : value <= 40 ? '#F87171' : '#FBBF24';
+function Headline({ a }: { a: Article }) {
+  const body = (
+    <>
+      <span className="flex min-w-0 flex-col gap-1">
+        <span className="text-body-sm font-medium text-fg group-hover:underline group-hover:underline-offset-4">
+          {cleanTitle(a)}
+          {a.link && <ExternalLink size={12} aria-hidden="true" className="ml-1.5 inline align-baseline text-fg-3" />}
+        </span>
+        <span className="flex flex-wrap items-center gap-x-2 text-caption text-fg-3">
+          <span>{label(a.category)}</span>
+          {a.source && <><span aria-hidden="true">·</span><span>{a.source}</span></>}
+          {a.published && <><span aria-hidden="true">·</span><time dateTime={a.published}>{timeAgo(a.published)}</time></>}
+        </span>
+      </span>
+      <Tone score={a.sentiment_score} className="shrink-0 pt-0.5" />
+    </>
+  );
   return (
-    <div className="glass-panel flex flex-col items-center gap-4 p-6">
-      <div className="text-sm font-medium text-textSecondary">Global Market Mood</div>
-      <div className="relative h-32 w-64">
-        <svg viewBox="0 0 200 110" className="h-full w-full">
-          <path d="M 15 100 A 85 85 0 0 1 185 100" fill="none" stroke="rgba(148,163,184,0.12)" strokeWidth="14" strokeLinecap="round" />
-          <path
-            d="M 15 100 A 85 85 0 0 1 185 100"
-            fill="none"
-            stroke={color}
-            strokeWidth="14"
-            strokeLinecap="round"
-            strokeDasharray={`${(value / 100) * 267} 267`}
-            style={{ transition: 'stroke-dasharray 1s ease, stroke 1s ease' }}
-          />
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-end pb-1">
-          <div className="text-4xl font-bold tabular" style={{ color }}>{value}</div>
-          <div className="text-xs font-mono uppercase tracking-widest text-textMuted">{label.replace('-', ' ')}</div>
-        </div>
-      </div>
-      <div className="flex w-64 justify-between text-[11px] text-textMuted">
-        <span>Extreme Fear</span>
-        <span>Neutral</span>
-        <span>Extreme Greed</span>
-      </div>
-    </div>
+    <li className="border-b border-line">
+      {a.link ? (
+        <a href={a.link} target="_blank" rel="noopener noreferrer"
+           className="group flex items-start justify-between gap-4 py-3">
+          {body}
+          <span className="sr-only">(opens in a new tab)</span>
+        </a>
+      ) : (
+        <div className="flex items-start justify-between gap-4 py-3">{body}</div>
+      )}
+    </li>
   );
 }
 
-function timeAgo(iso: string | null): string {
-  if (!iso) return '';
-  const diff = Date.now() - new Date(iso).getTime();
-  const hours = Math.floor(diff / 3600000);
-  if (hours < 1) return `${Math.max(1, Math.floor(diff / 60000))}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
-}
-
 export default function NewsPage() {
-  const { data, error, loading, reload: fetchNews } = useApi<NewsData>('/api/news');
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const { data, error, loading, reload } = useApi<NewsData>('/api/news');
+  const [category, setCategory] = useState('all');
 
-  const articles = useMemo(() => {
-    if (!data) return [];
-    if (activeCategory === 'all') return data.latest;
-    return data.categories[activeCategory]?.articles ?? [];
-  }, [data, activeCategory]);
+  const keys = data ? Object.keys(data.categories) : [];
+  const articles = !data ? [] : category === 'all' ? data.latest : data.categories[category]?.articles ?? [];
 
   return (
-    <div className="flex flex-col">
-      <PageShell className="flex-1">
-        <PageHeader
-          level={1}
-          title="News"
-          description="Live headlines scored with NLP sentiment across eight market categories."
-          actions={
-            <button
-              onClick={fetchNews}
-              disabled={loading}
-              className="flex items-center gap-2 rounded-xl border border-borderSubtle bg-white/[0.03] px-4 py-2 text-sm text-textSecondary transition-colors hover:border-accentGreen/40 hover:text-textPrimary disabled:opacity-50"
-            >
-              <RefreshCw size={14} className={clsx(loading && 'animate-spin')} /> Refresh
-            </button>
-          }
-        />
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-h3 font-bold">News</h1>
+          <p className="max-w-prose text-body-sm text-fg-2">
+            Headlines from public feeds, each scored for tone by a sentiment model. Tone is not a forecast.
+          </p>
+        </div>
+        <Button variant="secondary" size="sm" onClick={reload} loading={loading && Boolean(data)}>
+          <RefreshCw size={14} aria-hidden="true" /> Refresh
+        </Button>
+      </div>
 
-        {loading && !data ? (
-          <LoadingBlock lines={8} label="Loading news" />
-        ) : !data ? (
-          <ErrorState error={error} title="Couldn't load the news" onRetry={fetchNews} />
-        ) : (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
-            {/* Left rail: mood gauge + category moods */}
-            <div className="space-y-6">
-              <MoodGauge value={data.overall_mood_index} label={data.overall_sentiment} />
-              <div className="glass-panel p-5">
-                <h3 className="mb-4 text-sm font-semibold text-textSecondary">Sentiment by Category</h3>
-                <div className="space-y-3">
-                  {Object.entries(data.categories).map(([key, cat]) => (
-                    <button
-                      key={key}
-                      onClick={() => setActiveCategory(key === activeCategory ? 'all' : key)}
-                      className={clsx(
-                        'flex w-full items-center gap-3 rounded-lg px-2 py-1.5 transition-colors',
-                        activeCategory === key ? 'bg-white/5' : 'hover:bg-white/[0.03]'
-                      )}
-                    >
-                      <span className="w-24 text-left text-xs font-medium text-textSecondary">
-                        {CATEGORY_LABELS[key] ?? key}
-                      </span>
-                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/5">
-                        <div
-                          className={clsx(
-                            'h-full rounded-full transition-[width] duration-700',
-                            cat.mood_index >= 55 ? 'bg-accentGreen' : cat.mood_index <= 45 ? 'bg-accentRed' : 'bg-accentAmber'
-                          )}
-                          style={{ width: `${cat.mood_index}%` }}
-                        />
-                      </div>
-                      <span className="w-8 text-right text-xs font-semibold tabular text-textPrimary">
-                        {cat.mood_index}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+      {loading && !data ? (
+        <LoadingBlock lines={8} label="Loading news" />
+      ) : error && !data ? (
+        <ErrorState error={error} title="Couldn't load the news" onRetry={reload} />
+      ) : data && (
+        <>
+          <div className="flex flex-wrap items-baseline gap-x-8 gap-y-1 border-y border-line py-4">
+            <p className="flex items-baseline gap-3">
+              <span className="text-body-sm text-fg-2">Overall tone</span>
+              <span className="text-h4 font-bold tabular">{data.overall_mood_index}</span>
+              <span className="text-body-sm text-fg-2">of 100 · {moodWord(data.overall_mood_index)}</span>
+            </p>
+            <p className="text-caption text-fg-3">0 is all negative, 50 neutral, 100 all positive.</p>
+          </div>
 
-            {/* Feed */}
-            <div>
-              <div className="mb-4 flex flex-wrap gap-2">
-                {['all', ...Object.keys(data.categories)].map(key => (
-                  <button
-                    key={key}
-                    onClick={() => setActiveCategory(key)}
-                    className={clsx(
-                      'rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors',
-                      activeCategory === key
-                        ? 'bg-up/15 text-accentGreen'
-                        : 'border border-borderSubtle text-textSecondary hover:text-textPrimary'
-                    )}
-                  >
-                    {key === 'all' ? 'All' : CATEGORY_LABELS[key] ?? key}
-                  </button>
-                ))}
-              </div>
-
-              <div className="space-y-2.5">
-                {articles.map((a, i) => (
-                  <a
-                    key={`${a.link}-${i}`}
-                    href={a.link ?? undefined}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="glass-panel hover-lift group flex items-start justify-between gap-4 p-4"
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 text-[11px] text-textMuted">
-                        <span className="rounded bg-white/5 px-1.5 py-0.5 font-mono uppercase tracking-wide">
-                          {CATEGORY_LABELS[a.category] ?? a.category}
-                        </span>
-                        {a.source && <span>{a.source}</span>}
-                        {a.published && <span>· {timeAgo(a.published)}</span>}
-                      </div>
-                      <p className="mt-1.5 text-sm font-medium leading-snug text-textPrimary group-hover:text-textPrimary">
-                        {a.title}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 flex-col items-end gap-2">
-                      <SentimentBadge sentiment={a.sentiment} score={a.sentiment_score} />
-                      <ExternalLink size={12} className="text-textMuted opacity-0 transition-opacity group-hover:opacity-100" />
-                    </div>
-                  </a>
-                ))}
-                {articles.length === 0 && (
-                  <div className="glass-panel p-8 text-center text-sm text-textSecondary">
-                    No articles in this category right now.
-                  </div>
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_17rem]">
+            <section aria-label="Headlines" className="flex min-w-0 flex-col gap-2">
+              <Tabs idPrefix="news" label="Category" value={category} onChange={setCategory}
+                    tabs={[{ id: 'all', label: 'All' }, ...keys.map((k) => ({ id: k, label: label(k) }))]} />
+              <div role="tabpanel" id={`news-panel-${category}`} aria-labelledby={`news-tab-${category}`}>
+                {articles.length ? (
+                  <ul>{articles.map((a, i) => <Headline key={`${a.link ?? a.title}-${i}`} a={a} />)}</ul>
+                ) : (
+                  <EmptyState title="No headlines here right now" className="mt-4">
+                    Feeds refresh every few minutes. Try another category or check back shortly.
+                  </EmptyState>
                 )}
               </div>
-            </div>
+            </section>
+
+            <section aria-labelledby="tone-h" className="flex flex-col gap-3">
+              <h2 id="tone-h" className="text-body font-bold">Tone by category</h2>
+              <ul className="flex flex-col">
+                {keys.map((k) => {
+                  const idx = data.categories[k].mood_index;
+                  return (
+                    <li key={k}>
+                      <button type="button" onClick={() => setCategory(category === k ? 'all' : k)}
+                              aria-pressed={category === k}
+                              aria-label={`${label(k)}: ${idx} of 100, ${moodWord(idx)}`}
+                              className={clsx('grid min-h-11 w-full grid-cols-[6rem_1fr_2rem] items-center gap-3 text-left text-body-sm',
+                                category === k ? 'font-medium text-fg' : 'text-fg-2 hover:text-fg')}>
+                        <span>{label(k)}</span>
+                        <MoodBar index={idx} />
+                        <span className="text-right tabular">{idx}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+              <p className="text-caption text-fg-3">Select a category to filter the headlines.</p>
+            </section>
           </div>
-        )}
-      </PageShell>
+        </>
+      )}
     </div>
   );
 }

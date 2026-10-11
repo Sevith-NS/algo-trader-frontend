@@ -14,12 +14,12 @@ function Headline({ label, value, tone, sub }: {
   label: string; value: string; tone?: string; sub?: string;
 }) {
   return (
-    <div className="rounded-xl border border-borderSubtle bg-white/[0.02] p-3">
+    <div className="rounded-xl border border-borderSubtle bg-ink-2 p-3">
       <MicroLabel>{label}</MicroLabel>
       <div className={clsx('mt-1 text-xl font-bold tabular', tone ?? 'text-textPrimary')}>
         {value}
       </div>
-      {sub && <div className="mt-0.5 text-[10px] text-textMuted">{sub}</div>}
+      {sub && <div className="mt-0.5 text-caption text-textMuted">{sub}</div>}
     </div>
   );
 }
@@ -29,7 +29,7 @@ function Line({ label, value, tone, title }: {
 }) {
   return (
     <div className="flex items-baseline justify-between gap-3 py-1" title={title}>
-      <span className="text-[11px] text-textMuted">{label}</span>
+      <span className="text-caption text-textMuted">{label}</span>
       <span className={clsx('text-[12px] font-medium tabular', tone ?? 'text-textPrimary')}>
         {value}
       </span>
@@ -41,8 +41,8 @@ function Card({ title, icon, children }: {
   title: string; icon?: React.ReactNode; children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-borderSubtle bg-white/[0.02] p-4">
-      <h4 className="mb-2 flex items-center gap-1.5 border-b border-borderSubtle pb-2 text-[11px] font-mono uppercase tracking-wider text-textMuted">
+    <div className="rounded-xl border border-borderSubtle bg-ink-2 p-4">
+      <h4 className="mb-2 flex items-center gap-1.5 border-b border-borderSubtle pb-2 text-caption text-textMuted">
         {icon} {title}
       </h4>
       {children}
@@ -70,7 +70,7 @@ function monthTint(value: Num, extreme: number): string | undefined {
 
 function MonthlyGrid({ rows }: { rows: MonthlyRow[] }) {
   if (!rows.length) {
-    return <p className="text-[11px] text-textMuted">Not enough history for a monthly grid.</p>;
+    return <p className="text-caption text-textMuted">Not enough history for a monthly grid.</p>;
   }
   const extreme = rows.reduce((m, r) => {
     const vals = Object.values(r.months).filter((v): v is number => typeof v === 'number');
@@ -79,18 +79,18 @@ function MonthlyGrid({ rows }: { rows: MonthlyRow[] }) {
 
   return (
     <div className="-mx-1 overflow-x-auto">
-      <table className="w-full min-w-[640px] border-separate border-spacing-[2px] text-[10px] tabular">
+      <table className="w-full min-w-[640px] border-separate border-spacing-[2px] text-caption tabular">
         <thead>
           <tr className="text-textMuted">
-            <th className="text-left font-mono font-normal">Year</th>
-            {MONTHS.map((m) => <th key={m} className="font-mono font-normal">{m}</th>)}
-            <th className="font-mono font-normal">Year</th>
+            <th className="text-left font-normal">Year</th>
+            {MONTHS.map((m) => <th key={m} className="font-normal">{m}</th>)}
+            <th className="font-normal">Year</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row) => (
             <tr key={row.year}>
-              <td className="pr-1 text-left font-mono text-textSecondary">{row.year}</td>
+              <td className="pr-1 text-left text-textSecondary">{row.year}</td>
               {MONTHS.map((m) => {
                 const v = row.months[m];
                 return (
@@ -105,13 +105,13 @@ function MonthlyGrid({ rows }: { rows: MonthlyRow[] }) {
               })}
               <td className={clsx('rounded border border-borderSubtle px-1 py-1 text-center font-semibold',
                                   toneFor(row.total))}>
-                {typeof row.total === 'number' ? `${(row.total * 100).toFixed(1)}` : '—'}
+                {typeof row.total === 'number' ? `${(row.total * 100).toFixed(1)}` : '–'}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <p className="mt-1.5 px-1 text-[10px] text-textMuted">Figures are percent returns.</p>
+      <p className="mt-1.5 px-1 text-caption text-textMuted">Figures are percent returns.</p>
     </div>
   );
 }
@@ -125,7 +125,7 @@ function TradeTable({ trades, currency }: {
 }) {
   const [shown, setShown] = useState(PAGE);
   if (!trades.rows.length) {
-    return <p className="text-[11px] text-textMuted">This strategy took no trades on these bars.</p>;
+    return <p className="text-caption text-textMuted">This strategy took no trades on these bars.</p>;
   }
   // Newest first: the most recent trades are the ones being reasoned about.
   const ordered = [...trades.rows].reverse();
@@ -133,9 +133,9 @@ function TradeTable({ trades, currency }: {
   return (
     <div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[680px] text-[11px] tabular">
+        <table className="w-full min-w-[680px] text-caption tabular">
           <thead>
-            <tr className="border-b border-borderSubtle text-left font-mono text-[10px] uppercase tracking-wider text-textMuted">
+            <tr className="border-b border-borderSubtle text-left text-caption text-textMuted">
               <th className="py-1.5 pr-2 font-normal">Side</th>
               <th className="py-1.5 pr-2 font-normal">Entry</th>
               <th className="py-1.5 pr-2 text-right font-normal">Price</th>
@@ -163,24 +163,24 @@ function TradeTable({ trades, currency }: {
                 <td className="py-1.5 pr-2 text-right text-textSecondary">{num(t.exit_price)}</td>
                 <td className="py-1.5 pr-2 text-right text-textMuted">{t.bars_held}</td>
                 <td className={clsx('py-1.5 pr-2 text-right font-semibold', toneFor(t.ret_pct))}>
-                  {t.ret_pct === null ? '—' : `${t.ret_pct > 0 ? '+' : ''}${t.ret_pct.toFixed(2)}%`}
+                  {t.ret_pct === null ? '–' : `${t.ret_pct > 0 ? '+' : ''}${t.ret_pct.toFixed(2)}%`}
                 </td>
                 <td className={clsx('py-1.5 pr-2 text-right', toneFor(t.pnl))}>
                   {money(t.pnl, currency)}
                 </td>
                 <td className="py-1.5 pr-2 text-right text-accentRed/80">
-                  {t.mae_pct === null ? '—' : `${t.mae_pct.toFixed(1)}%`}
+                  {t.mae_pct === null ? '–' : `${t.mae_pct.toFixed(1)}%`}
                 </td>
                 <td className="py-1.5 pr-2 text-right text-accentGreen/80">
-                  {t.mfe_pct === null ? '—' : `+${t.mfe_pct.toFixed(1)}%`}
+                  {t.mfe_pct === null ? '–' : `+${t.mfe_pct.toFixed(1)}%`}
                 </td>
-                <td className="py-1.5 font-mono text-[10px] text-textMuted">{t.exit_reason}</td>
+                <td className="py-1.5 text-caption text-textMuted">{t.exit_reason}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <div className="mt-2 flex items-center justify-between text-[10px] text-textMuted">
+      <div className="mt-2 flex items-center justify-between text-caption text-textMuted">
         <span>
           Showing {Math.min(shown, ordered.length)} of {trades.total}
           {trades.truncated && ' (log capped at 2,000)'}
@@ -261,10 +261,10 @@ export default function BacktestResults({ result, currency }: {
       </div>
 
       {/* ---- Equity curve + drawdown ---- */}
-      <div className="rounded-xl border border-borderSubtle bg-white/[0.02] p-3">
+      <div className="rounded-xl border border-borderSubtle bg-ink-2 p-3">
         <div className="mb-1 flex flex-wrap items-center justify-between gap-2 px-1">
           <MicroLabel>Equity curve vs buy &amp; hold · drawdown below</MicroLabel>
-          <span className="text-[10px] text-textMuted">
+          <span className="text-caption text-textMuted">
             {shortDate(s.start)} → {shortDate(s.end)}
             {result.equity.downsampled && ' · curve thinned for display'}
           </span>
@@ -318,7 +318,7 @@ export default function BacktestResults({ result, currency }: {
           <Line
             label="Avg MAE, winners" value={`${num(e.excursions.avg_mae_winners, 1)}%`}
             tone="text-accentRed/80"
-            title="How far winners went against you first — the stop-width evidence"
+            title="How far winners went against you first: the stop-width evidence"
           />
           <Line label="Avg MAE, losers" value={`${num(e.excursions.avg_mae_losers, 1)}%`} tone="text-accentRed/80" />
           <Line
@@ -340,12 +340,12 @@ export default function BacktestResults({ result, currency }: {
       {/* ---- Drawdowns ---- */}
       <Card title="Deepest drawdowns" icon={<ArrowDownRight size={12} />}>
         {e.drawdowns.length === 0 ? (
-          <p className="text-[11px] text-textMuted">This curve never went underwater.</p>
+          <p className="text-caption text-textMuted">This curve never went underwater.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[520px] text-[11px] tabular">
+            <table className="w-full min-w-[520px] text-caption tabular">
               <thead>
-                <tr className="border-b border-borderSubtle text-left font-mono text-[10px] uppercase tracking-wider text-textMuted">
+                <tr className="border-b border-borderSubtle text-left text-caption text-textMuted">
                   <th className="py-1.5 pr-2 font-normal">Depth</th>
                   <th className="py-1.5 pr-2 font-normal">Started</th>
                   <th className="py-1.5 pr-2 font-normal">Low</th>
@@ -365,7 +365,7 @@ export default function BacktestResults({ result, currency }: {
                     </td>
                     <td className="py-1.5 pr-2 text-right text-textMuted">{d.length_bars} bars</td>
                     <td className="py-1.5 text-right text-textMuted">
-                      {d.recovery_bars === null ? '—' : `${d.recovery_bars} bars`}
+                      {d.recovery_bars === null ? '–' : `${d.recovery_bars} bars`}
                     </td>
                   </tr>
                 ))}

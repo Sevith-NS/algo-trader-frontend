@@ -56,11 +56,11 @@ export default function DeskVerdict({
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
         <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
           <Stamp size={15} style={{ color: dColor }} /> Desk Verdict
-          <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide text-textMuted">
+          <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
             portfolio manager
           </span>
         </h4>
-        <span className="flex items-center gap-1.5 text-[11px] text-textMuted">
+        <span className="flex items-center gap-1.5 text-caption text-textMuted">
           <CalendarClock size={12} /> review in {verdict.review_in_days}d
         </span>
       </div>
@@ -72,7 +72,7 @@ export default function DeskVerdict({
           {verdict.decision === 'APPROVE'
             ? <CheckCircle2 size={22} style={{ color: dColor }} />
             : <XCircle size={22} style={{ color: dColor }} />}
-          <span className="text-2xl font-black tracking-tight" style={{ color: dColor }}>
+          <span className="text-2xl font-bold tracking-tight" style={{ color: dColor }}>
             {verdict.decision}
           </span>
         </div>
@@ -87,23 +87,23 @@ export default function DeskVerdict({
           <div className="text-xl font-bold tabular" style={{ color: verdict.size_pct > 0 ? aColor : undefined }}>
             {rawPct(verdict.size_pct, 2)}
           </div>
-          <div className="text-[10px] text-textMuted">of total equity</div>
+          <div className="text-caption text-textMuted">of total equity</div>
         </div>
         <div>
           <MicroLabel>Shares</MicroLabel>
           <div className="text-xl font-bold tabular text-textPrimary">{sizing.shares.toLocaleString()}</div>
-          <div className="text-[10px] text-textMuted">
-            at {sizing.price ? fmtPrice(sizing.price, currency) : '—'}
+          <div className="text-caption text-textMuted">
+            at {sizing.price ? fmtPrice(sizing.price, currency) : '–'}
           </div>
         </div>
         <div>
           <MicroLabel>Notional</MicroLabel>
           <div className="text-xl font-bold tabular text-textPrimary">{fmtPrice(sizing.notional, currency)}</div>
-          <div className="text-[10px] text-textMuted">{rawPct(sizing.pct_of_equity, 2)} of book</div>
+          <div className="text-caption text-textMuted">{rawPct(sizing.pct_of_equity, 2)} of book</div>
         </div>
         <div>
           <MicroLabel>Measured against</MicroLabel>
-          <div className="mt-0.5 space-y-0.5 text-[11px] text-textSecondary">
+          <div className="mt-0.5 space-y-0.5 text-caption text-textSecondary">
             <div>half-Kelly <span className="tabular">{rawPct(verdict.half_kelly_pct, 2)}</span></div>
             <div>committee avg <span className="tabular">{rawPct(verdict.committee_average_pct, 2)}</span></div>
           </div>
@@ -111,7 +111,7 @@ export default function DeskVerdict({
       </div>
 
       {sizing.note && (
-        <p className="mt-2 text-[11px] text-accentAmber">{sizing.note}</p>
+        <p className="mt-2 text-caption text-accentAmber">{sizing.note}</p>
       )}
 
       {verdict.rationale && (
@@ -120,7 +120,7 @@ export default function DeskVerdict({
 
       {verdict.conditions.length > 0 && (
         <div className="mt-4">
-          <h5 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold font-mono uppercase tracking-wider text-textMuted">
+          <h5 className="mb-1.5 flex items-center gap-1.5 text-caption font-semibold text-textMuted">
             <ListChecks size={12} /> Approved on these conditions
           </h5>
           <ul className="space-y-1">
@@ -155,19 +155,19 @@ export default function DeskVerdict({
               : `${verdict.action} ${sizing.shares.toLocaleString()} ${symbol} on paper`}
           </button>
           {executed && (
-            <span className={clsx('text-[11px]', executed.success ? 'text-accentGreen' : 'text-accentRed')}>
+            <span className={clsx('text-caption', executed.success ? 'text-accentGreen' : 'text-accentRed')}>
               {executed.message}
             </span>
           )}
           {!done && !executed && (
-            <span className="text-[11px] text-textMuted">
+            <span className="text-caption text-textMuted">
               Places this order at the live price in your paper portfolio.
             </span>
           )}
         </div>
       )}
 
-      <p className="mt-4 border-t border-borderSubtle pt-2 text-[10px] leading-relaxed text-textMuted">
+      <p className="mt-4 border-t border-borderSubtle pt-2 text-caption leading-relaxed text-textMuted">
         Agents argue over figures computed by this platform&apos;s own engines, but their
         reasoning is generated and can be wrong in ways the numbers are not. Educational
         analysis on a paper-trading platform, not investment advice.

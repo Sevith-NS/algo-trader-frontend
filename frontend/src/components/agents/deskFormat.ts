@@ -77,13 +77,13 @@ export const STAGE_ORDER = ['gather', 'analysts', 'debate', 'judge', 'trader', '
 
 export const pct = (value: number | null | undefined, digits = 1) =>
   value === null || value === undefined || Number.isNaN(value)
-    ? '—'
+    ? '–'
     : `${value >= 0 ? '+' : ''}${value.toFixed(digits)}%`;
 
 /** Unsigned percentage — sizes and probabilities, where a "+" would be noise. */
 export const rawPct = (value: number | null | undefined, digits = 1) =>
   value === null || value === undefined || Number.isNaN(value)
-    ? '—'
+    ? '–'
     : `${value.toFixed(digits)}%`;
 
 export const relativeDay = (days: number | null | undefined) => {

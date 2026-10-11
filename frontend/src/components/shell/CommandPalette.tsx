@@ -4,14 +4,20 @@ import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { useEffect, useId, useRef, useState } from 'react';
 import { apiGet, errorMessage } from '@/lib/api';
+import { readStorage, writeStorage } from '@/lib/browser';
 import type { SearchResult } from '@/types/api';
 import { Search, X } from '@/components/ui/icons';
 
-const RECENT_KEY = 'flint.recent-symbols.v1';
+// Recent searches are the signed-in user's own: lib/browser namespaces the
+// key by user id and clears other users' entries on sign-in.
+const RECENT_KEY = 'recent-symbols.v1';
+
+/** Yahoo sends EQUITY / ETF / CRYPTOCURRENCY; show Equity, ETF, Cryptocurrency. */
+const sentenceCase = (s?: string) => (!s ? s : s.length <= 4 ? s : s[0] + s.slice(1).toLowerCase());
 
 function readRecent(): string[] {
   try {
-    const v = JSON.parse(window.localStorage.getItem(RECENT_KEY) ?? '[]');
+    const v = JSON.parse(readStorage(RECENT_KEY) ?? '[]');
     return Array.isArray(v) ? v.filter((s) => typeof s === 'string').slice(0, 6) : [];
   } catch {
     return [];
@@ -19,12 +25,8 @@ function readRecent(): string[] {
 }
 
 export function rememberSymbol(symbol: string) {
-  try {
-    const next = [symbol, ...readRecent().filter((s) => s !== symbol)].slice(0, 6);
-    window.localStorage.setItem(RECENT_KEY, JSON.stringify(next));
-  } catch {
-    /* storage unavailable: recents are a convenience only */
-  }
+  const next = [symbol, ...readRecent().filter((s) => s !== symbol)].slice(0, 6);
+  writeStorage(RECENT_KEY, JSON.stringify(next));
 }
 
 /**
@@ -74,7 +76,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
   const recent = open ? readRecent() : [];
   const options: { symbol: string; name?: string; meta?: string }[] = query.trim()
     ? results.map((r) => ({ symbol: r.symbol, name: r.shortname || r.longname,
-                            meta: [r.quoteType, r.exchDisp].filter(Boolean).join(' · ') }))
+                            meta: [sentenceCase(r.quoteType), r.exchDisp].filter(Boolean).join(' · ') }))
     : recent.map((s) => ({ symbol: s }));
 
   const go = (symbol: string) => {
@@ -100,9 +102,13 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
       onClose={onClose}
       onClick={(e) => { if (e.target === dialogRef.current) onClose(); }}
       aria-label="Search symbols"
-      className="m-0 h-[100dvh] max-h-none w-full max-w-none border-0 bg-ink-1 p-0 text-fg backdrop:bg-black/70 sm:mx-auto sm:mt-[12vh] sm:h-auto sm:max-h-[70vh] sm:w-[min(40rem,calc(100vw-2rem))] sm:border sm:border-line-strong"
+      // sm:bottom-auto: a modal dialog is pinned top and bottom by default, so
+      // without it the box stretches to max-height instead of fitting results.
+      className="m-0 h-[100dvh] max-h-none w-full max-w-none border-0 bg-ink-1 p-0 text-fg backdrop:bg-black/70 sm:bottom-auto sm:mx-auto sm:mt-[12vh] sm:h-auto sm:max-h-[70vh] sm:w-[min(40rem,calc(100vw-2rem))] sm:border sm:border-line-strong"
     >
-      <div className="flex items-center gap-2 border-b border-line px-3">
+      {/* Focus shows on the row's bottom edge, inside the dialog; the field's
+          own ring would be drawn outside it and over the dialog border. */}
+      <div className="flex items-center gap-2 border-b border-line px-3 focus-within:border-up">
         <Search className="shrink-0 text-fg-3" />
         <input
           ref={inputRef}
@@ -118,7 +124,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
           maxLength={64}
           autoComplete="off"
           spellCheck={false}
-          className="min-h-14 w-full bg-transparent text-body text-fg outline-none placeholder:text-fg-3"
+          className="min-h-14 w-full min-w-0 bg-transparent text-body text-fg outline-none focus-visible:outline-none placeholder:text-fg-3"
         />
         <button type="button" onClick={onClose} aria-label="Close search"
                 className="grid min-h-11 min-w-11 place-items-center text-fg-2 hover:text-fg">
@@ -144,13 +150,14 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
             <li key={o.symbol} id={`${listId}-${i}`} role="option" aria-selected={i === active}
                 onMouseEnter={() => setActive(i)}
                 onMouseDown={(e) => { e.preventDefault(); go(o.symbol); }}
-                className={clsx('flex min-h-12 cursor-pointer items-center justify-between gap-4 px-4',
+                // Phones: type and exchange drop to a second line so the name keeps its width.
+                className={clsx('flex min-h-12 cursor-pointer flex-col justify-center gap-0.5 px-4 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4',
                   i === active ? 'bg-ink-2' : '')}>
               <span className="flex min-w-0 items-baseline gap-3">
-                <span className="ticker text-body-sm">{o.symbol}</span>
+                <span className="ticker shrink-0 text-body-sm">{o.symbol}</span>
                 {o.name && <span className="truncate text-body-sm text-fg-2">{o.name}</span>}
               </span>
-              {o.meta && <span className="shrink-0 text-caption text-fg-3">{o.meta}</span>}
+              {o.meta && <span className="truncate text-caption text-fg-3 sm:shrink-0">{o.meta}</span>}
             </li>
           ))}
         </ul>
