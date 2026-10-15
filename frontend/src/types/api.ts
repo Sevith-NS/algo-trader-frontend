@@ -149,3 +149,49 @@ export type SearchResult = {
   exchDisp?: string;
   exchange?: string;
 };
+
+
+/** One index or sector row from /api/markets/pulse. */
+export type PulseRow = {
+  symbol: string;
+  name: string;
+  price: number;
+  change: number | null;
+  change_pct: number;
+  spark: number[];
+  as_of: string | null;
+};
+
+export type MarketPulse = {
+  market: 'in' | 'us';
+  label: string;
+  currency: string;
+  session: { state: 'open' | 'closed'; hours: string; note: string };
+  indices: PulseRow[];
+  /** Counts over `universe`, which always names what was counted. */
+  breadth: {
+    universe: string;
+    advancing: number;
+    declining: number;
+    unchanged: number;
+    priced: number;
+    scanned: number;
+    coverage_pct: number;
+    partial: boolean;
+    as_of: string | null;
+  };
+  sectors: PulseRow[];
+  missing: string[];
+  source: string;
+  computed_at: string;
+};
+
+export type FxQuote = {
+  pair: string;
+  base: string;
+  quote: string;
+  rate: number;
+  source: string;
+  as_of: string | null;
+  stale: boolean;
+};

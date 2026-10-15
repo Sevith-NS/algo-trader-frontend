@@ -76,8 +76,8 @@ Each primitive comes with all its states, keyboard support and a short usage com
 ## Phase 4: Screens
 
 ### Home (market pulse)
-- [ ] **T4.1** Indices strip (India and US indices, session dots, horizontal scroll on phone). `[M]` `[BE]` pulse
-- [ ] **T4.2** Breadth bar and sector heat table with India/US segmented control. `[M]` `[BE]` pulse
+- [x] **T4.1** Indices strip (India and US indices, session dots, horizontal scroll on phone). `[M]` `[BE]` pulse
+- [x] **T4.2** Breadth bar and sector heat table with India/US segmented control. `[M]` `[BE]` pulse
 - [ ] **T4.3** Movers table (Gainers, Losers, Volume) reusing `DataTable`. `[M]`
 - [ ] **T4.4** "Your day" column: real net worth Figure, paper P&L today (blue), triggered alerts, top 8 watchlist rows. `[M]` *Needs:* T3.4
 - [ ] **T4.5** News on holdings and watchlist (tone-tagged), 5 items + "All news". `[S]`

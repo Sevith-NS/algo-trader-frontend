@@ -3,6 +3,8 @@
 import clsx from 'clsx';
 import Link from 'next/link';
 import { PageHeader, Panel } from '@/components/PageHeader';
+import { IndicesStrip } from '@/components/home/IndicesStrip';
+import { MarketBreadth } from '@/components/home/MarketBreadth';
 import { Watchlist } from '@/components/home/Watchlist';
 import { PortfolioPulse } from '@/components/portfolio/Summary';
 import { Change } from '@/components/ui/Change';
@@ -90,9 +92,14 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader level={1} title="Today" className="mb-2" />
+      {/* Market first (docs/DESIGN.md §9.1); the full Home layout is T4.6. */}
+      <IndicesStrip />
       <PortfolioPulse />
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <Watchlist />
+        <div className="flex min-w-0 flex-col gap-4">
+          <MarketBreadth />
+          <Watchlist />
+        </div>
         <div className="flex flex-col gap-4">
           <Sessions />
           <RecentDecisions />
