@@ -28,7 +28,8 @@ export function Dialog({ open, onClose, title, children, className }: {
       onClick={(e) => { if (e.target === ref.current) onClose(); }}
       aria-labelledby="dialog-title"
       className={clsx(
-        'glass-2 m-0 mt-auto w-full max-w-none rounded-t-2xl p-0 text-fg backdrop:bg-black/60 backdrop:backdrop-blur-sm sm:rounded-2xl',
+        // overflow-hidden: the body scrolls; the dialog's UA overflow:auto drew 1px scrollbars.
+        'glass-2 m-0 mt-auto w-full max-w-none overflow-hidden rounded-t-2xl p-0 text-fg backdrop:bg-black/60 backdrop:backdrop-blur-sm sm:rounded-2xl',
         'sm:m-auto sm:w-[min(32rem,calc(100vw-2rem))]',
         className,
       )}

@@ -7,6 +7,7 @@ import NewsPage from '@/app/(app)/news/page';
 import PortfolioLayout from '@/app/(app)/portfolio/layout';
 import Holdings from '@/app/(app)/portfolio/page';
 import Risk from '@/app/(app)/portfolio/risk/page';
+import BrokerCallback from '@/app/(app)/settings/brokers/callback/page';
 import Settings from '@/app/(app)/settings/page';
 import { AppShell } from '@/components/shell/AppShell';
 import { SymbolView } from '@/components/symbol/SymbolView';
@@ -26,6 +27,7 @@ const SCREENS: Record<string, () => ReactNode> = {
   risk: () => <PortfolioLayout><Risk /></PortfolioLayout>,
   news: () => <NewsPage />,
   settings: () => <Settings />,
+  'broker-callback': () => <BrokerCallback />,
   symbol: () => <SymbolView symbol="RELIANCE.NS" />,
 };
 

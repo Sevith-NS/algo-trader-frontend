@@ -3,6 +3,7 @@
 import { UserProfile, useClerk } from '@clerk/nextjs';
 import clsx from 'clsx';
 import { useState, type FormEvent } from 'react';
+import { Brokers } from '@/components/settings/Brokers';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { Field, describedBy, inputClass } from '@/components/ui/Field';
@@ -127,7 +128,7 @@ function DataAndPrivacy() {
   return (
     <div className="flex max-w-xl flex-col gap-6">
       <div className="flex flex-col items-start gap-2">
-        <p className="text-body-sm text-fg-2">Download everything Polaris stores about you: profile, paper account, every fill, watchlists and your decision journal.</p>
+        <p className="text-body-sm text-fg-2">Download everything Polaris stores about you: profile, paper account, every fill, watchlists, your decision journal, broker connections (never their access tokens), synced holdings and alerts.</p>
         <Button variant="secondary" onClick={exportData} loading={exporting}>Export my data</Button>
       </div>
       <div className="flex flex-col items-start gap-2 border-t border-line pt-6">
@@ -165,6 +166,11 @@ export default function Settings() {
         <div className="max-w-full overflow-x-auto">
           <UserProfile routing="hash" appearance={{ elements: { rootBox: 'w-full', cardBox: 'w-full max-w-none border border-white/10' } }} />
         </div>
+      </Section>
+
+      <Section id="brokers-h" title="Brokers"
+               intro="Read-only connections that bring your real holdings into Polaris. Real holdings are kept apart from paper ones.">
+        <Brokers />
       </Section>
 
       <Section id="prefs-h" title="Trading preferences">

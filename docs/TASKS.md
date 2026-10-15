@@ -52,7 +52,7 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [ ] **T2.9** `Dialog` v3 (radius 14, overlay shadow, scrim, focus trap and return). `[M]`
 - [x] **T2.10** `Sheet`: right panel on `lg`+, bottom sheet with a handle on phone; focus management; Escape; reduced-motion aware. `[L]`
 - [ ] **T2.11** `Popover`, `Menu` and `Tooltip` (positioning, Escape, outside click, APG menu keys). `[L]`
-- [ ] **T2.12** `Badge`/`Chip`, `ModeBadge` (Real/Paper), `SyncBadge`. `[S]`
+- [ ] **T2.12** `Badge`/`Chip`, `ModeBadge` (Real/Paper), ~~`SyncBadge`~~ (done with T4.14). `[S]`
 - [ ] **T2.13** `Figure` and `StatStrip`. `[S]`
 - [ ] **T2.14** `Price` with tick flash and throttled `aria-live`; `Change` v3 (true minus, arrow, absolute and/or percent). `[M]`
 - [ ] **T2.15** `ProvenanceChip` (hover on pointer, inline on touch, amber when stale). `[M]`
@@ -93,8 +93,8 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [ ] **T4.13** Paper order ticket on `Sheet`: books only into paper, shows risk and stop before the button, blue primary, disclaimer. `[L]`
 
 ### Brokers and settings
-- [ ] **T4.14** Settings → Brokers: list connections with SyncBadge, "Connect Zerodha", "Connect Upstox", Sync now, Disconnect (typed confirm), scopes shown. `[L]` `[BE]` brokers
-- [ ] **T4.15** `/settings/brokers/callback`: success, cancelled and error states, then return to Brokers. `[S]` `[BE]`
+- [x] **T4.14** Settings → Brokers: list connections with SyncBadge, "Connect Zerodha", "Connect Upstox", Sync now, Disconnect (typed confirm), scopes shown. `[L]` `[BE]` brokers
+- [x] **T4.15** `/settings/brokers/callback`: success, cancelled and error states, then return to Brokers. `[S]` `[BE]`
 - [ ] **T4.16** "Needs reconnect" amber `Banner` on Portfolio and Home when any broker needs attention. `[S]`
 - [ ] **T4.17** Settings → Preferences: base currency (INR/USD), density, reduced-motion override. Restyle Profile, Security and Data and privacy sections. `[M]`
 

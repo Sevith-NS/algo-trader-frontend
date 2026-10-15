@@ -13,13 +13,41 @@ export type Profile = {
   created_at: string;
 };
 
+export type SyncStatus = 'connected' | 'syncing' | 'needs_reconnect' | 'error';
+
+/** Paper accounts take simulated orders; real ones mirror a broker, read-only. */
 export type Account = {
   id: string;
   name: string;
+  kind: 'paper' | 'real';
   currency: string;
-  starting_cash: string;
+  /** Null for real accounts. */
+  starting_cash: string | null;
+  created_at: string;
+  broker: 'zerodha' | null;
+  sync: { connection_id: string; status: SyncStatus; last_synced_at: string | null } | null;
+};
+
+export type BrokerConnection = {
+  id: string;
+  broker: 'zerodha';
+  broker_user_id: string;
+  broker_user_name: string | null;
+  status: SyncStatus;
+  account_id: string | null;
+  last_synced_at: string | null;
+  token_expires_at: string | null;
+  last_error: string | null;
+  scopes: string[];
   created_at: string;
 };
+
+export type BrokersResponse = {
+  connections: BrokerConnection[];
+  available: { broker: 'zerodha'; label: string; markets: string[]; configured: boolean }[];
+};
+
+export type SyncResult = { account_id: string; holdings: number; skipped: number; synced_at: string };
 
 export type PositionRow = {
   symbol: string;

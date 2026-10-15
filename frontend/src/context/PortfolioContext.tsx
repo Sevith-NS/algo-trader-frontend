@@ -45,7 +45,8 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
         apiGet<{ accounts: Account[] }>('/api/accounts'),
       ]);
       setProfile(me);
-      const acct = accounts.accounts[0] ?? null;
+      // Real (broker) accounts are read-only; this context drives paper trading.
+      const acct = accounts.accounts.find((a) => a.kind === 'paper') ?? null;
       setAccount(acct);
       setBook(acct ? await apiGet<PositionsResponse>(`/api/accounts/${acct.id}/positions`) : null);
       setError(null);
