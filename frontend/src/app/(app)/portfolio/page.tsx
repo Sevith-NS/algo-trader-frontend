@@ -33,13 +33,13 @@ export default function Holdings() {
   }
 
   return (
-    <section aria-label="Holdings" className="flex flex-col gap-4">
+    <section aria-label="Holdings" className="glass flex flex-col gap-4 rounded-2xl p-5 md:p-6">
       {/* Laptop: one table. */}
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-table">
           <caption className="sr-only">Open paper positions, values in {ccy}</caption>
           <thead>
-            <tr className="border-b border-line text-left text-caption text-fg-3">
+            <tr className="border-b border-white/10 text-left text-caption text-fg-3">
               <th scope="col" className="py-2 font-normal">Symbol</th>
               <th scope="col" className="py-2 text-right font-normal">Quantity</th>
               <th scope="col" className="py-2 text-right font-normal">Avg cost ({ccy})</th>
@@ -51,7 +51,7 @@ export default function Holdings() {
           </thead>
           <tbody>
             {book.positions.map((p) => (
-              <tr key={p.symbol} className="border-b border-line">
+              <tr key={p.symbol} className="border-b border-white/[0.07] last:border-0">
                 <th scope="row" className="py-3 text-left font-normal">
                   <Link href={`/s/${encodeURIComponent(p.symbol)}`} className="ticker hover:underline">{p.symbol}</Link>
                 </th>
@@ -72,7 +72,7 @@ export default function Holdings() {
       </div>
 
       {/* Phone: one card per holding, same numbers. */}
-      <ul className="flex flex-col divide-y divide-line border-y border-line md:hidden">
+      <ul className="flex flex-col divide-y divide-white/[0.07] md:hidden">
         {book.positions.map((p) => (
           <li key={p.symbol}>
             <Link href={`/s/${encodeURIComponent(p.symbol)}`} className="flex min-h-16 items-center justify-between gap-4 py-3">

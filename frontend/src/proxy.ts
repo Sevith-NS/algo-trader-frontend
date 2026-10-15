@@ -6,7 +6,7 @@
  * surface checks for itself on the server:
  *   - app/(app)/layout.tsx and app/onboarding/layout.tsx call auth.protect()
  *   - app/api/backend/* refuses any request without a session
- *   - the Flint API verifies the session token again on every call
+ *   - the Polaris API verifies the session token again on every call
  */
 import { clerkMiddleware } from '@clerk/nextjs/server';
 

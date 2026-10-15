@@ -52,22 +52,22 @@ export function ChartPanel({ symbol, levels }: { symbol: string; levels?: QuantL
   const priceLines = useMemo(() => {
     if (!showPlan || !levels) return undefined;
     const lines = [
-      { price: levels.entry, color: '#F2F4F3', lineStyle: 0, lineWidth: 2, title: 'Entry' },
-      { price: levels.stop_loss, color: '#E5484D', lineStyle: 3, lineWidth: 2, title: 'Stop' },
-      { price: levels.target_1, color: '#2FBF71', lineStyle: 3, lineWidth: 1, title: 'T1' },
-      { price: levels.target_2, color: '#2FBF71', lineStyle: 3, lineWidth: 2, title: 'T2' },
+      { price: levels.entry, color: '--fg', lineStyle: 0, lineWidth: 2, title: 'Entry' },
+      { price: levels.stop_loss, color: '--red', lineStyle: 3, lineWidth: 2, title: 'Stop' },
+      { price: levels.target_1, color: '--green', lineStyle: 3, lineWidth: 1, title: 'T1' },
+      { price: levels.target_2, color: '--green', lineStyle: 3, lineWidth: 2, title: 'T2' },
     ] as const;
     return lines.filter((l) => l.price != null).map((l) => ({ ...l, axisLabelVisible: true }));
   }, [levels, showPlan]);
 
   return (
-    <section aria-label="Price chart" className="flex flex-col gap-3">
+    <section aria-label="Price chart" className="glass flex flex-col gap-3 rounded-2xl p-4 md:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div role="group" aria-label="Timeframe" className="flex border border-control">
+        <div role="group" aria-label="Timeframe" className="flex overflow-hidden rounded-sm border border-white/15 bg-black/30">
           {TIMEFRAMES.map((t) => (
             <button key={t.id} type="button" aria-pressed={tf === t.id} onClick={() => setTf(t.id)}
                     className={clsx('min-h-9 min-w-11 px-2 text-table tabular',
-                      tf === t.id ? 'bg-ink-2 text-fg' : 'text-fg-2 hover:text-fg')}>
+                      tf === t.id ? 'bg-fg text-ink-0' : 'text-fg-2 hover:text-fg')}>
               {t.label}
             </button>
           ))}

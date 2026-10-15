@@ -1,8 +1,10 @@
-# Flint OS v2: Design and UX Spec
+# Polaris OS v2: Design and UX Spec
 
 **Status:** Draft for approval (Phase 1) · **Branch:** `flint-os-v2` · **Date:** 2026-10-10
 **Method:** Google UX Design Certificate process (empathize, define, ideate, prototype, test) plus the roadmap.sh UX Design roadmap (behaviour design, UX patterns, research).
 **Supersedes:** the "committed identity" in `CLAUDE.md` (deep slate, neon accents, glass, General Sans). The principles in `PRODUCT.md` carry forward; its visual rules do not.
+
+> **Superseded in part (2026-10-11):** §4 navigation, §6 (visual language), §8 (component inventory) and §15.4 (landing exception) are replaced by `docs/DESIGN.md` (v3). Product scope is now `docs/PRD.md` Part III. The rest (empathize, flows, accessibility, security) still applies.
 
 Once approved, this file is the source of truth. Code that disagrees with it is a bug; changes to it need an explicit decision.
 
@@ -13,7 +15,7 @@ Once approved, this file is the source of truth. Code that disagrees with it is 
 | Area | Decision |
 |---|---|
 | Access | Invite-only. The owner first, then invited testers in waves. Multi-user from day one. |
-| Auth | Clerk only (sign-in, sign-up, MFA, sessions). No passwords stored by Flint. |
+| Auth | Clerk only (sign-in, sign-up, MFA, sessions). No passwords stored by Polaris. |
 | Data | Neon Postgres. Every user-owned row is scoped by Clerk user id and protected by row-level security. |
 | Backend | FastAPI. Every input validated at the edge. |
 | Markets | Global, all asset classes. One instrument model for everything; data coverage rolls out in waves (section 12). |
@@ -79,7 +81,7 @@ The opposite of the list is also required: real skeleton loaders, real product v
 
 ```
 Public
-  /                     Landing: what Flint is, a real product view, "Request an invite"
+  /                     Landing: what Polaris is, a real product view, "Request an invite"
   /sign-in  /sign-up    Clerk (sign-up requires an invite)
   /legal/privacy  /legal/terms
 
@@ -201,7 +203,7 @@ Plain, short, specific. Buttons say exactly what happens ("Place paper order", "
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│ FLINT   Home  Markets  Portfolio  News          [ Search  Ctrl K ]     (SN)  │
+│ POLARIS Home  Markets  Portfolio  News          [ Search  Ctrl K ]     (SN)  │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ RELIANCE.NS  Reliance Industries · NSE · INR · Equity        ● Open 15m delay │
 │ ₹2,914.50   ▲ +38.20 (+1.33%)                                 [ Paper trade ] │
@@ -223,7 +225,7 @@ Plain, short, specific. Buttons say exactly what happens ("Place paper order", "
 
 ```
 ┌──────────────────────────┐
-│ FLINT          [⌕]  (SN) │
+│ POLARIS        [⌕]  (SN) │
 ├──────────────────────────┤
 │ RELIANCE.NS   ● Open     │
 │ ₹2,914.50  ▲ +1.33%      │
@@ -333,3 +335,4 @@ Advanced features will sit behind paid tiers once the core is stable. Planned no
 1. **Coolvetica licence.** Resolved 2026-10-11: the free licence excludes website embedding, so Coolvetica is not used. Display type is the UI stack at 700.
 2. **Invites.** Sent by the owner from the Clerk dashboard (restricted sign-up). A public waitlist can come later.
 3. **Starting paper balance.** Chosen in onboarding, defaulting to ₹10,00,000 or the $100,000 equivalent in the base currency.
+4. **Landing page exception.** Decided 2026-10-11 by the owner: the landing page at `/` does not follow sections 3 and 6. It is Swiss industrial print (paper `#EEECE6`, carbon ink `#0E0E0C`, hazard red `#BF1F12` only for stops and losses), Archivo expanded black for display and IBM Plex Mono for data, with Locomotive Scroll v5 and GSAP ScrollTrigger (pinned and scrubbed sections). It is scoped to `src/app/landing.css` and `src/components/landing/`. Reduced motion still gets a finished static page. Everything behind sign-in keeps this spec.

@@ -12,19 +12,19 @@ import { actionColor, gradeColor, GRADE_LABELS, pct, rawPct, relativeDay } from 
 import { Chip, MicroLabel } from './DeskAtoms';
 
 function Scorecard({ stats }: { stats: JournalStats }) {
-  const hitColor = stats.hit_rate === null ? '#848C88'
-    : stats.hit_rate >= 50 ? '#2FBF71' : '#E5484D';
-  const alphaColor = stats.avg_signed_alpha_pct === null ? '#848C88'
-    : stats.avg_signed_alpha_pct >= 0 ? '#2FBF71' : '#E5484D';
+  const hitColor = stats.hit_rate === null ? 'var(--fg-3)'
+    : stats.hit_rate >= 50 ? 'var(--green)' : 'var(--red)';
+  const alphaColor = stats.avg_signed_alpha_pct === null ? 'var(--fg-3)'
+    : stats.avg_signed_alpha_pct >= 0 ? 'var(--green)' : 'var(--red)';
 
   return (
-    <div className="grid grid-cols-2 gap-4 rounded-xl border border-borderSubtle bg-ink-2 p-4 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-4 rounded-xl well p-4 sm:grid-cols-4">
       <div>
         <MicroLabel>Hit rate</MicroLabel>
         <div className="text-2xl font-bold tabular" style={{ color: hitColor }}>
           {stats.hit_rate === null ? '–' : `${stats.hit_rate.toFixed(0)}%`}
         </div>
-        <div className="text-caption text-textMuted">
+        <div className="text-caption text-fg-3">
           {stats.hits}/{stats.directional} directional calls
         </div>
       </div>
@@ -33,19 +33,19 @@ function Scorecard({ stats }: { stats: JournalStats }) {
         <div className="text-2xl font-bold tabular" style={{ color: alphaColor }}>
           {pct(stats.avg_signed_alpha_pct)}
         </div>
-        <div className="text-caption text-textMuted">vs S&amp;P 500, per call</div>
+        <div className="text-caption text-fg-3">vs S&amp;P 500, per call</div>
       </div>
       <div>
         <MicroLabel>Stood aside</MicroLabel>
-        <div className="text-2xl font-bold tabular text-textPrimary">{stats.stand_aside}</div>
-        <div className="text-caption text-textMuted">
+        <div className="text-2xl font-bold tabular text-fg">{stats.stand_aside}</div>
+        <div className="text-caption text-fg-3">
           {stats.dodged} dodged · {stats.missed_moves} missed
         </div>
       </div>
       <div>
         <MicroLabel>Decisions</MicroLabel>
-        <div className="text-2xl font-bold tabular text-textPrimary">{stats.total}</div>
-        <div className="text-caption text-textMuted">{stats.graded} scored so far</div>
+        <div className="text-2xl font-bold tabular text-fg">{stats.total}</div>
+        <div className="text-caption text-fg-3">{stats.graded} scored so far</div>
       </div>
     </div>
   );
@@ -57,24 +57,24 @@ function Row({ entry, onDelete }: { entry: JournalEntry; onDelete: (id: string) 
   const aColor = actionColor(entry.action);
 
   return (
-    <div className="flex flex-col gap-2 border-t border-borderSubtle py-3 first:border-t-0 sm:flex-row sm:items-start sm:gap-4">
+    <div className="flex flex-col gap-2 border-t border-line py-3 first:border-t-0 sm:flex-row sm:items-start sm:gap-4">
       <div className="flex min-w-0 shrink-0 items-center gap-2 sm:w-44">
-        <span className="ticker text-[13px] font-semibold text-textPrimary">{entry.symbol}</span>
+        <span className="ticker text-[13px] font-semibold text-fg">{entry.symbol}</span>
         <Chip label={entry.decision === 'REJECT' ? `REJECT ${entry.action}` : entry.action} color={aColor} />
       </div>
 
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-caption text-textMuted">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-caption text-fg-3">
           <span>{entry.date}</span>
           <span>{relativeDay(outcome?.days_held)}</span>
-          <span>conviction <span className="tabular text-textSecondary">{entry.conviction_10}/10</span></span>
+          <span>conviction <span className="tabular text-fg-2">{entry.conviction_10}/10</span></span>
           {entry.size_pct > 0 && (
-            <span>size <span className="tabular text-textSecondary">{rawPct(entry.size_pct, 2)}</span></span>
+            <span>size <span className="tabular text-fg-2">{rawPct(entry.size_pct, 2)}</span></span>
           )}
           <span>{entry.rounds} {entry.rounds === 1 ? 'round' : 'rounds'} · {entry.debate_winner.toLowerCase()} won</span>
         </div>
         {entry.thesis && (
-          <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-textSecondary">{entry.thesis}</p>
+          <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-fg-2">{entry.thesis}</p>
         )}
       </div>
 
@@ -88,9 +88,9 @@ function Row({ entry, onDelete }: { entry: JournalEntry; onDelete: (id: string) 
               <span className="text-sm font-bold tabular" style={{ color: gColor }}>
                 {pct(outcome.alpha_pct)}
               </span>
-              <span className="text-caption text-textMuted">alpha</span>
+              <span className="text-caption text-fg-3">alpha</span>
             </div>
-            <div className="mt-0.5 text-caption tabular text-textMuted">
+            <div className="mt-0.5 text-caption tabular text-fg-3">
               {pct(outcome.return_pct)} vs SPX {pct(outcome.benchmark_return_pct)}
             </div>
             <div className="mt-1 flex justify-end">
@@ -98,13 +98,13 @@ function Row({ entry, onDelete }: { entry: JournalEntry; onDelete: (id: string) 
             </div>
           </div>
         ) : (
-          <span className="text-caption text-textMuted">too fresh to score</span>
+          <span className="text-caption text-fg-3">too fresh to score</span>
         )}
         <button
           onClick={() => onDelete(entry.id)}
           aria-label={`Forget the ${entry.date} decision on ${entry.symbol}`}
           title="Forget this decision so it stops informing future runs"
-          className="mt-0.5 rounded p-1 text-textMuted transition-colors hover:text-accentRed"
+          className="mt-0.5 rounded p-1 text-fg-3 transition-colors hover:text-down"
         >
           <Trash2 size={13} />
         </button>
@@ -168,17 +168,17 @@ export default function DecisionJournal({
   };
 
   return (
-    <div className="glass-panel p-5">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
-        <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
-          <History size={15} className="text-accentBlue" /> Decision Journal
-          <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
+    <div className="glass rounded-xl p-5">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
+        <h4 className="flex items-center gap-2 text-sm font-semibold text-fg">
+          <History size={15} className="text-fg-2" /> Decision Journal
+          <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-caption text-fg-3">
             scored on alpha · feeds the next run
           </span>
         </h4>
         <div className="flex items-center gap-2">
           {symbol && (
-            <div className="flex overflow-hidden rounded-lg border border-borderSubtle">
+            <div className="flex overflow-hidden rounded-sm border border-white/15 bg-black/30">
               {(['symbol', 'all'] as const).map((option) => (
                 <button
                   key={option}
@@ -186,8 +186,8 @@ export default function DecisionJournal({
                   className={clsx(
                     'px-2.5 py-1 text-caption transition-colors',
                     scope === option
-                      ? 'bg-line text-textPrimary'
-                      : 'text-textMuted hover:text-textSecondary',
+                      ? 'bg-line text-fg'
+                      : 'text-fg-3 hover:text-fg-2',
                   )}
                 >
                   {option === 'symbol' ? symbol : 'All'}
@@ -199,7 +199,7 @@ export default function DecisionJournal({
             onClick={load}
             disabled={loading}
             aria-label="Rescore the journal"
-            className="rounded-lg border border-borderSubtle px-2 py-1.5 text-textMuted transition-colors hover:text-textPrimary disabled:opacity-50"
+            className="rounded-sm border border-white/25 bg-black/30 px-2 py-1.5 text-fg-3 transition-colors hover:text-fg disabled:opacity-50"
           >
             <RefreshCw size={13} />
           </button>
@@ -207,15 +207,15 @@ export default function DecisionJournal({
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 text-[12px] text-textSecondary">
-          <WifiOff size={14} className="shrink-0 text-accentAmber" /> {error}
+        <div className="flex items-center gap-2 text-[12px] text-fg-2">
+          <WifiOff size={14} className="shrink-0 text-warn" /> {error}
         </div>
       )}
 
       {!error && stats && <Scorecard stats={stats} />}
 
       {!error && entries.length === 0 && !loading && (
-        <p className="mt-4 flex items-center gap-2 text-[12px] text-textMuted">
+        <p className="mt-4 flex items-center gap-2 text-[12px] text-fg-3">
           <Target size={13} />
           No decisions recorded yet. Every desk run is journalled here and scored against
           the S&amp;P once the market has had a day to respond.

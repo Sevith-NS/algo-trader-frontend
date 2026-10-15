@@ -20,9 +20,9 @@ const MARKETS: { id: Market; label: string }[] = [
 
 function Section({ id, title, intro, children }: { id: string; title: string; intro?: string; children: React.ReactNode }) {
   return (
-    <section aria-labelledby={id} className="flex flex-col gap-4 border-t border-line pt-6">
+    <section aria-labelledby={id} className="glass flex flex-col gap-4 rounded-2xl p-5 md:p-6">
       <div className="flex flex-col gap-1">
-        <h2 id={id} className="text-h4 font-bold">{title}</h2>
+        <h2 id={id} className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />{title}</h2>
         {intro && <p className="max-w-prose text-body-sm text-fg-2">{intro}</p>}
       </div>
       {children}
@@ -71,8 +71,8 @@ function Preferences({ profile, onSaved }: { profile: Profile; onSaved: () => vo
             const on = markets.includes(m.id);
             return (
               <label key={m.id} className={clsx('flex min-h-11 cursor-pointer items-center gap-3 border px-3 text-body-sm',
-                on ? 'border-up' : 'border-line hover:border-control')}>
-                <input type="checkbox" checked={on} className="accent-[#2FBF71]"
+                on ? 'border-fg bg-white/[0.06]' : 'border-white/15 hover:border-white/30')}>
+                <input type="checkbox" checked={on} className="accent-fg"
                        onChange={() => setMarkets((all) => (on ? all.filter((x) => x !== m.id) : [...all, m.id]))} />
                 {m.label}
               </label>
@@ -101,7 +101,7 @@ function DataAndPrivacy() {
       const res = await fetch(`${API_BASE}/api/me/export`);
       if (!res.ok) throw new Error('export failed');
       const url = URL.createObjectURL(await res.blob());
-      const a = Object.assign(document.createElement('a'), { href: url, download: 'flint-export.json' });
+      const a = Object.assign(document.createElement('a'), { href: url, download: 'polaris-export.json' });
       a.click();
       URL.revokeObjectURL(url);
     } catch {
@@ -127,7 +127,7 @@ function DataAndPrivacy() {
   return (
     <div className="flex max-w-xl flex-col gap-6">
       <div className="flex flex-col items-start gap-2">
-        <p className="text-body-sm text-fg-2">Download everything Flint stores about you: profile, paper account, every fill, watchlists and your decision journal.</p>
+        <p className="text-body-sm text-fg-2">Download everything Polaris stores about you: profile, paper account, every fill, watchlists and your decision journal.</p>
         <Button variant="secondary" onClick={exportData} loading={exporting}>Export my data</Button>
       </div>
       <div className="flex flex-col items-start gap-2 border-t border-line pt-6">
@@ -157,13 +157,13 @@ export default function Settings() {
   const { profile, loading, error, refresh } = usePortfolio();
 
   return (
-    <div className="flex flex-col gap-8">
-      <h1 className="text-h3 font-bold">Settings</h1>
+    <div className="flex flex-col gap-4">
+      <h1 className="text-silver text-h2 font-normal tracking-[-0.03em] md:text-[40px] md:leading-[44px]">Settings</h1>
 
       <Section id="security-h" title="Account and security"
-               intro="Your email, password, two-step verification and the devices signed in to Flint. Turn on two-step verification to protect your account.">
+               intro="Your email, password, two-step verification and the devices signed in to Polaris. Turn on two-step verification to protect your account.">
         <div className="max-w-full overflow-x-auto">
-          <UserProfile routing="hash" appearance={{ elements: { rootBox: 'w-full', cardBox: 'w-full max-w-none border border-line' } }} />
+          <UserProfile routing="hash" appearance={{ elements: { rootBox: 'w-full', cardBox: 'w-full max-w-none border border-white/10' } }} />
         </div>
       </Section>
 

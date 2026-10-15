@@ -14,15 +14,15 @@ export default function IdeaCard({ card }: { card: DiscoverCard }) {
   return (
     <Link
       href={`/s/${encodeURIComponent(card.symbol)}`}
-      className="glass-panel block p-4 transition-colors hover:bg-ink-2 focus-visible:ring-1 focus-visible:ring-accentCyan/50"
+      className="glass rounded-xl block p-4 transition-colors hover:bg-white/[0.06] focus-visible:ring-1 focus-visible:ring-fg-2/50"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="font-semibold text-textPrimary">{card.symbol}</div>
-          <div className="truncate text-xs text-textMuted">{card.name}</div>
+          <div className="font-semibold text-fg">{card.symbol}</div>
+          <div className="truncate text-xs text-fg-3">{card.name}</div>
         </div>
         <div className="shrink-0 text-right">
-          <div className="text-sm font-semibold tabular text-textPrimary">
+          <div className="text-sm font-semibold tabular text-fg">
             {fmtPrice(card.price, card.currency)}
           </div>
           <div className="mt-0.5">
@@ -53,7 +53,7 @@ export default function IdeaCard({ card }: { card: DiscoverCard }) {
         {card.tags.map((tag) => (
           <div key={tag.id} className="flex items-start gap-1.5">
             <span className={clsx('mt-1 h-1.5 w-1.5 shrink-0 rounded-full', TAG_STYLES[tag.id].dot)} />
-            <span className="text-caption leading-snug text-textMuted">{tag.reason}</span>
+            <span className="text-caption leading-snug text-fg-3">{tag.reason}</span>
           </div>
         ))}
       </div>

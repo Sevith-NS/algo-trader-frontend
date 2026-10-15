@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import {
   createChart, ColorType, IChartApi, LineSeries, AreaSeries, LineStyle, Time,
 } from 'lightweight-charts';
+import { cssVar } from '../../lib/theme';
 import type { Curve } from '../../types/backtest';
 
 const INTRADAY = new Set(['1m', '5m', '15m', '30m', '60m', '1h']);
@@ -57,10 +58,12 @@ export default function EquityChart({
   useEffect(() => {
     if (!containerRef.current) return;
 
+    const fg2 = cssVar('--fg-2');
+
     const chart = createChart(containerRef.current, {
       layout: {
         background: { type: ColorType.Solid, color: 'transparent' },
-        textColor: '#A4ACA8',
+        textColor: fg2,
         panes: { separatorColor: 'rgba(148,163,184,0.12)' },
       },
       autoSize: true,
@@ -90,7 +93,7 @@ export default function EquityChart({
     }
 
     const strategy = chart.addSeries(LineSeries, {
-      color: '#A4ACA8',
+      color: fg2,
       lineWidth: 2,
       priceLineVisible: false,
       title: 'strategy',
@@ -108,7 +111,7 @@ export default function EquityChart({
       const dd = chart.addSeries(
         AreaSeries,
         {
-          lineColor: '#E5484D',
+          lineColor: cssVar('--red'),
           topColor: 'rgba(248,113,113,0.05)',
           bottomColor: 'rgba(248,113,113,0.45)',
           lineWidth: 1,

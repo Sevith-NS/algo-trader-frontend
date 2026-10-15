@@ -1,5 +1,5 @@
 /**
- * Backend-for-frontend: the only way the browser reaches the Flint API.
+ * Backend-for-frontend: the only way the browser reaches the Polaris API.
  *
  * The browser calls /api/backend/api/<route> on this origin. This handler runs
  * on the Next.js server, swaps the Clerk session cookie for a short-lived
@@ -43,7 +43,7 @@ async function forward(req: NextRequest, { params }: Ctx) {
     return fail(404, 'Not found.', 'not_found');
   }
   if (req.method !== 'GET' && !sameOrigin(req)) {
-    return fail(403, 'This request did not come from Flint.', 'forbidden');
+    return fail(403, 'This request did not come from Polaris.', 'forbidden');
   }
 
   const { userId, getToken } = await auth();
@@ -77,7 +77,7 @@ async function forward(req: NextRequest, { params }: Ctx) {
       signal: req.signal,
     });
   } catch {
-    return fail(503, 'Flint is unavailable right now. Try again shortly.', 'unavailable');
+    return fail(503, 'Polaris is unavailable right now. Try again shortly.', 'unavailable');
   }
 
   const headers = new Headers();

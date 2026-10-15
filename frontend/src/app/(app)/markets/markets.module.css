@@ -20,19 +20,19 @@
 
 .header h2 {
   font-size: 1.5rem;
-  color: var(--text-primary);
+  color: var(--fg);
   margin-bottom: 0.5rem;
   font-weight: 600;
 }
 
 .header p {
-  color: var(--text-secondary);
+  color: var(--fg-2);
 }
 
 .loading {
   text-align: center;
   padding: 3rem;
-  color: var(--text-secondary);
+  color: var(--fg-2);
 }
 
 .tableWrapper {
@@ -48,16 +48,16 @@
 .table th {
   text-align: left;
   padding: 1rem;
-  color: var(--text-secondary);
+  color: var(--fg-2);
   font-weight: 500;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--line);
   cursor: pointer;
   transition: color 0.2s ease;
   user-select: none;
 }
 
 .table th:hover {
-  color: var(--text-primary);
+  color: var(--fg);
 }
 
 .table td {
@@ -71,17 +71,17 @@
 }
 
 .symbolLink {
-  color: var(--text-primary);
+  color: var(--fg);
   font-weight: 600;
 }
 
 .symbolLink:hover {
-  color: var(--accent-green);
+  color: var(--green);
   text-decoration: underline;
 }
 
 .name {
-  color: var(--text-secondary);
+  color: var(--fg-2);
   max-width: 250px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -92,11 +92,11 @@
 }
 
 .positive {
-  color: var(--accent-green);
+  color: var(--green);
 }
 
 .negative {
-  color: var(--accent-red);
+  color: var(--red);
 }
 
 @media (max-width: 768px) {

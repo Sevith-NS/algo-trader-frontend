@@ -2,43 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Flint OS v2. Tokens mirror tailwind.config.js; see docs/flint-os-v2/DESIGN.md. */
+/* Polaris v3.2 "Glass". Tokens mirror tailwind.config.js; see docs/DESIGN.md.
+   Calibrated against the Wealthcore reference: neutral greys, near-opaque
+   glass with a diagonal sheen and a rim light, heavy grain, silver display. */
 :root {
-  --ink-0: #0A0B0B;
-  --ink-1: #111312;
-  --ink-2: #181B1A;
-  --line: #242927;
-  --line-strong: #353C39;
-  --control: #626A66;
-  --fg: #F2F4F3;
-  --fg-2: #A4ACA8;
-  --fg-3: #848C88;
-  --green: #2FBF71;
-  --red: #E5484D;
-  --amber: #D9A23A;
+  --ink-0: #0B0B0C;
+  --ink-1: #141414;
+  --ink-2: #1C1C1C;
+  --ink-3: #242424;
+  --line: #2A2A2A;
+  --line-strong: #3A3A3A;
+  --control: #7A7A7A;
+  --fg: #F5F5F5;
+  --fg-2: #B5B5B5;
+  --fg-3: #A0A0A0; /* 5.3:1 on the brightest card sheen (#2D2D2D) */
+  --green: #3DD68C;
+  --red: #FF7A75;
+  --amber: #E8B04A;
+  --paper: #86B7FF; /* paper money only */
+
+  /* Chart series greys, between fg and control. Indicators use these, never
+     green/red (those mean direction). */
+  --series-2: #C9C9C9;
+  --series-4: #808080;
+
+  /* Glass. The fill is near-opaque on purpose: the reference reads as glass
+     because of the light behind it and the rim around it, not because the
+     card is see-through. 0.80 keeps the brightest sheen at #2D2D2D over the
+     app's light field (fg-3 stays AA). */
+  --glass-fill: rgb(17 17 17 / 0.80);
+  --glass-fill-2: rgb(22 22 22 / 0.90);
+  --glass-fill-hero: rgb(15 15 15 / 0.88);
+  --glass-sheen: linear-gradient(135deg, rgb(255 255 255 / 0.075) 0%, rgb(255 255 255 / 0.025) 42%, rgb(255 255 255 / 0) 72%);
+  --glass-rim: linear-gradient(135deg, rgb(255 255 255 / 0.34) 0%, rgb(255 255 255 / 0.08) 38%, rgb(255 255 255 / 0.04) 70%, rgb(255 255 255 / 0.14) 100%);
+  --glass-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 24px 48px -24px rgb(0 0 0 / 0.7);
+  --blur: 14px;
+
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
 
   --font-ui: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-display: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-  /* Legacy names still read by CSS modules and inline styles. */
-  --bg-primary: var(--ink-0);
-  --bg-secondary: var(--ink-1);
-  --bg-elevated: var(--ink-2);
-  --text-primary: var(--fg);
-  --text-secondary: var(--fg-2);
-  --text-muted: var(--fg-3);
-  --accent-green: var(--green);
-  --accent-red: var(--red);
-  --accent-amber: var(--amber);
-  --accent-blue: var(--fg-2);
-  --accent-purple: var(--fg-2);
-  --accent-cyan: var(--fg-2);
-  --border-subtle: var(--line);
-  --border-strong: var(--line-strong);
-  --font-sans: var(--font-ui);
-  --font-mono: var(--font-ui);
-
   color-scheme: dark;
+}
+
+@media (min-width: 1024px) {
+  :root { --blur: 24px; }
 }
 
 html,
@@ -80,7 +95,7 @@ button {
 
 h1, h2, h3, h4 {
   margin: 0;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
   text-wrap: balance;
 }
 
@@ -89,14 +104,14 @@ p {
 }
 
 ::selection {
-  background: rgba(47, 191, 113, 0.28);
+  background: rgb(255 255 255 / 0.22);
 }
 
 input,
 textarea,
 select {
   font: inherit;
-  caret-color: var(--green);
+  caret-color: var(--fg);
 }
 
 ::placeholder {
@@ -106,15 +121,15 @@ select {
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 9999px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--control); }
 
-/* One focus treatment everywhere: 2px green ring with a 2px gap. In the base
-   layer so a component that shows focus its own way (outline-none plus a
-   visible alternative) can override it. */
+/* One focus treatment everywhere: a 2px white ring with a 2px gap. White,
+   because colour is reserved for meaning. In the base layer so a component
+   that shows focus its own way can override it. */
 @layer base {
   :focus-visible {
-    outline: 2px solid var(--green);
+    outline: 2px solid var(--fg);
     outline-offset: 2px;
   }
 }
@@ -133,33 +148,268 @@ select {
   font-variant-numeric: tabular-nums;
 }
 
-/* Small labels: sentence case, no tracking. Tracked uppercase eyebrows are
-   on the banned list. */
 .label {
   font-size: 12px;
   line-height: 16px;
   color: var(--fg-3);
-  text-transform: none;
-  letter-spacing: 0;
 }
 
-/* Legacy panel class: now a flat surface with a hairline. */
-.glass-panel {
-  background: var(--ink-1);
-  border: 1px solid var(--line);
-  border-radius: 2px;
+/* ----------------------------------------------------------------- glass -- */
+
+/* In the components layer so utilities on the same element (a border colour,
+   a hover fill, a position) still win, as they do for any Tailwind class. */
+@layer components {
+
+  /* Near-opaque dark glass: diagonal sheen over a translucent fill, a rim
+     light drawn as a masked gradient border (::before), a soft drop, and a
+     faint emboss on the text. Never on table rows or list items; at most two
+     layers deep. */
+  .glass,
+  .glass-hero {
+    position: relative;
+  }
+  /* glass-2 is for overlays, which are always positioned (fixed, absolute or
+     a native <dialog>); setting position here would override the dialog's. */
+  .glass,
+  .glass-2,
+  .glass-hero {
+    background: var(--glass-sheen), var(--g-fill, var(--glass-fill));
+    border: 1px solid transparent;
+    box-shadow: var(--glass-shadow);
+    text-shadow: 0 1px 0 rgb(0 0 0 / 0.35);
+    -webkit-backdrop-filter: blur(var(--blur)) saturate(110%);
+    backdrop-filter: blur(var(--blur)) saturate(110%);
+  }
+  .glass::before,
+  .glass-2::before,
+  .glass-hero::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--g-rim, var(--glass-rim));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .glass-2 { --g-fill: var(--glass-fill-2); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 32px 64px -24px rgb(0 0 0 / 0.8); }
+  .glass-hero { --g-fill: var(--glass-fill-hero); }
+
+  /* Semantic tints: a wash of the colour in the fill and in the rim. They sit
+     on top of a glass class and never replace the text label. */
+  .glass-up    { --tint: 61 214 140; }
+  .glass-down  { --tint: 255 122 117; }
+  .glass-warn  { --tint: 232 176 74; }
+  .glass-paper { --tint: 134 183 255; }
+  .glass-up,
+  .glass-down,
+  .glass-warn,
+  .glass-paper {
+    --g-fill: linear-gradient(rgb(var(--tint) / 0.07), rgb(var(--tint) / 0.07)), var(--glass-fill);
+    --g-rim: linear-gradient(135deg, rgb(var(--tint) / 0.55) 0%, rgb(var(--tint) / 0.14) 40%, rgb(var(--tint) / 0.06) 70%, rgb(var(--tint) / 0.22) 100%);
+  }
+
+  /* A flat inset well inside glass: inputs, nested sections, table frames. */
+  .well {
+    background: rgb(0 0 0 / 0.28);
+    border: 1px solid rgb(255 255 255 / 0.07);
+  }
+
+  /* The reference's ring dot: a status marker that reads at any size. */
+  .ring-dot {
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: rgb(255 255 255 / 0.08);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14);
+  }
+  .ring-dot::after {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: currentColor;
+  }
+
+  /* Square status pill (REBALANCE NEEDED, PAPER, STOP HIT). */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 2px;
+    border: 1px solid rgb(255 255 255 / 0.16);
+    background: rgb(255 255 255 / 0.06);
+    font-size: 11px;
+    line-height: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* Faint dot grid for chart wells, as in the reference's value card. */
+  .dot-grid {
+    background-image: radial-gradient(rgb(255 255 255 / 0.08) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  /* No blur support, or the person asked for less transparency: solid. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass, .glass-hero { --glass-fill: var(--ink-2); --glass-fill-hero: var(--ink-2); }
+    .glass-2 { --glass-fill-2: var(--ink-2); }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .glass, .glass-2, .glass-hero {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      --glass-fill: var(--ink-2);
+      --glass-fill-2: var(--ink-2);
+      --glass-fill-hero: var(--ink-2);
+    }
+  }
 }
 
-.hover-lift {
-  transition: border-color 120ms ease-out;
+/* --------------------------------------------------- light field + grain -- */
+
+/* The page: a vertical ink gradient, a grainy monochrome light behind the
+   glass, and film grain over everything. Fixed pseudo-elements, so there is
+   no JavaScript and no per-frame work. .ambient is the app; the brightest
+   point stays near #5A5A5A so glass text keeps AA. The landing lights itself
+   with .bloom. */
+.ambient {
+  position: relative;
+  isolation: isolate;
+}
+.ambient::before,
+.ambient::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+.ambient::before {
+  z-index: -1;
+  background:
+    radial-gradient(38vmax 52vmax at 100% 18%, rgb(150 150 150 / 0.42), rgb(150 150 150 / 0.12) 45%, transparent 72%),
+    radial-gradient(42vmax 30vmax at 0% 100%, rgb(255 255 255 / 0.07), transparent 70%),
+    linear-gradient(180deg, #0B0B0C 0%, #121212 55%, #181818 100%);
+}
+.ambient::after {
+  z-index: 60;
+  opacity: 0.11;
+  mix-blend-mode: overlay;
+  background-image: var(--grain);
+}
+
+/* ------------------------------------------------------- landing grain -- */
+
+/* Film grain over the whole landing page. Two layers, because one blend mode
+   can't do both jobs: "overlay" textures the lit areas and glass but leaves
+   pure black untouched, so a faint "screen" layer adds grain to the dark.
+   Static on purpose (no animated noise).
+
+   CUSTOMISE HERE:
+     --grain-light    strength on lit areas and glass        (0 to 1)
+     --grain-dark     strength on dark areas                  (0 to 0.15; above that it looks dusty)
+     --grain-scale    tile size: smaller = finer grain        (e.g. 120px fine, 300px coarse)
+   The noise pattern itself is --grain in :root (baseFrequency: higher = finer,
+   numOctaves: more = more detail). Override any of these on .landing-grain in
+   page.tsx with Tailwind, e.g. [--grain-dark:0.08]. */
+.landing-grain {
+  --grain-light: 0.16;
+  --grain-dark: 0.06;
+  --grain-scale: 200px;
+  /* No position or z-index here: that would make this element its own group
+     and the layers would blend with nothing (a flat haze over the page). */
+}
+.landing-grain::before,
+.landing-grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background-image: var(--grain);
+  background-size: var(--grain-scale);
+}
+.landing-grain::before {
+  opacity: var(--grain-light);
+  mix-blend-mode: overlay;
+}
+.landing-grain::after {
+  opacity: var(--grain-dark);
+  mix-blend-mode: screen;
+}
+
+/* A free-floating silver bloom: the landing's continuous light. Absolute and
+   behind its section's content; it fades to transparent at every edge, so
+   blooms overlap across sections with no seams. --b sets the strength (0..1);
+   keep text-bearing areas off the bright core (DESIGN.md §2.4). */
+.bloom {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 9999px;
+  /* A Gaussian falloff sampled every 10%: no kinks, so no visible rings or
+     edges where the light fades over a flat dark area. */
+  background: radial-gradient(closest-side,
+    rgb(205 205 205 / calc(var(--b, 1) * 1.000)) 0%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.969)) 10%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.880)) 20%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.749)) 30%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.597)) 40%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.442)) 50%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.301)) 60%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.184)) 70%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.095)) 80%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.035)) 90%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.000)) 100%);
+}
+
+
+/* ---------------------------------------------------------------- silver -- */
+
+/* Display sizes and the hero figure only. Darkest stop is 7.3:1 on ink-0. */
+.text-silver {
+  background: linear-gradient(180deg, #FFFFFF 0%, #E4E4E4 45%, #A3A3A3 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 2px 6px rgb(0 0 0 / 0.45));
+}
+@media (forced-colors: active) {
+  .text-silver { background: none; color: CanvasText; filter: none; }
 }
 
 /* Skeleton placeholder used while data loads. */
 .skeleton {
-  background: var(--ink-2);
-  border-radius: 2px;
+  background: rgb(255 255 255 / 0.06);
+  border-radius: 4px;
   animation: pulseSoft 1.6s ease-in-out infinite;
 }
+
+/* Sheet (components/ui/Sheet.tsx): slides from its edge. Exit keyframes set
+   only the end state, so a drag-dismissed sheet leaves from where it was let go. */
+.sheet { animation: sheet-in-up var(--dur-slow) var(--ease-standard); }
+.sheet[data-closing] { animation: sheet-out-down 220ms var(--ease-exit) forwards; }
+.sheet::backdrop { animation: sheet-fade-in var(--dur-slow) var(--ease-standard); }
+.sheet[data-closing]::backdrop { animation: sheet-fade-out 220ms var(--ease-exit) forwards; }
+@media (min-width: 1024px) {
+  .sheet { animation-name: sheet-in-left; }
+  .sheet[data-closing] { animation-name: sheet-out-right; }
+}
+@keyframes sheet-in-up { from { transform: translateY(100%); } }
+@keyframes sheet-out-down { to { transform: translateY(100%); } }
+@keyframes sheet-in-left { from { transform: translateX(100%); } }
+@keyframes sheet-out-right { to { transform: translateX(100%); } }
+@keyframes sheet-fade-in { from { opacity: 0; } }
+@keyframes sheet-fade-out { to { opacity: 0; } }
 
 @keyframes pulseSoft {
   0%, 100% { opacity: 1; }

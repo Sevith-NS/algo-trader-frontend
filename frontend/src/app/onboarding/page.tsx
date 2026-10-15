@@ -1,6 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { Wordmark } from '@/components/shell/AppShell';
@@ -102,34 +103,34 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="mx-auto flex min-h-[100dvh] w-full max-w-xl flex-col px-4 pb-10 pt-[calc(1rem+env(safe-area-inset-top,0px))]">
+    <div className="ambient mx-auto flex min-h-[100dvh] w-full max-w-xl flex-col px-4 pb-10 pt-[calc(1rem+env(safe-area-inset-top,0px))]">
       <header className="flex h-12 items-center justify-between">
-        <Wordmark />
+        <Link href="/" aria-label="Polaris, go to the landing page"><Wordmark /></Link>
         <span className="text-caption text-fg-3">Step {step + 1} of {STEPS.length}</span>
       </header>
 
       <ol aria-label="Progress" className="mt-2 grid grid-cols-3 gap-1">
         {STEPS.map((s, i) => (
           <li key={s} aria-current={i === step ? 'step' : undefined}
-              className={clsx('h-0.5', i <= step ? 'bg-up' : 'bg-line-strong')}>
+              className={clsx('h-0.5', i <= step ? 'bg-fg' : 'bg-line-strong')}>
             <span className="sr-only">{s}{i < step ? ', done' : ''}</span>
           </li>
         ))}
       </ol>
 
-      <main className="flex flex-1 flex-col gap-6 pt-10">
+      <main className="glass mt-8 flex flex-1 flex-col gap-6 rounded-2xl p-6 md:p-8">
         {step === 0 && (
           <fieldset className="flex flex-col gap-4">
             <legend className="contents">
-              <h1 ref={headingRef} tabIndex={-1} className="text-h3 font-bold outline-none">Which currency should Flint count in?</h1>
+              <h1 ref={headingRef} tabIndex={-1} className="text-h3 font-normal tracking-[-0.02em] outline-none">Which currency should Polaris count in?</h1>
             </legend>
             <p className="text-body-sm text-fg-2">Your paper balance, profit and risk are shown in this currency. Holdings in other currencies are converted at live rates.</p>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {CURRENCIES.map((c) => (
-                <label key={c.code} className={clsx('flex min-h-12 cursor-pointer items-center gap-3 border px-3',
-                  currency === c.code ? 'border-up bg-up/[0.06]' : 'border-line hover:border-control')}>
+                <label key={c.code} className={clsx('flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border px-3 transition-colors duration-fast',
+                  currency === c.code ? 'border-fg bg-white/[0.06]' : 'border-white/15 hover:border-white/30')}>
                   <input type="radio" name="currency" value={c.code} checked={currency === c.code}
-                         onChange={() => setCurrency(c.code)} className="accent-[#2FBF71]" />
+                         onChange={() => setCurrency(c.code)} className="accent-fg" />
                   <span className="ticker text-body-sm">{c.code}</span>
                   <span className="text-body-sm text-fg-2">{c.name}</span>
                 </label>
@@ -141,16 +142,16 @@ export default function Onboarding() {
         {step === 1 && (
           <fieldset className="flex flex-col gap-4">
             <legend className="contents">
-              <h1 ref={headingRef} tabIndex={-1} className="text-h3 font-bold outline-none">Which markets do you trade?</h1>
+              <h1 ref={headingRef} tabIndex={-1} className="text-h3 font-normal tracking-[-0.02em] outline-none">Which markets do you trade?</h1>
             </legend>
             <p className="text-body-sm text-fg-2">These shape your default lists and market views. You can trade anything either way, and change this later in Settings.</p>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {MARKETS.map((m) => {
                 const on = markets.includes(m.id);
                 return (
-                  <label key={m.id} className={clsx('flex min-h-14 cursor-pointer items-center gap-3 border px-3 py-2',
-                    on ? 'border-up bg-up/[0.06]' : 'border-line hover:border-control')}>
-                    <input type="checkbox" checked={on} className="accent-[#2FBF71]"
+                  <label key={m.id} className={clsx('flex min-h-14 cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 transition-colors duration-fast',
+                    on ? 'border-fg bg-white/[0.06]' : 'border-white/15 hover:border-white/30')}>
+                    <input type="checkbox" checked={on} className="accent-fg"
                            onChange={() => setMarkets(on ? markets.filter((x) => x !== m.id) : [...markets, m.id])} />
                     <span className="flex flex-col">
                       <span className="text-body-sm font-medium">{m.label}</span>
@@ -165,8 +166,8 @@ export default function Onboarding() {
 
         {step === 2 && (
           <div className="flex flex-col gap-5">
-            <h1 ref={headingRef} tabIndex={-1} className="text-h3 font-bold outline-none">How much will you risk on one trade?</h1>
-            <p className="text-body-sm text-fg-2">Flint sizes every suggested position so that if the stop is hit, you lose this share of your balance. Most disciplined traders use 0.5% to 2%.</p>
+            <h1 ref={headingRef} tabIndex={-1} className="text-h3 font-normal tracking-[-0.02em] outline-none">How much will you risk on one trade?</h1>
+            <p className="text-body-sm text-fg-2">Polaris sizes every suggested position so that if the stop is hit, you lose this share of your balance. Most disciplined traders use 0.5% to 2%.</p>
             <Field id="risk" label="Risk per trade (%)" error={riskError}
                    hint={Number.isFinite(riskNum * cashNum) && !riskError && !cashError
                      ? `That is ${formatMoney((riskNum / 100) * cashNum, currency, 0)} at risk per trade.` : undefined}>

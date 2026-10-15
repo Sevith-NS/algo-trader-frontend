@@ -7,6 +7,7 @@ import type { BacktestResult, MonthlyRow, Num, TradeRow } from '../../types/back
 import { money, num, pct, ratio, shortDate, signedPct, toneFor } from '../../lib/backtest';
 import { MicroLabel } from '../agents/DeskAtoms';
 import EquityChart from './EquityChart';
+import { tint } from '../../lib/theme';
 
 /* ------------------------------------------------------------------ atoms */
 
@@ -14,12 +15,12 @@ function Headline({ label, value, tone, sub }: {
   label: string; value: string; tone?: string; sub?: string;
 }) {
   return (
-    <div className="rounded-xl border border-borderSubtle bg-ink-2 p-3">
+    <div className="rounded-xl well p-3">
       <MicroLabel>{label}</MicroLabel>
-      <div className={clsx('mt-1 text-xl font-bold tabular', tone ?? 'text-textPrimary')}>
+      <div className={clsx('mt-1 text-xl font-bold tabular', tone ?? 'text-fg')}>
         {value}
       </div>
-      {sub && <div className="mt-0.5 text-caption text-textMuted">{sub}</div>}
+      {sub && <div className="mt-0.5 text-caption text-fg-3">{sub}</div>}
     </div>
   );
 }
@@ -29,8 +30,8 @@ function Line({ label, value, tone, title }: {
 }) {
   return (
     <div className="flex items-baseline justify-between gap-3 py-1" title={title}>
-      <span className="text-caption text-textMuted">{label}</span>
-      <span className={clsx('text-[12px] font-medium tabular', tone ?? 'text-textPrimary')}>
+      <span className="text-caption text-fg-3">{label}</span>
+      <span className={clsx('text-[12px] font-medium tabular', tone ?? 'text-fg')}>
         {value}
       </span>
     </div>
@@ -41,8 +42,8 @@ function Card({ title, icon, children }: {
   title: string; icon?: React.ReactNode; children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-borderSubtle bg-ink-2 p-4">
-      <h4 className="mb-2 flex items-center gap-1.5 border-b border-borderSubtle pb-2 text-caption text-textMuted">
+    <div className="rounded-xl well p-4">
+      <h4 className="mb-2 flex items-center gap-1.5 border-b border-line pb-2 text-caption text-fg-3">
         {icon} {title}
       </h4>
       {children}
@@ -70,7 +71,7 @@ function monthTint(value: Num, extreme: number): string | undefined {
 
 function MonthlyGrid({ rows }: { rows: MonthlyRow[] }) {
   if (!rows.length) {
-    return <p className="text-caption text-textMuted">Not enough history for a monthly grid.</p>;
+    return <p className="text-caption text-fg-3">Not enough history for a monthly grid.</p>;
   }
   const extreme = rows.reduce((m, r) => {
     const vals = Object.values(r.months).filter((v): v is number => typeof v === 'number');
@@ -81,7 +82,7 @@ function MonthlyGrid({ rows }: { rows: MonthlyRow[] }) {
     <div className="-mx-1 overflow-x-auto">
       <table className="w-full min-w-[640px] border-separate border-spacing-[2px] text-caption tabular">
         <thead>
-          <tr className="text-textMuted">
+          <tr className="text-fg-3">
             <th className="text-left font-normal">Year</th>
             {MONTHS.map((m) => <th key={m} className="font-normal">{m}</th>)}
             <th className="font-normal">Year</th>
@@ -90,20 +91,20 @@ function MonthlyGrid({ rows }: { rows: MonthlyRow[] }) {
         <tbody>
           {rows.map((row) => (
             <tr key={row.year}>
-              <td className="pr-1 text-left text-textSecondary">{row.year}</td>
+              <td className="pr-1 text-left text-fg-2">{row.year}</td>
               {MONTHS.map((m) => {
                 const v = row.months[m];
                 return (
                   <td
                     key={m}
-                    className="rounded px-1 py-1 text-center text-textPrimary"
+                    className="rounded px-1 py-1 text-center text-fg"
                     style={{ background: monthTint(v, extreme) }}
                   >
                     {typeof v === 'number' ? (v * 100).toFixed(1) : ''}
                   </td>
                 );
               })}
-              <td className={clsx('rounded border border-borderSubtle px-1 py-1 text-center font-semibold',
+              <td className={clsx('rounded border border-line px-1 py-1 text-center font-semibold',
                                   toneFor(row.total))}>
                 {typeof row.total === 'number' ? `${(row.total * 100).toFixed(1)}` : '–'}
               </td>
@@ -111,7 +112,7 @@ function MonthlyGrid({ rows }: { rows: MonthlyRow[] }) {
           ))}
         </tbody>
       </table>
-      <p className="mt-1.5 px-1 text-caption text-textMuted">Figures are percent returns.</p>
+      <p className="mt-1.5 px-1 text-caption text-fg-3">Figures are percent returns.</p>
     </div>
   );
 }
@@ -125,7 +126,7 @@ function TradeTable({ trades, currency }: {
 }) {
   const [shown, setShown] = useState(PAGE);
   if (!trades.rows.length) {
-    return <p className="text-caption text-textMuted">This strategy took no trades on these bars.</p>;
+    return <p className="text-caption text-fg-3">This strategy took no trades on these bars.</p>;
   }
   // Newest first: the most recent trades are the ones being reasoned about.
   const ordered = [...trades.rows].reverse();
@@ -135,7 +136,7 @@ function TradeTable({ trades, currency }: {
       <div className="overflow-x-auto">
         <table className="w-full min-w-[680px] text-caption tabular">
           <thead>
-            <tr className="border-b border-borderSubtle text-left text-caption text-textMuted">
+            <tr className="border-b border-line text-left text-caption text-fg-3">
               <th className="py-1.5 pr-2 font-normal">Side</th>
               <th className="py-1.5 pr-2 font-normal">Entry</th>
               <th className="py-1.5 pr-2 text-right font-normal">Price</th>
@@ -151,36 +152,36 @@ function TradeTable({ trades, currency }: {
           </thead>
           <tbody>
             {ordered.slice(0, shown).map((t, i) => (
-              <tr key={`${t.entry_time}-${i}`} className="border-b border-borderSubtle/50">
+              <tr key={`${t.entry_time}-${i}`} className="border-b border-line/50">
                 <td className="py-1.5 pr-2">
-                  <span className={t.direction > 0 ? 'text-accentGreen' : 'text-accentRed'}>
+                  <span className={t.direction > 0 ? 'text-up' : 'text-down'}>
                     {t.direction > 0 ? 'LONG' : 'SHORT'}
                   </span>
                 </td>
-                <td className="py-1.5 pr-2 text-textSecondary">{shortDate(t.entry_time)}</td>
-                <td className="py-1.5 pr-2 text-right text-textSecondary">{num(t.entry_price)}</td>
-                <td className="py-1.5 pr-2 text-textSecondary">{shortDate(t.exit_time)}</td>
-                <td className="py-1.5 pr-2 text-right text-textSecondary">{num(t.exit_price)}</td>
-                <td className="py-1.5 pr-2 text-right text-textMuted">{t.bars_held}</td>
+                <td className="py-1.5 pr-2 text-fg-2">{shortDate(t.entry_time)}</td>
+                <td className="py-1.5 pr-2 text-right text-fg-2">{num(t.entry_price)}</td>
+                <td className="py-1.5 pr-2 text-fg-2">{shortDate(t.exit_time)}</td>
+                <td className="py-1.5 pr-2 text-right text-fg-2">{num(t.exit_price)}</td>
+                <td className="py-1.5 pr-2 text-right text-fg-3">{t.bars_held}</td>
                 <td className={clsx('py-1.5 pr-2 text-right font-semibold', toneFor(t.ret_pct))}>
                   {t.ret_pct === null ? '–' : `${t.ret_pct > 0 ? '+' : ''}${t.ret_pct.toFixed(2)}%`}
                 </td>
                 <td className={clsx('py-1.5 pr-2 text-right', toneFor(t.pnl))}>
                   {money(t.pnl, currency)}
                 </td>
-                <td className="py-1.5 pr-2 text-right text-accentRed/80">
+                <td className="py-1.5 pr-2 text-right text-down/80">
                   {t.mae_pct === null ? '–' : `${t.mae_pct.toFixed(1)}%`}
                 </td>
-                <td className="py-1.5 pr-2 text-right text-accentGreen/80">
+                <td className="py-1.5 pr-2 text-right text-up/80">
                   {t.mfe_pct === null ? '–' : `+${t.mfe_pct.toFixed(1)}%`}
                 </td>
-                <td className="py-1.5 text-caption text-textMuted">{t.exit_reason}</td>
+                <td className="py-1.5 text-caption text-fg-3">{t.exit_reason}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <div className="mt-2 flex items-center justify-between text-caption text-textMuted">
+      <div className="mt-2 flex items-center justify-between text-caption text-fg-3">
         <span>
           Showing {Math.min(shown, ordered.length)} of {trades.total}
           {trades.truncated && ' (log capped at 2,000)'}
@@ -189,7 +190,7 @@ function TradeTable({ trades, currency }: {
           <button
             type="button"
             onClick={() => setShown((s) => s + PAGE * 4)}
-            className="rounded border border-borderSubtle px-2 py-1 text-textSecondary transition-colors hover:text-textPrimary"
+            className="rounded-sm border border-white/25 px-2 py-1 text-fg-2 transition-colors hover:text-fg"
           >
             Show more
           </button>
@@ -219,16 +220,16 @@ export default function BacktestResults({ result, currency }: {
         />
         <Headline
           label="Sharpe" value={num(s.sharpe)}
-          tone={(s.sharpe ?? 0) >= 1 ? 'text-accentGreen' : undefined}
+          tone={(s.sharpe ?? 0) >= 1 ? 'text-up' : undefined}
           sub={`sortino ${num(s.sortino)}`}
         />
         <Headline
-          label="Max drawdown" value={pct(s.max_dd)} tone="text-accentRed"
+          label="Max drawdown" value={pct(s.max_dd)} tone="text-down"
           sub={`${s.dd_bars} bars underwater`}
         />
         <Headline
           label="Profit factor" value={ratio(s.profit_factor)}
-          tone={(s.profit_factor ?? 0) >= 1.5 ? 'text-accentGreen' : undefined}
+          tone={(s.profit_factor ?? 0) >= 1.5 ? 'text-up' : undefined}
           sub={`win rate ${pct(s.win_rate, 1)}`}
         />
         <Headline
@@ -246,25 +247,25 @@ export default function BacktestResults({ result, currency }: {
       <div
         className="rounded-xl p-3 text-[12px] leading-relaxed"
         style={{
-          border: `1px solid ${beatBuyHold ? '#2FBF7140' : '#A4ACA840'}`,
-          background: beatBuyHold ? '#2FBF710d' : '#A4ACA80d',
+          border: `1px solid ${beatBuyHold ? tint('var(--green)', 25) : tint('var(--fg-2)', 25)}`,
+          background: beatBuyHold ? tint('var(--green)', 5) : tint('var(--fg-2)', 5),
         }}
       >
-        <span className="text-textSecondary">
+        <span className="text-fg-2">
           Over {num(s.years, 1)} years and {result.bars.toLocaleString()} bars, this strategy
           returned <span className={clsx('font-semibold tabular', toneFor(s.cagr))}>{signedPct(s.cagr)}</span> a year
-          against buy &amp; hold&apos;s <span className="font-semibold tabular text-textSecondary">{signedPct(s.bh_cagr)}</span>,
-          {' '}while in the market only <span className="font-semibold tabular text-textSecondary">{pct(s.exposure, 0)}</span> of the time
-          {' '}and drawing down <span className="font-semibold tabular text-accentRed">{pct(s.max_dd)}</span> at worst
+          against buy &amp; hold&apos;s <span className="font-semibold tabular text-fg-2">{signedPct(s.bh_cagr)}</span>,
+          {' '}while in the market only <span className="font-semibold tabular text-fg-2">{pct(s.exposure, 0)}</span> of the time
+          {' '}and drawing down <span className="font-semibold tabular text-down">{pct(s.max_dd)}</span> at worst
           {' '}(buy &amp; hold: <span className="tabular">{pct(s.bh_max_dd)}</span>).
         </span>
       </div>
 
       {/* ---- Equity curve + drawdown ---- */}
-      <div className="rounded-xl border border-borderSubtle bg-ink-2 p-3">
+      <div className="rounded-xl well p-3">
         <div className="mb-1 flex flex-wrap items-center justify-between gap-2 px-1">
           <MicroLabel>Equity curve vs buy &amp; hold · drawdown below</MicroLabel>
-          <span className="text-caption text-textMuted">
+          <span className="text-caption text-fg-3">
             {shortDate(s.start)} → {shortDate(s.end)}
             {result.equity.downsampled && ' · curve thinned for display'}
           </span>
@@ -285,8 +286,8 @@ export default function BacktestResults({ result, currency }: {
           <Line label="CAGR" value={signedPct(s.cagr)} tone={toneFor(s.cagr)} />
           <Line label="Alpha vs buy & hold" value={signedPct(s.alpha_cagr)} tone={toneFor(s.alpha_cagr)} />
           <Line label="Volatility (ann.)" value={pct(s.volatility)} />
-          <Line label="Best trade" value={`${num(s.best_trade)}%`} tone="text-accentGreen" />
-          <Line label="Worst trade" value={`${num(s.worst_trade)}%`} tone="text-accentRed" />
+          <Line label="Best trade" value={`${num(s.best_trade)}%`} tone="text-up" />
+          <Line label="Worst trade" value={`${num(s.worst_trade)}%`} tone="text-down" />
         </Card>
 
         <Card title="Risk" icon={<ArrowDownRight size={12} />}>
@@ -317,10 +318,10 @@ export default function BacktestResults({ result, currency }: {
         <Card title="Excursions & benchmark" icon={<Ruler size={12} />}>
           <Line
             label="Avg MAE, winners" value={`${num(e.excursions.avg_mae_winners, 1)}%`}
-            tone="text-accentRed/80"
+            tone="text-down/80"
             title="How far winners went against you first: the stop-width evidence"
           />
-          <Line label="Avg MAE, losers" value={`${num(e.excursions.avg_mae_losers, 1)}%`} tone="text-accentRed/80" />
+          <Line label="Avg MAE, losers" value={`${num(e.excursions.avg_mae_losers, 1)}%`} tone="text-down/80" />
           <Line
             label="Avg give-back" value={`${num(e.excursions.avg_giveback_winners, 1)}%`}
             title="Open profit handed back between the best price and the exit"
@@ -332,7 +333,7 @@ export default function BacktestResults({ result, currency }: {
               <Line label="Correlation" value={num(bench.correlation)} />
             </>
           ) : (
-            <Line label="Benchmark" value="not available" tone="text-textMuted" />
+            <Line label="Benchmark" value="not available" tone="text-fg-3" />
           )}
         </Card>
       </div>
@@ -340,12 +341,12 @@ export default function BacktestResults({ result, currency }: {
       {/* ---- Drawdowns ---- */}
       <Card title="Deepest drawdowns" icon={<ArrowDownRight size={12} />}>
         {e.drawdowns.length === 0 ? (
-          <p className="text-caption text-textMuted">This curve never went underwater.</p>
+          <p className="text-caption text-fg-3">This curve never went underwater.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[520px] text-caption tabular">
               <thead>
-                <tr className="border-b border-borderSubtle text-left text-caption text-textMuted">
+                <tr className="border-b border-line text-left text-caption text-fg-3">
                   <th className="py-1.5 pr-2 font-normal">Depth</th>
                   <th className="py-1.5 pr-2 font-normal">Started</th>
                   <th className="py-1.5 pr-2 font-normal">Low</th>
@@ -356,15 +357,15 @@ export default function BacktestResults({ result, currency }: {
               </thead>
               <tbody>
                 {e.drawdowns.map((d, i) => (
-                  <tr key={i} className="border-b border-borderSubtle/50">
-                    <td className="py-1.5 pr-2 font-semibold text-accentRed">{pct(d.depth, 1)}</td>
-                    <td className="py-1.5 pr-2 text-textSecondary">{shortDate(d.start)}</td>
-                    <td className="py-1.5 pr-2 text-textSecondary">{shortDate(d.trough)}</td>
-                    <td className={clsx('py-1.5 pr-2', d.recovered ? 'text-textSecondary' : 'text-accentAmber')}>
+                  <tr key={i} className="border-b border-line/50">
+                    <td className="py-1.5 pr-2 font-semibold text-down">{pct(d.depth, 1)}</td>
+                    <td className="py-1.5 pr-2 text-fg-2">{shortDate(d.start)}</td>
+                    <td className="py-1.5 pr-2 text-fg-2">{shortDate(d.trough)}</td>
+                    <td className={clsx('py-1.5 pr-2', d.recovered ? 'text-fg-2' : 'text-warn')}>
                       {d.recovered ? shortDate(d.end) : 'still open'}
                     </td>
-                    <td className="py-1.5 pr-2 text-right text-textMuted">{d.length_bars} bars</td>
-                    <td className="py-1.5 text-right text-textMuted">
+                    <td className="py-1.5 pr-2 text-right text-fg-3">{d.length_bars} bars</td>
+                    <td className="py-1.5 text-right text-fg-3">
                       {d.recovery_bars === null ? '–' : `${d.recovery_bars} bars`}
                     </td>
                   </tr>

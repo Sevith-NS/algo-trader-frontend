@@ -4,7 +4,7 @@ import { auth } from '@clerk/nextjs/server';
 const API_URL = process.env.FLINT_API_URL ?? 'http://127.0.0.1:5000';
 
 /**
- * Call the Flint API from a server component or layout, as the signed-in user.
+ * Call the Polaris API from a server component or layout, as the signed-in user.
  * Returns null on any failure; callers decide what an outage means for them.
  */
 export async function serverGet<T>(path: string): Promise<T | null> {

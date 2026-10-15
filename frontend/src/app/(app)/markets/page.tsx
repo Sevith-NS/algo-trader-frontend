@@ -39,7 +39,7 @@ function rateLimitMessage(res: Response, body: { retry_after_seconds?: number } 
  * without hue.
  */
 function heatClass(change: number | null): string {
-  if (change === null) return 'bg-ink-2';
+  if (change === null) return 'bg-white/[0.06]';
   if (change >= 5) return 'bg-up/80';
   if (change >= 2) return 'bg-up/60';
   if (change > 0) return 'bg-up/40';
@@ -52,8 +52,8 @@ function heatClass(change: number | null): string {
 function SectionHeading({ title, hint }: { title: string; hint?: string }) {
   return (
     <div className="mb-3 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-      <h2 className="text-sm font-semibold text-textSecondary">{title}</h2>
-      {hint && <span className="text-xs text-textMuted">{hint}</span>}
+      <h2 className="text-sm font-semibold text-fg-2">{title}</h2>
+      {hint && <span className="text-xs text-fg-3">{hint}</span>}
     </div>
   );
 }
@@ -64,31 +64,31 @@ function MoverList({ title, accent, items }: {
   items: DiscoverCard[];
 }) {
   return (
-    <div className="glass-panel p-5">
+    <div className="glass rounded-xl p-5">
       <h3
         className={clsx(
-          'mb-3 border-b border-borderSubtle pb-2 text-sm font-semibold',
-          accent === 'green' ? 'text-accentGreen' : 'text-accentRed',
+          'mb-3 border-b border-line pb-2 text-sm font-semibold',
+          accent === 'green' ? 'text-up' : 'text-down',
         )}
       >
         {title}
       </h3>
       {items.length === 0 ? (
-        <p className="py-4 text-center text-xs text-textMuted">No data</p>
+        <p className="py-4 text-center text-xs text-fg-3">No data</p>
       ) : (
         <div className="space-y-1">
           {items.map((c) => (
             <Link
               key={c.symbol}
               href={`/s/${encodeURIComponent(c.symbol)}`}
-              className="flex items-center justify-between gap-3 rounded p-2 transition-colors hover:bg-ink-2 focus-visible:ring-1 focus-visible:ring-accentCyan/50"
+              className="flex items-center justify-between gap-3 rounded p-2 transition-colors hover:bg-white/[0.06] focus-visible:ring-1 focus-visible:ring-fg-2/50"
             >
               <div className="min-w-0">
-                <div className="ticker text-textPrimary">{c.symbol}</div>
-                <div className="truncate text-xs text-textMuted">{c.name}</div>
+                <div className="ticker text-fg">{c.symbol}</div>
+                <div className="truncate text-xs text-fg-3">{c.name}</div>
               </div>
               <div className="shrink-0 text-right">
-                <div className="text-sm tabular text-textPrimary">{fmtPrice(c.price, c.currency)}</div>
+                <div className="text-sm tabular text-fg">{fmtPrice(c.price, c.currency)}</div>
                 <div className="mt-0.5"><PctChip value={c.change_1d_pct} /></div>
               </div>
             </Link>
@@ -223,8 +223,8 @@ export default function MarketsPage() {
                     // up with the view strip above them.
                     'inline-flex min-h-9 items-center rounded-lg border px-3 text-xs font-medium transition-colors duration-150',
                     m.id === market
-                      ? 'border-accentGreen/40 bg-accentGreen/10 text-accentGreen'
-                      : 'border-borderSubtle text-textSecondary hover:bg-ink-2 hover:text-textPrimary'
+                      ? 'border-fg bg-fg text-ink-0'
+                      : 'border-line text-fg-2 hover:bg-white/[0.06] hover:text-fg'
                   )}
                 >
                   {m.label}
@@ -232,12 +232,12 @@ export default function MarketsPage() {
               ))}
             </div>
             {data?.as_of && (
-              <span className="tabular text-xs text-textMuted">as of {data.as_of}</span>
+              <span className="tabular text-xs text-fg-3">as of {data.as_of}</span>
             )}
           </div>
 
           {market === 'bonds' && (
-            <p className="mb-5 rounded-lg border border-borderSubtle bg-ink-2 px-3 py-2 text-xs text-textMuted">
+            <p className="mb-5 rounded-lg well px-3 py-2 text-xs text-fg-3">
               US-listed bond ETFs stand in here. The Indian G-Sec series has no reliable keyless source yet (PRD A11).
             </p>
           )}
@@ -246,29 +246,29 @@ export default function MarketsPage() {
             <div className="space-y-8">
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
                 {Array.from({ length: 16 }).map((_, i) => (
-                  <div key={i} className="h-[92px] rounded-md bg-ink-2 skeleton" />
+                  <div key={i} className="h-[92px] rounded-md bg-white/[0.06] skeleton" />
                 ))}
               </div>
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                <div className="glass-panel h-64 skeleton" />
-                <div className="glass-panel h-64 skeleton" />
+                <div className="glass rounded-xl h-64 skeleton" />
+                <div className="glass rounded-xl h-64 skeleton" />
               </div>
             </div>
           ) : error ? (
-            <div className="glass-panel flex h-64 flex-col items-center justify-center gap-3 px-6 text-center">
-              <WifiOff size={22} className="text-accentAmber" />
-              <p className="max-w-md text-sm leading-relaxed text-textSecondary">{error}</p>
+            <div className="glass rounded-xl flex h-64 flex-col items-center justify-center gap-3 px-6 text-center">
+              <WifiOff size={22} className="text-warn" />
+              <p className="max-w-md text-sm leading-relaxed text-fg-2">{error}</p>
               <button
                 onClick={() => { setError(''); setRetryNonce((n) => n + 1); }}
-                className="mt-1 flex items-center gap-1.5 rounded-lg border border-borderSubtle px-3 py-1.5 text-xs font-medium text-textSecondary transition-colors hover:bg-ink-2 hover:text-textPrimary"
+                className="mt-1 flex items-center gap-1.5 rounded-sm border border-white/25 bg-black/30 px-3 py-1.5 text-xs font-medium text-fg-2 transition-colors hover:bg-white/[0.06] hover:text-fg"
               >
                 <RotateCw size={12} /> Retry
               </button>
             </div>
           ) : cards.length === 0 ? (
-            <div className="glass-panel flex h-64 flex-col items-center justify-center gap-3 px-6 text-center">
-              <WifiOff size={22} className="text-accentAmber" />
-              <p className="max-w-md text-sm leading-relaxed text-textSecondary">
+            <div className="glass rounded-xl flex h-64 flex-col items-center justify-center gap-3 px-6 text-center">
+              <WifiOff size={22} className="text-warn" />
+              <p className="max-w-md text-sm leading-relaxed text-fg-2">
                 No data parsed for {data?.universe_label ?? 'this market'} right now. The upstream
                 feed may be down. Data refreshes as the cache recovers (~30 min).
               </p>
@@ -276,7 +276,7 @@ export default function MarketsPage() {
                 // Belt-and-braces: outage payloads aren't cached, but drop any
                 // entry for this market anyway before refetching.
                 onClick={() => { delete cacheRef.current[market]; setRetryNonce((n) => n + 1); }}
-                className="mt-1 flex items-center gap-1.5 rounded-lg border border-borderSubtle px-3 py-1.5 text-xs font-medium text-textSecondary transition-colors hover:bg-ink-2 hover:text-textPrimary"
+                className="mt-1 flex items-center gap-1.5 rounded-sm border border-white/25 bg-black/30 px-3 py-1.5 text-xs font-medium text-fg-2 transition-colors hover:bg-white/[0.06] hover:text-fg"
               >
                 <RotateCw size={12} /> Retry
               </button>
@@ -297,10 +297,10 @@ export default function MarketsPage() {
                       href={`/s/${encodeURIComponent(c.symbol)}`}
                       className={clsx(
                         heatClass(c.change_1d_pct),
-                        'flex min-h-[92px] flex-col justify-between rounded-md p-3 transition-[filter] hover:brightness-110 focus-visible:ring-1 focus-visible:ring-accentCyan/50'
+                        'flex min-h-[92px] flex-col justify-between rounded-md p-3 transition-[filter] hover:brightness-110 focus-visible:ring-1 focus-visible:ring-fg-2/50'
                       )}
                     >
-                      <div className="ticker truncate text-sm text-textPrimary">{c.symbol}</div>
+                      <div className="ticker truncate text-sm text-fg">{c.symbol}</div>
                       <div>
                         <div className="truncate text-sm font-medium tabular text-white/90">
                           {fmtPrice(c.price, c.currency)}
@@ -336,16 +336,16 @@ export default function MarketsPage() {
               <section>
                 <Link
                   href="/markets/ideas"
-                  className="group glass-panel flex flex-wrap items-center justify-between gap-x-6 gap-y-3 p-5 transition-colors hover:border-line-strong"
+                  className="group glass rounded-xl flex flex-wrap items-center justify-between gap-x-6 gap-y-3 p-5 transition-colors hover:border-line-strong"
                 >
                   <div className="min-w-0">
-                    <h2 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
+                    <h2 className="flex items-center gap-2 text-sm font-semibold text-fg">
                       Horizon setups
-                      <span className="tabular rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textSecondary">
+                      <span className="tabular rounded bg-white/[0.06] px-1.5 py-0.5 text-caption text-fg-2">
                         {tagged.length}
                       </span>
                     </h2>
-                    <p className="mt-1 max-w-xl text-xs leading-relaxed text-textMuted">
+                    <p className="mt-1 max-w-xl text-xs leading-relaxed text-fg-3">
                       {tagged.length === 0
                         ? `Nothing tagged in ${data?.universe_label ?? 'this market'} right now. Tags re-evaluate as cached data refreshes, about every 30 minutes.`
                         : `${tagged.length} names in ${data?.universe_label ?? 'this market'} carry a descriptive tag with the numbers that fired. Candidates, not calls.`}
@@ -368,13 +368,13 @@ export default function MarketsPage() {
                           </span>
                         ))}
                         {presentTags.length > 4 && (
-                          <span className="tabular text-caption text-textMuted">
+                          <span className="tabular text-caption text-fg-3">
                             +{presentTags.length - 4}
                           </span>
                         )}
                       </div>
                     )}
-                    <span className="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs font-medium text-accentGreen">
+                    <span className="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs font-medium text-up">
                       Open Ideas
                       <ArrowRight
                         size={14}

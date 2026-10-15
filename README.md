@@ -1,4 +1,4 @@
-# Flint — Quant Screener & Portfolio Intelligence
+# Polaris — Quant Screener & Portfolio Intelligence
 
 A personal stock screener and portfolio management platform with quant-grade analytics:
 
@@ -21,7 +21,7 @@ A personal stock screener and portfolio management platform with quant-grade ana
   are all set in the panel, and the report carries the professional stat block — Calmar,
   Ulcer, Omega, MAE/MFE, a drawdown table, a monthly grid and the trade log — plus three
   robustness passes: **out-of-sample**, **walk-forward** and a **Monte Carlo** resample.
-- **Flint AI** — floating assistant (bottom-right on every page) powered by Gemini. It sees your paper portfolio, the symbol on screen, live quant signals and news sentiment, and answers grounded questions about risk, sizing and markets.
+- **Polaris AI** — floating assistant (bottom-right on every page) powered by Gemini. It sees your paper portfolio, the symbol on screen, live quant signals and news sentiment, and answers grounded questions about risk, sizing and markets.
 - **ML Forecasts** — XGBoost next-day direction probability, Prophet 7-day forecast, news fear/greed index.
 - **Geotrade** — AI macro analysis per country on a 3D globe.
 
@@ -144,7 +144,7 @@ AAPL rather than 11,500 daily ones), so that path asks with an explicit date win
 
 ```bash
 cd backend
-python3 -m venv venv
+(Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned) ; (& c:\Users\asus\Desktop\algo-trader-backend\venv\Scripts\Activate.ps1)
 ./venv/bin/pip install -r requirements.txt
 cp .env.example .env      # then fill in GEMINI_API_KEY
 ./run.sh

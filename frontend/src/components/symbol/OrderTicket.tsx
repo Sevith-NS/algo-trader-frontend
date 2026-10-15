@@ -140,7 +140,7 @@ function TicketForm({ onClose, symbol, price, currency, fx, suggested, planStop,
 
         {(blocked || error) && <p role="alert" className="text-body-sm text-down">{blocked || error}</p>}
 
-        <Button type="submit" variant={side === 'buy' ? 'primary' : 'danger'} loading={submitting}
+        <Button type="submit" variant={side === 'buy' ? 'paper' : 'danger'} loading={submitting}
                 disabled={!qty || Boolean(qtyError || stopError || blocked)}>
           Place paper {side}
         </Button>

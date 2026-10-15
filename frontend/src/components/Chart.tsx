@@ -7,6 +7,7 @@ import {
 } from 'lightweight-charts';
 import { ema, bollinger, macd, rsi } from '../lib/indicators';
 import { readStorage, useBrowserValue, writeStorage } from '../lib/browser';
+import { cssVar, tint } from '../lib/theme';
 import { CHART_INTERACTION_FREE, DrawingHint, DrawingRail, useChartDrawings } from './ChartDrawings';
 
 // ---------------------------------------------------------------------------
@@ -42,18 +43,18 @@ const clampPeriod = (v: number) =>
   Math.min(PERIOD_MAX, Math.max(PERIOD_MIN, Math.round(v)));
 const clampMult = (v: number) => Math.min(MULT_MAX, Math.max(MULT_MIN, v));
 
-// Indicators are drawn in white and greys, never in green or red: in Flint
+// Indicators are drawn in white and greys, never in green or red: in Polaris
 // those two colours mean direction and nothing else. Lines are told apart by
 // weight and dash, and each toolbar chip carries its line's swatch.
 const CHIP_META: { key: IndicatorKey; label: string; color: string }[] = [
-  { key: 'ema', label: 'EMA', color: '#F2F4F3' },
-  { key: 'ribbon', label: 'EMA Ribbon', color: '#C9CFCC' },
-  { key: 'bb', label: 'Bollinger', color: '#A4ACA8' },
-  { key: 'macd', label: 'MACD', color: '#F2F4F3' },
-  { key: 'rsi', label: 'RSI', color: '#F2F4F3' },
+  { key: 'ema', label: 'EMA', color: 'var(--fg)' },
+  { key: 'ribbon', label: 'EMA Ribbon', color: 'var(--series-2)' },
+  { key: 'bb', label: 'Bollinger', color: 'var(--fg-2)' },
+  { key: 'macd', label: 'MACD', color: 'var(--fg)' },
+  { key: 'rsi', label: 'RSI', color: 'var(--fg)' },
 ];
 
-const RIBBON_COLORS = ['#F2F4F3', '#C9CFCC', '#A4ACA8', '#7E8682'];
+const RIBBON_TOKENS = ['--fg', '--series-2', '--fg-2', '--series-4'] as const;
 
 // ---------------------------------------------------------------------------
 // Wheel-to-zoom (TradingView behaviour)
@@ -146,7 +147,7 @@ function ParamInput({ label, value, min, max, step, onCommit }: {
   };
   return (
     <label className="flex items-center justify-between gap-3 py-1">
-      <span className="text-caption text-textSecondary">{label}</span>
+      <span className="text-caption text-fg-2">{label}</span>
       <input
         type="number"
         defaultValue={value}
@@ -155,7 +156,7 @@ function ParamInput({ label, value, min, max, step, onCommit }: {
         step={step ?? 1}
         onBlur={(e) => commit(e.currentTarget)}
         onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-        className="w-20 rounded border border-borderSubtle bg-ink-0 px-2 py-1 text-right text-xs tabular text-textPrimary focus:border-line-strong"
+        className="w-20 rounded border border-white/15 bg-black/30 px-2 py-1 text-right text-xs tabular text-fg focus:border-line-strong"
       />
     </label>
   );
@@ -198,7 +199,8 @@ interface ChartProps {
     borderDownColor?: string;
     wickUpColor?: string;
     wickDownColor?: string;
-    /** Lines without a price yet (a level still loading) are skipped. */
+    /** Lines without a price yet (a level still loading) are skipped. A colour
+     *  given as a token name (`--red`) is resolved from globals.css. */
     priceLines?: (Omit<CreatePriceLineOptions, 'price'> & { price: number | null })[];
   };
 }
@@ -267,22 +269,27 @@ export default function Chart({
 
   const {
     backgroundColor = 'transparent',
-    textColor = '#848C88',
-    upColor = '#2FBF71',
-    downColor = '#E5484D',
-    borderUpColor = '#2FBF71',
-    borderDownColor = '#E5484D',
-    wickUpColor = '#2FBF71',
-    wickDownColor = '#E5484D',
+    textColor,
+    upColor,
+    downColor,
+    borderUpColor,
+    borderDownColor,
+    wickUpColor,
+    wickDownColor,
   } = colors;
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
+    const fg = cssVar('--fg');
+    const fg3 = cssVar('--fg-3');
+    const up = cssVar('--green');
+    const down = cssVar('--red');
+
     const chart = createChart(chartContainerRef.current, {
       layout: {
         background: { type: ColorType.Solid, color: backgroundColor },
-        textColor,
+        textColor: textColor ?? fg3,
         fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
         fontSize: 11,
       },
@@ -294,13 +301,13 @@ export default function Chart({
       height,
       grid: {
         vertLines: { visible: false },
-        horzLines: { color: '#181B1A' },
+        horzLines: { color: cssVar('--ink-2') },
       },
       timeScale: {
-        borderColor: '#242927',
+        borderColor: cssVar('--line'),
       },
       rightPriceScale: {
-        borderColor: '#242927',
+        borderColor: cssVar('--line'),
       },
       // Wheel zoom is driven by our own handler on the wrapper (see the wheel
       // effect below) rather than by the library. The library binds its
@@ -312,11 +319,11 @@ export default function Chart({
 
     // Candles live in pane 0 (v5: addSeries(definition, options, paneIndex)).
     const candleSeries = chart.addSeries(CandlestickSeries, {
-      upColor,
-      downColor,
+      upColor: upColor ?? up,
+      downColor: downColor ?? down,
       borderVisible: false,
-      wickUpColor,
-      wickDownColor,
+      wickUpColor: wickUpColor ?? up,
+      wickDownColor: wickDownColor ?? down,
     });
     candleSeries.setData(data);
 
@@ -351,14 +358,14 @@ export default function Chart({
     // ---- Pane 0 overlays ----
     if (config.ema.on) {
       addOverlayLine(toLineData(ema(closes, config.ema.period)), {
-        color: '#F2F4F3', lineWidth: 2, title: `EMA ${config.ema.period}`,
+        color: fg, lineWidth: 2, title: `EMA ${config.ema.period}`,
       });
     }
 
     if (config.ribbon.on) {
       config.ribbon.periods.forEach((period, i) => {
         addOverlayLine(toLineData(ema(closes, period)), {
-          color: RIBBON_COLORS[i], lineWidth: 1, title: `EMA ${period}`,
+          color: cssVar(RIBBON_TOKENS[i]), lineWidth: 1, title: `EMA ${period}`,
         });
       });
     }
@@ -381,7 +388,7 @@ export default function Chart({
       const rsiPoints = toLineData(rsi(closes, config.rsi.period));
       if (rsiPoints.length > 0) {
         const rsiSeries = addOverlayLine(rsiPoints, {
-          color: '#F2F4F3', lineWidth: 2, title: `RSI ${config.rsi.period}`,
+          color: fg, lineWidth: 2, title: `RSI ${config.rsi.period}`,
           lastValueVisible: true,
         }, nextPane++);
         // Overbought/oversold guides drawn as price lines on the RSI series.
@@ -420,8 +427,8 @@ export default function Chart({
           }
         });
         histSeries.setData(histData);
-        addOverlayLine(macdPoints, { color: '#F2F4F3', lineWidth: 2, title: 'MACD', lastValueVisible: true }, macdPane);
-        addOverlayLine(toLineData(result.signal), { color: '#848C88', lineWidth: 1, title: 'Signal' }, macdPane);
+        addOverlayLine(macdPoints, { color: fg, lineWidth: 2, title: 'MACD', lastValueVisible: true }, macdPane);
+        addOverlayLine(toLineData(result.signal), { color: fg3, lineWidth: 1, title: 'Signal' }, macdPane);
       }
     }
 
@@ -544,7 +551,9 @@ export default function Chart({
     });
     priceLineRefs.current = (colors.priceLines ?? [])
       .filter((line): line is CreatePriceLineOptions => line?.price != null)
-      .map(line => series.createPriceLine(line));
+      .map(line => series.createPriceLine(
+        line.color?.startsWith('--') ? { ...line, color: cssVar(line.color as `--${string}`) } : line,
+      ));
   }, [colors.priceLines, data, rebuildEpoch]);
 
   return (
@@ -561,24 +570,24 @@ export default function Chart({
                   if (active && openPopover === key) setOpenPopover(null);
                 }}
                 className={`rounded border px-2 py-1 text-xs transition-colors ${
-                  active ? '' : 'border-borderSubtle bg-ink-0 text-textSecondary hover:text-textPrimary'
+                  active ? '' : 'border-line bg-ink-0 text-fg-2 hover:text-fg'
                 }`}
-                style={active ? { borderColor: color, backgroundColor: `${color}1a`, color } : undefined}
+                style={active ? { borderColor: color, backgroundColor: tint(color, 10), color } : undefined}
               >
                 {label}
               </button>
               {active && (
                 <button
                   onClick={() => setOpenPopover(openPopover === key ? null : key)}
-                  className="rounded border border-borderSubtle bg-ink-0 px-1.5 py-1 text-caption tabular text-textMuted transition-colors hover:text-textPrimary"
+                  className="rounded border border-white/15 bg-black/30 px-1.5 py-1 text-caption tabular text-fg-3 transition-colors hover:text-fg"
                   title={`${label} settings`}
                 >
                   {chipSummary(key, config)}
                 </button>
               )}
               {openPopover === key && (
-                <div className="glass-panel absolute left-0 top-full z-20 mt-2 w-52 p-3">
-                  <div className="mb-1 text-caption font-semibold text-textMuted">
+                <div className="glass-2 rounded-lg absolute left-0 top-full z-20 mt-2 w-52 p-3">
+                  <div className="mb-1 text-caption font-semibold text-fg-3">
                     {label}
                   </div>
                   {key === 'ema' && (

@@ -39,11 +39,11 @@ const POLL_MS = 4000;
 
 // Segments are named in text; no per-segment hue (amber means stale data).
 const SEGMENT_ACCENT: Record<string, string> = {
-  largecap: 'text-textSecondary',
-  midcap: 'text-textSecondary',
-  smallcap: 'text-textSecondary',
-  microcap: 'text-textSecondary',
-  unranked: 'text-textSecondary',
+  largecap: 'text-fg-2',
+  midcap: 'text-fg-2',
+  smallcap: 'text-fg-2',
+  microcap: 'text-fg-2',
+  unranked: 'text-fg-2',
 };
 
 /* ------------------------------- formatting ------------------------------ */
@@ -76,13 +76,13 @@ function Change({ pct, abs }: { pct: number; abs?: number }) {
       <span
         className={clsx(
           'tabular text-sm font-semibold',
-          up ? 'text-accentGreen' : 'text-accentRed',
+          up ? 'text-up' : 'text-down',
         )}
       >
         {fmtPct(pct)}
       </span>
       {abs !== undefined && (
-        <span className="tabular text-caption text-textMuted">
+        <span className="tabular text-caption text-fg-3">
           {up ? '+' : ''}{inr.format(abs)}
         </span>
       )}
@@ -95,7 +95,7 @@ function SegmentBadge({ segment, label }: { segment: string; label: string }) {
     <span
       className={clsx(
         'label shrink-0 text-caption',
-        SEGMENT_ACCENT[segment] ?? 'text-textMuted',
+        SEGMENT_ACCENT[segment] ?? 'text-fg-3',
       )}
     >
       {label}
@@ -107,7 +107,7 @@ function FnoBadge() {
   return (
     <span
       title="Futures and options available on this underlying"
-      className="label shrink-0 rounded border border-borderSubtle px-1 text-caption text-textMuted"
+      className="label shrink-0 rounded border border-line px-1 text-caption text-fg-3"
     >
       F&amp;O
     </span>
@@ -123,13 +123,13 @@ function Identity({ row, children }: { row: MoverRow; children?: React.ReactNode
   return (
     <div className="min-w-0">
       <div className="flex items-baseline gap-2">
-        <span className="ticker truncate text-sm text-textPrimary">{row.symbol}</span>
+        <span className="ticker truncate text-sm text-fg">{row.symbol}</span>
         {row.fno && <FnoBadge />}
         {children}
       </div>
       <div className="mt-0.5 flex items-center gap-2 truncate">
         <SegmentBadge segment={row.segment} label={row.segment_label} />
-        <span className="truncate text-caption text-textSecondary">{row.name}</span>
+        <span className="truncate text-caption text-fg-2">{row.name}</span>
       </div>
     </div>
   );
@@ -158,8 +158,8 @@ function RowLink({
         href={terminalHref(row)}
         aria-label={`Open ${row.symbol} (${row.name}) in the terminal`}
         className={clsx(
-          'group grid items-center gap-3 border-t border-borderSubtle py-3',
-          'transition-colors hover:bg-ink-2 focus-visible:bg-ink-2',
+          'group grid items-center gap-3 border-t border-line py-3',
+          'transition-colors hover:bg-white/[0.06] focus-visible:bg-white/[0.06]',
           className,
         )}
       >
@@ -174,7 +174,7 @@ function Chevron() {
     <ChevronRight
       size={13}
       aria-hidden="true"
-      className="shrink-0 text-textMuted opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+      className="shrink-0 text-fg-3 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
     />
   );
 }
@@ -186,12 +186,12 @@ function Row({ row, rank }: { row: MoverRow; rank: number }) {
       row={row}
       className="grid-cols-[1.75rem_minmax(0,1fr)_5.5rem_6rem_0.75rem] sm:grid-cols-[1.75rem_minmax(0,1fr)_7rem_6rem_6rem_0.75rem]"
     >
-      <span className="tabular text-caption text-textMuted">{rank}</span>
+      <span className="tabular text-caption text-fg-3">{rank}</span>
       <Identity row={row} />
       <div className="hidden sm:block">
         <Sparkline data={row.spark} className="h-7" />
       </div>
-      <span className="tabular text-right text-sm text-textSecondary">
+      <span className="tabular text-right text-sm text-fg-2">
         {fmtPrice(row.price)}
       </span>
       <div className="text-right">
@@ -206,18 +206,18 @@ function Row({ row, rank }: { row: MoverRow; rank: number }) {
 function CompactRow({ row, rank }: { row: MoverRow; rank: number }) {
   return (
     <RowLink row={row} className="grid-cols-[1.5rem_minmax(0,1fr)_5rem_0.75rem]">
-      <span className="tabular text-caption text-textMuted">{rank}</span>
+      <span className="tabular text-caption text-fg-3">{rank}</span>
       <Identity row={row} />
       <div className="text-right">
         <span
           className={clsx(
             'tabular text-sm font-semibold',
-            row.change_pct >= 0 ? 'text-accentGreen' : 'text-accentRed',
+            row.change_pct >= 0 ? 'text-up' : 'text-down',
           )}
         >
           {fmtPct(row.change_pct)}
         </span>
-        <div className="tabular text-caption text-textMuted">{fmtPrice(row.price)}</div>
+        <div className="tabular text-caption text-fg-3">{fmtPrice(row.price)}</div>
       </div>
       <Chevron />
     </RowLink>
@@ -232,20 +232,20 @@ function RowSkeleton({ count, compact = false }: { count: number; compact?: bool
         <li
           key={i}
           className={clsx(
-            'grid items-center gap-3 border-t border-borderSubtle py-3',
+            'grid items-center gap-3 border-t border-line py-3',
             compact
               ? 'grid-cols-[1.5rem_minmax(0,1fr)_5rem_0.75rem]'
               : 'grid-cols-[1.75rem_minmax(0,1fr)_5.5rem_6rem_0.75rem] sm:grid-cols-[1.75rem_minmax(0,1fr)_7rem_6rem_6rem_0.75rem]',
           )}
         >
-          <div className="h-3 w-3 rounded bg-ink-2" />
+          <div className="h-3 w-3 rounded bg-white/[0.06]" />
           <div className="space-y-1.5">
-            <div className="h-3 w-24 rounded bg-ink-2" />
-            <div className="h-2.5 w-40 rounded bg-ink-2" />
+            <div className="h-3 w-24 rounded bg-white/[0.06]" />
+            <div className="h-2.5 w-40 rounded bg-white/[0.06]" />
           </div>
-          {!compact && <div className="hidden h-6 rounded bg-ink-2 sm:block" />}
-          <div className="ml-auto h-3 w-16 rounded bg-ink-2" />
-          {!compact && <div className="ml-auto h-3 w-14 rounded bg-ink-2" />}
+          {!compact && <div className="hidden h-6 rounded bg-white/[0.06] sm:block" />}
+          <div className="ml-auto h-3 w-16 rounded bg-white/[0.06]" />
+          {!compact && <div className="ml-auto h-3 w-14 rounded bg-white/[0.06]" />}
           <div />
         </li>
       ))}
@@ -260,15 +260,15 @@ function Breadth({ advancing, declining }: { advancing: number; declining: numbe
   const advPct = (advancing / total) * 100;
   return (
     <div className="flex items-center gap-3">
-      <span className="tabular text-caption text-accentGreen">{advancing} adv</span>
+      <span className="tabular text-caption text-up">{advancing} adv</span>
       <div
         className="flex h-1.5 w-32 overflow-hidden bg-down/25"
         role="img"
         aria-label={`${advancing} advancing, ${declining} declining`}
       >
-        <div className="h-full bg-accentGreen" style={{ width: `${advPct}%` }} />
+        <div className="h-full bg-up" style={{ width: `${advPct}%` }} />
       </div>
-      <span className="tabular text-caption text-accentRed">{declining} decl</span>
+      <span className="tabular text-caption text-down">{declining} decl</span>
     </div>
   );
 }
@@ -286,18 +286,18 @@ function SectionHeading({
   aside?: React.ReactNode;
 }) {
   return (
-    <div className="mb-4 flex flex-col gap-2 border-b border-borderSubtle pb-3 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mb-4 flex flex-col gap-2 border-b border-line pb-3 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <h2 className="flex items-center gap-2 text-lg font-extrabold text-textPrimary">
+        <h2 className="flex items-center gap-2 text-lg font-extrabold text-fg">
           {icon}
           {title}
         </h2>
-        <p className="mt-1 max-w-3xl text-[12px] leading-relaxed text-textSecondary">
+        <p className="mt-1 max-w-3xl text-[12px] leading-relaxed text-fg-2">
           {blurb}
         </p>
       </div>
       {aside && (
-        <div className="tabular shrink-0 text-caption text-textMuted sm:text-right">
+        <div className="tabular shrink-0 text-caption text-fg-3 sm:text-right">
           {aside}
         </div>
       )}
@@ -319,7 +319,7 @@ function TopMoversSection({
   return (
     <section className="mb-12">
       <SectionHeading
-        icon={<Layers size={17} className="text-textSecondary" />}
+        icon={<Layers size={17} className="text-fg-2" />}
         title="Top movers by cap segment"
         blurb="Biggest absolute moves inside each NSE size bucket, so a 4% day in a largecap is not buried under a 20% day in a nano. Segment membership is the exchange's own constituent list; Unranked means the company trades on NSE but sits below the Total Market 750 line, where NSE publishes no size index."
         aside={
@@ -401,7 +401,7 @@ function IntradaySectionView({
   return (
     <section className="mb-12">
       <SectionHeading
-        icon={<Zap size={17} className="text-accentCyan" />}
+        icon={<Zap size={17} className="text-fg-2" />}
         title="Top intraday stocks"
         blurb={
           intraday
@@ -428,7 +428,7 @@ function IntradaySectionView({
             ? `Ranked by ${intraday.interval} range`
             : 'Ranked by daily move'
         }
-        icon={<Zap size={13} className="text-accentCyan" />}
+        icon={<Zap size={13} className="text-fg-2" />}
         aside={
           intraday?.ranked_by === 'change_pct'
             ? 'intraday ranges not warm yet'
@@ -445,7 +445,7 @@ function IntradaySectionView({
                 row={row}
                 className="grid-cols-[1.75rem_minmax(0,1fr)_5rem_5.5rem_0.75rem] sm:grid-cols-[1.75rem_minmax(0,1fr)_7rem_5rem_5.5rem_0.75rem]"
               >
-                <span className="tabular text-caption text-textMuted">{i + 1}</span>
+                <span className="tabular text-caption text-fg-3">{i + 1}</span>
                 <Identity row={row} />
                 <div className="hidden sm:block">
                   <Sparkline data={row.spark} className="h-7" />
@@ -453,16 +453,16 @@ function IntradaySectionView({
                 <div className="text-right">
                   {row.intraday_range_pct !== undefined ? (
                     <>
-                      <span className="tabular text-sm font-semibold text-accentCyan">
+                      <span className="tabular text-sm font-semibold text-fg-2">
                         {row.intraday_range_pct.toFixed(2)}%
                       </span>
-                      <div className="tabular text-caption text-textMuted">
+                      <div className="tabular text-caption text-fg-3">
                         {row.bars} bars
                       </div>
                     </>
                   ) : (
                     <span
-                      className="tabular text-caption text-textMuted"
+                      className="tabular text-caption text-fg-3"
                       title="Outside the enriched shortlist for this warm cycle"
                     >
                       not measured
@@ -491,17 +491,17 @@ function IntradaySectionView({
 
 const CONFIDENCE_STYLE: Record<string, { cls: string; title: string }> = {
   confirmed: {
-    cls: 'border-accentGreen/40 text-accentGreen',
+    cls: 'border-up/40 text-up',
     title:
       'Close sits at a standard band AND the session’s 5-minute series shows the close pinned to the day’s extreme, which is what a locked book looks like.',
   },
   inferred: {
-    cls: 'border-accentAmber/40 text-accentAmber',
+    cls: 'border-warn/40 text-warn',
     title:
       'Close sits at a standard band, but intraday data does not corroborate a lock, so the round number may be coincidence.',
   },
   unverified: {
-    cls: 'border-borderSubtle text-textMuted',
+    cls: 'border-line text-fg-3',
     title: 'Band match only; no intraday data warm yet for this name.',
   },
 };
@@ -542,7 +542,7 @@ function CircuitList({ rows, side }: { rows: MoverRow[]; side: 'upper' | 'lower'
           <span
             className={clsx(
               'tabular text-caption font-bold',
-              side === 'upper' ? 'text-accentGreen' : 'text-accentRed',
+              side === 'upper' ? 'text-up' : 'text-down',
             )}
           >
             {row.circuit_band}%
@@ -554,12 +554,12 @@ function CircuitList({ rows, side }: { rows: MoverRow[]; side: 'upper' | 'lower'
             <span
               className={clsx(
                 'tabular text-sm font-semibold',
-                side === 'upper' ? 'text-accentGreen' : 'text-accentRed',
+                side === 'upper' ? 'text-up' : 'text-down',
               )}
             >
               {fmtPct(row.change_pct)}
             </span>
-            <div className="tabular text-caption text-textMuted">
+            <div className="tabular text-caption text-fg-3">
               {row.bars !== undefined ? `${row.bars} bars` : fmtPrice(row.price)}
             </div>
           </div>
@@ -580,7 +580,7 @@ function CircuitsSection({
   return (
     <section className="mb-12">
       <SectionHeading
-        icon={<ArrowUpToLine size={17} className="text-accentGreen" />}
+        icon={<ArrowUpToLine size={17} className="text-up" />}
         title="Circuit hits"
         blurb={
           circuits
@@ -604,7 +604,7 @@ function CircuitsSection({
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Panel
           title="Upper circuit"
-          icon={<ArrowUpToLine size={13} className="text-accentGreen" />}
+          icon={<ArrowUpToLine size={13} className="text-up" />}
           aside={circuits ? `${circuits.upper_count} names` : undefined}
         >
           {loading ? <RowSkeleton count={6} compact /> : (
@@ -614,7 +614,7 @@ function CircuitsSection({
 
         <Panel
           title="Lower circuit"
-          icon={<ArrowDownToLine size={13} className="text-accentRed" />}
+          icon={<ArrowDownToLine size={13} className="text-down" />}
           aside={circuits ? `${circuits.lower_count} names` : undefined}
         >
           {loading ? <RowSkeleton count={6} compact /> : (
@@ -722,7 +722,7 @@ export default function MoversPage() {
           />
 
           <div className="flex flex-wrap items-center gap-2">
-            <span className="label w-16 shrink-0 text-caption text-textMuted">Moved</span>
+            <span className="label w-16 shrink-0 text-caption text-fg-3">Moved</span>
             {THRESHOLDS.map((t) => (
               <button
                 key={t}
@@ -732,8 +732,8 @@ export default function MoversPage() {
                 className={clsx(
                   'tabular inline-flex min-h-11 items-center border px-3 py-1 text-caption transition-colors sm:min-h-0',
                   minMove === t
-                    ? 'border-accentGreen/50 bg-up/10 text-accentGreen'
-                    : 'border-borderSubtle text-textSecondary hover:border-borderSubtle hover:text-textPrimary',
+                    ? 'border-fg bg-fg text-ink-0'
+                    : 'border-line text-fg-2 hover:border-line hover:text-fg',
                 )}
               >
                 ±{t}%
@@ -744,8 +744,8 @@ export default function MoversPage() {
 
         {/* ------------------------- status / warnings ----------------------- */}
         {data?.warming && (
-          <div className="mb-6 flex items-center gap-3 rounded-lg border border-accentBlue/25 bg-accentBlue/[0.06] px-4 py-3 text-sm text-textSecondary">
-            <Loader2 size={15} className="shrink-0 text-accentBlue" />
+          <div className="mb-6 flex items-center gap-3 rounded-lg border border-fg-2/25 bg-fg-2/[0.06] px-4 py-3 text-sm text-fg-2">
+            <Loader2 size={15} className="shrink-0 text-fg-2" />
             <span>
               {data.warm_progress?.phase === 'intraday'
                 ? 'Measuring intraday ranges for the biggest movers'
@@ -758,11 +758,11 @@ export default function MoversPage() {
         )}
 
         {data && data.excluded_implausible > 0 && (
-          <div className="mb-6 flex items-start gap-2 rounded-lg border border-accentPurple/25 bg-accentPurple/[0.06] px-4 py-3 text-sm text-textSecondary">
-            <AlertTriangle size={14} className="mt-0.5 shrink-0 text-accentPurple" />
+          <div className="mb-6 flex items-start gap-2 rounded-lg border border-fg-2/25 bg-fg-2/[0.06] px-4 py-3 text-sm text-fg-2">
+            <AlertTriangle size={14} className="mt-0.5 shrink-0 text-fg-2" />
             <span>
               Dropped{' '}
-              <span className="tabular font-semibold text-textPrimary">
+              <span className="tabular font-semibold text-fg">
                 {data.excluded_implausible}
               </span>{' '}
               row{data.excluded_implausible === 1 ? '' : 's'} moving more than{' '}
@@ -775,7 +775,7 @@ export default function MoversPage() {
                   {data.excluded_examples.map((e, i) => (
                     <span key={e.symbol}>
                       {i > 0 && ', '}
-                      <span className="ticker text-textPrimary">{e.symbol}</span>{' '}
+                      <span className="ticker text-fg">{e.symbol}</span>{' '}
                       <span className="tabular">{fmtPct(e.change_pct)}</span>
                     </span>
                   ))}
@@ -787,10 +787,10 @@ export default function MoversPage() {
         )}
 
         {data && data.warnings.length > 0 && (
-          <div className="mb-6 space-y-1 rounded-lg border border-accentAmber/25 bg-accentAmber/[0.06] px-4 py-3 text-sm text-textSecondary">
+          <div className="mb-6 space-y-1 rounded-lg border border-warn/25 bg-warn/[0.06] px-4 py-3 text-sm text-fg-2">
             {data.warnings.map((w) => (
               <div key={w} className="flex items-start gap-2">
-                <AlertTriangle size={14} className="mt-0.5 shrink-0 text-accentAmber" />
+                <AlertTriangle size={14} className="mt-0.5 shrink-0 text-warn" />
                 <span>{w}</span>
               </div>
             ))}
@@ -798,14 +798,14 @@ export default function MoversPage() {
         )}
 
         {Boolean(error) && (
-          <div className="mb-6 flex items-start gap-2 rounded-lg border border-accentRed/30 bg-down/[0.06] px-4 py-3 text-sm text-textSecondary">
-            <AlertTriangle size={14} className="mt-0.5 shrink-0 text-accentRed" />
+          <div className="mb-6 flex items-start gap-2 rounded-lg border border-down/30 bg-down/[0.06] px-4 py-3 text-sm text-fg-2">
+            <AlertTriangle size={14} className="mt-0.5 shrink-0 text-down" />
             <div>
-              <p className="text-textPrimary">{errorMessage(error)}</p>
+              <p className="text-fg">{errorMessage(error)}</p>
               <button
                 type="button"
                 onClick={reload}
-                className="mt-1 text-xs text-accentGreen underline underline-offset-4"
+                className="mt-1 text-xs text-up underline underline-offset-4"
               >
                 Retry
               </button>
@@ -828,7 +828,7 @@ export default function MoversPage() {
         {/* --------------------- reference: the full board ------------------- */}
         <section className="mb-12">
           <SectionHeading
-            icon={<Layers size={17} className="text-textSecondary" />}
+            icon={<Layers size={17} className="text-fg-2" />}
             title={`Everything that moved ±${minMove}% or more`}
             blurb="The unsegmented board, ranked by absolute move across the whole scope. Use the threshold buttons above to tighten or widen it."
             aside={data ? `${data.big_mover_count} in ${data.scope_label}` : undefined}
@@ -859,7 +859,7 @@ export default function MoversPage() {
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <Panel
             title="Top gainers"
-            icon={<TrendingUp size={13} className="text-accentGreen" />}
+            icon={<TrendingUp size={13} className="text-up" />}
             aside={data ? data.scope_label : undefined}
           >
             {showSkeleton ? (
@@ -877,7 +877,7 @@ export default function MoversPage() {
 
           <Panel
             title="Top losers"
-            icon={<TrendingDown size={13} className="text-accentRed" />}
+            icon={<TrendingDown size={13} className="text-down" />}
             aside={data ? data.scope_label : undefined}
           >
             {showSkeleton ? (
@@ -894,7 +894,7 @@ export default function MoversPage() {
           </Panel>
         </div>
 
-        <p className="mt-8 text-caption leading-relaxed text-textMuted">
+        <p className="mt-8 text-caption leading-relaxed text-fg-3">
           Size-segment membership is the exchange&apos;s own: NIFTY 50, Next 50, Midcap
           150, Smallcap 250 and Microcap 250 constituent lists. Everything else NSE
           lists in the cash EQ series is labelled Unranked rather than assigned a cap
@@ -905,7 +905,7 @@ export default function MoversPage() {
           it in the{' '}
           <Link
             href="/markets"
-            className="underline underline-offset-4 hover:text-textSecondary"
+            className="underline underline-offset-4 hover:text-fg-2"
           >
             terminal
           </Link>
@@ -936,7 +936,7 @@ function ScopeRow({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="label w-16 shrink-0 text-caption text-textMuted">{label}</span>
+      <span className="label w-16 shrink-0 text-caption text-fg-3">{label}</span>
       {items.map((s) => (
         <button
           key={s.id}
@@ -946,13 +946,13 @@ function ScopeRow({
           className={clsx(
             'inline-flex min-h-11 items-center border px-3 py-1 text-caption font-medium transition-colors sm:min-h-0',
             active === s.id
-              ? 'border-accentGreen/50 bg-up/10 text-accentGreen'
-              : 'border-borderSubtle text-textSecondary hover:text-textPrimary',
+              ? 'border-fg bg-fg text-ink-0'
+              : 'border-line text-fg-2 hover:text-fg',
           )}
         >
           {s.label}
           {s.count > 0 && (
-            <span className="tabular ml-1.5 text-caption text-textMuted">{s.count}</span>
+            <span className="tabular ml-1.5 text-caption text-fg-3">{s.count}</span>
           )}
         </button>
       ))}
@@ -962,9 +962,9 @@ function ScopeRow({
 
 function EmptyState({ headline, hint }: { headline: string; hint?: string }) {
   return (
-    <div className="border-t border-borderSubtle py-12 text-center">
-      <p className="text-sm text-textSecondary">{headline}</p>
-      {hint && <p className="mt-1 text-xs text-textMuted">{hint}</p>}
+    <div className="border-t border-line py-12 text-center">
+      <p className="text-sm text-fg-2">{headline}</p>
+      {hint && <p className="mt-1 text-xs text-fg-3">{hint}</p>}
     </div>
   );
 }

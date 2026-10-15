@@ -1,0 +1,88 @@
+# Polaris Project Memory
+
+The running record of what's done, what was decided and why. Newest first within each section. Read this at the start of every session; append to it at the end of every task.
+
+---
+
+## Current state (2026-10-11, after the v3.2 overhaul)
+
+- **Branch:** `flint-os-v2`, nothing committed since `ad24e52` (owner asked not to commit).
+- **Design:** v3.2 "Glass", calibrated against the Wealthcore reference (DESIGN.md §2). Neutral greys, near-opaque glass with sheen + rim light, grainy silver light, white actions.
+- **Done:** tokens and glass layer; AppShell rebuilt (floating glass sidebar, phone glass top bar + floating tab bar); every shared component restyled (Button, Panel, PageHeader, Tabs, Field, Dialog, Toast, States); landing page rebuilt from scratch in the dark glass system with Locomotive + GSAP (2 pinned sections); every app screen moved onto glass (Home, Portfolio, Risk, Markets, Movers, News, Settings, Symbol, Onboarding, auth, legal) including the AI desk and backtest internals via a scripted pass.
+- **Verified:** lint, tsc, 28 tests, production build; screenshots of the landing (1440, 390, reduced motion, scrolled) and of the real screens through `/dev/app/<screen>` (no session, so data panels show error states).
+- **Not verified:** real screens with real data (needs a signed-in session and the backend). Pinned scroll on a real trackpad.
+- **Next up:** owner review of the live app. Backend v3 contracts are built (ARCHITECTURE §5.4) and live on the Neon dev branch; production needs `python -m db.migrate` and the Kite redirect URL registered before `[BE]` screens can ship. Unblocked frontend work: Phase 2 primitives (T2.9, T2.11…), T4.25/T4.26 watchlists, T4.3 movers (`/api/movers` + `/api/market-overview`), restyles (T4.12, T4.20–T4.24, T4.30–T4.33).
+
+## Progress log
+
+| Date | Task | Note |
+|---|---|---|
+| 2026-10-15 | Backend v3 (BE) | Built the 7 missing contracts in `algo-trader-backend` (owner asked; uncommitted there too). Migration `0003_real_accounts_alerts.sql`: `accounts.kind` + `broker_connection_id`, `broker_connections` (Kite token AES-GCM encrypted, AAD = user + row), `broker_link_states` (hashed one-time state), `holdings`, `account_snapshots`, `alerts`, `alert_firings`; RLS forced on all, column-level grants, trigger blocks fills on real accounts. New `flint_api/kite.py`, `secretbox.py`, `performance.py`, `pulse_engine.py`, routers `brokers.py`, `alerts.py`; `ledger.py` gained kind/holdings/performance; `market.py` gained `/fx` and `/markets/pulse`; export covers the new tables (never the token). Contracts in ARCHITECTURE §5.4. Tests: 32 new (`tests/test_api_v3.py`), **95/95 pass on the Neon dev branch**. Migration applied to **dev only**. Found `.env` points at **production** (`ep-empty-wave`), not dev, although `.neon` says dev; the earlier baseline run used production (test users cleaned up). `BROKER_TOKEN_KEY` generated into backend `.env`. |
+| 2026-10-15 | T0.3 backend contracts | Checked `C:\Users\asus\Desktop\algo-trader-backend` (`flint_api/routers/*`, `db/migrations/0001–0002`) at `54947af`. Of the 8 v3 contracts: 1 partial (accounts, no `kind`), 7 missing (broker connect, broker status, real holdings, FX, market pulse, performance, alerts). Watchlists CRUD exists. Full table in ARCHITECTURE §5.4. The backend has uncommitted work (`.env.example`, `requirements.txt`, new `index.py`, `vercel.json`, `README.md`); not touched. |
+| 2026-10-15 | T3.3 BottomTabs | Phone/tablet tab bar is now Home · Markets · Search · Portfolio · More (was …Portfolio · News). More (`aria-haspopup="dialog"`, `aria-expanded`) opens the T2.10 `Sheet` with a `MORE` nav list: News, Settings. Watchlists and Alerts are left out until their routes exist (no dead links); T4.25/T4.27 note to add them. More shows the active style when the current route is in `MORE`. New `NavMore` glyph. Safe-area padding was already on the bar. Verified via CDP at 390: labels, open, Escape returns focus to More, link closes the sheet and navigates. |
+| 2026-10-15 | T2.10 Sheet | `components/ui/Sheet.tsx` on native `<dialog>` (browser focus trap + return). Props: `open`, `onClose`, `title`, `description?`, `footer?` (pinned under the scrolling body, safe-area padded). Phone: bottom, 90dvh max, handle + drag-to-dismiss (>96px; shorter snaps back). lg+: right panel, full height, 28rem. Escape (`cancel` prevented), scrim and handle all call `onClose`; exit plays 220ms before `close()`. Keyframes in globals.css (`.sheet`); exits set only `to` so a dragged sheet leaves from where it was released. Locks `html` overflow while open. Demo in `/dev/ui`. Verified via CDP at 1440 and 390: open, Escape, scrim, focus return to opener, short/long drag, reduced motion. Gotcha: `<dialog>`'s UA `overflow:auto` showed 1px scrollbars, so the dialog is `overflow-hidden`. |
+| 2026-10-15 | T1.9 hex → tokens | 92 hex literals in 15 files → 14, all in `app/layout.tsx` (theme-color meta + Clerk appearance need literal colours; commented as the one exception). New `lib/theme.ts`: `cssVar('--x')` resolves a token for canvas (lightweight-charts, drawings overlay; call only in effects/paint) and `tint(color, pct)` = `color-mix` for DOM alpha (replaces `${hex}1a` suffixes, which break on `var()`). Desk/intel/backtest colour helpers now return `var(--…)`. Price lines take a token name (`'--red'`), resolved in Chart. New tokens `--series-2` `#C9C9C9`, `--series-4` `#808080` (indicator greys). lint, tsc, 28 tests, build pass; charts not checked visually (need data). |
+| 2026-10-15 | T1.8 lint guards | `eslint.config.mjs`: `no-restricted-imports` + an `ImportExpression` selector block `locomotive-scroll`, `gsap/ScrollTrigger`, `gsap/SplitText` outside `src/components/landing/`; `no-restricted-syntax` flags hex in `className` (literals and template parts, incl. inside `clsx`). Verified with a throwaway probe file (4/4 caught). Gotcha: esquery regexes end at the first `/`, so the module pattern uses `.` for it. |
+| 2026-10-11 | T0.9 landing grain | Owner asked for grain on the whole landing. New `.landing-grain` (globals.css): an overlay layer for lit areas and glass plus a faint screen layer so black gets grain too; knobs `--grain-light` 0.16, `--grain-dark` 0.04, `--grain-scale` 200px. Gotcha: the wrapper must not set position/z-index, or the layers blend only with its empty box (a flat haze; it lifted blacks from 11 to 33). Measured after the fix: dark 17 (std 1.2), lit 25 (std 2.5). |
+| 2026-10-11 | T0.8 tape seam | Owner: hard border by the marquee. Cause: a hero radial glow anchored at its column's bottom edge (`at 50% 100%`) was brightest exactly where the element ended, so it was sliced into a line at the tape top. Removed it; bloom falloff is now Gaussian (no stop kinks); added a bridge bloom under the tape (core below it, `--b 0.65`); tape labels fg-2 for contrast. Kept the owner's own hero bloom sizing. Verified with live (motion-on) scroll captures and pixel profiles: no step across the tape. |
+| 2026-10-11 | T0.7 continuous landing | Owner: make the landing continuous with the allocation/net-worth light everywhere, no hard boundaries; logo clickable to the landing. Replaced `.light-panel`/`.light-center` (deleted) with `.bloom` radial lights behind the hero cards, real/paper cards, plan chart, desk row, risk row and closing card. Removed the hero split background, tape borders, nav band and border, and footer rule (now a fading nav wash, edge-faded tape and gradient hairline). Logo goes to `/` in the app sidebar, phone header and onboarding; on the landing it smooth-scrolls to the top. Verified lint, tsc, build, 1440 and 390 captures. |
+| 2026-10-11 | T0.6 v3.2 overhaul | Owner: "glass not good yet, overhaul landing and entire app like the reference". Sampled the reference (page `#0C0D0F→#1A1A19`, cards `#2D2D2D→#131313`, rim ~`#707070`, light peak `#B6B6B6`, heavy grain on light only). New palette + glass recipe in globals.css (`glass`, `glass-2`, `glass-hero`, tints, `.well`, `.pill`, `.ring-dot`, `.dot-grid`, `.light-panel`, `.light-center`, `.ambient`). Renamed `glass-1`→`glass`. Rebuilt AppShell, landing (`app/page.tsx`, `LandingMotion`, `PlanChart`), deleted `landing.css`, the print palette, Archivo/Plex and the unused `public/landing/symbol-aapl.png`. Scripted glass pass over 28 files (nested cards→`.well`, flat ink fills→white washes, inputs→black/30, segmented→white selected). Green removed from every action and selection. Added dev previews `/dev/shell` and `/dev/app/[screen]` (404 in prod). |
+| 2026-10-11 | T1.4–T1.7 | Migrated 829 legacy alias uses in 28 files with a scratch script (map: bgPrimary→ink-0, bgSecondary→ink-1, bgElevated→ink-2, textPrimary→fg, textSecondary→fg-2, textMuted→fg-3, accentGreen→up, accentRed→down, accentAmber→warn, accentBlue/Purple/Cyan→fg-2, borderSubtle→line, borderStrong→line-strong, `.glass-panel`→`glass-1` + `rounded-xl`). Line endings preserved. Removed the alias blocks, `.glass-panel` and `.hover-lift`. The Chart indicator dropdown became `glass-2`. |
+| 2026-10-11 | T1.1, T1.2, T1.10–T1.12, T2.1 | Tokens v3.1 in tailwind + CSS vars; glass classes in `@layer components` (so utilities override them); `.ambient`/`.ambient-brand` light field + grain; `.text-silver`; Clerk red updated; `/dev/ui` gallery (404 in prod). Verified: lint, tsc, 28 tests, build; screenshots at 1440 and 360 (no overflow). The landing's cream classes were renamed `paper`→`print` because `paper` now means paper-money blue. |
+| 2026-10-11 | T0.5 | DESIGN.md → v3.1 "Glass" after the owner shared the Wealthcore reference. RULES, TASKS (T1.10–T1.12, T5.12) and ARCHITECTURE updated. |
+| 2026-10-11 | T0.4 | Marked v2 DESIGN §4/§6/§8/§15.4 superseded; CLAUDE.md and PRODUCT.md now point at `docs/`. |
+| 2026-10-11 | T0.1 | Wrote `docs/` ARCHITECTURE, DESIGN (v3), MEMORY, RULES, TASKS; moved PRD into `docs/` and added Part III (v3 scope). Installed skills globally: frontend-design, ui-taste + ios-design (uizze), high-end-visual-design, motion-graphics, ui-ux-pro-max. |
+
+## Decisions
+
+| Date | Decision | Why / source |
+|---|---|---|
+| 2026-10-11 | **Product is a personal portfolio manager** with real and paper portfolios, kept separate and never summed. | Owner Q&A |
+| 2026-10-11 | Real holdings come in through **read-only broker API sync** (start with Zerodha Kite and Upstox). No order placement on real accounts. | Owner Q&A |
+| 2026-10-11 | **Markets: India + US**, INR or USD base currency with FX conversion. | Owner Q&A |
+| 2026-10-11 | **Home answers "what's the market doing"** (market pulse) first; the portfolio summary sits in a side column. | Owner Q&A |
+| 2026-10-11 | Modules kept: AI trading desk + backtest, screener/discover, news + intel. Added: **watchlists and alerts**. | Owner Q&A |
+| 2026-10-11 | **Design v3 softens v2 toward modern SaaS**: radii 4/6/10/14, ink-3, an overlay shadow, an inset card highlight. Still dark only, no gradients or glass. | Owner Q&A ("soften toward SaaS") |
+| 2026-10-11 | **One system everywhere**: the landing page moves into the dark app system; the print palette (paper, Archivo, Plex Mono, hazard red) is retired. Supersedes v2 DESIGN §15.4. | Owner Q&A |
+| 2026-10-11 | **Typography stays the Helvetica stack**; tabular numerals, no mono face. | Owner Q&A. ui-ux-pro-max suggested Fira Code/Sans; overruled. |
+| 2026-10-11 | **Second accent = paper blue `#6EA8FE`**, used only for simulated money. Amber stays reserved for stale data, so it wasn't reused for paper. | Owner chose "paper-mode accent"; blue picked to avoid clashing with amber. 8.2:1 on ink-0. |
+| 2026-10-11 | Red changed `#E5484D` → `#F0625F`; control border `#626A66` → `#6B7470`. | The old red was 4.4:1 on ink-2 (fails AA); the old control was 2.9:1 on ink-3. |
+| 2026-10-11 | **Navigation: sidebar (lg+) + bottom tabs (phone)** + Ctrl K palette. | Owner Q&A |
+| 2026-10-11 | **Landing motion: cinematic but precise.** Locomotive v5 + GSAP ScrollTrigger, at most 2 pinned scrubbed sections; WebGL gimmicks stay deleted. | Owner Q&A |
+| 2026-10-11 | **v3.1 "Glass" direction** from the Wealthcore reference (motionsites.ai, public preview image only; the premium prompt was not used). Dark frosted glass cards (16/20px) over a monochrome grainy light field; sharp 2px controls; white primary button; regular-weight display with silver text; `text-micro` uppercase only in badges. | Owner request. Replaces the "no glass, no gradients" rules for those three sanctioned gradients only. |
+| 2026-10-11 | Glass text contrast rule: text-bearing glass only over backdrops ≤ `#3A3D3C`; `glass-hero` (85%) for landing cards over bright areas. | Measured: 80% glass over a `#BFC3C1` field drops `fg-3` to 3.6:1. |
+| 2026-10-11 | Semantic glass tints: green, red, amber, plus paper blue; colour is still never the only signal. | Owner asked for glass red/green/amber. |
+| 2026-10-11 | 3D (ThreeUI) is optional, landing-only, behind a licence check and a +150 KB budget (T5.12). The look is built from CSS first. | Keeps the app fast; `three` was removed in v2. |
+| 2026-10-11 | No fake logo strip on the landing page (the reference has one); use an honest text line instead. | Honesty principle |
+| 2026-10-11 | **v3.2 calibration supersedes v3.1 values**: neutral greys; accents brightened (`#3DD68C`, `#FF7A75`, `#E8B04A`, `#86B7FF`) so they pass AA on the card sheen; fg-3 `#A0A0A0`; glass fill 80% (glass), 90% (glass-2), 88% (hero); white focus ring; white selected states. | The reference's glass effect comes from light + rim, not transparency; measured contrast set the alphas. |
+| 2026-10-11 | Text never sits directly on a light panel; inside `glass-hero` or an `ink-0/85` pill only. | White text on a `#C4C4C4` bloom fails AA. |
+| 2026-10-11 | Landing copy: "See everything you own. Test everything you don't." No logo strip; a text line names brokers and markets. 3D (ThreeUI) still not used. | Honesty; CSS light achieves the look. |
+| 2026-10-11 | Docs live in `docs/`. `PRD.md` moved there from the root. | Owner Q&A |
+| 2026-10-15 | **Product renamed Flint → Polaris** in all visible copy, titles, aria-labels, comments, docs and `package.json`. Kept on purpose: `flint.*` / `flint:u:` storage keys (renaming wipes saved charts), `FLINT_API_URL` (deploy config), `docs/flint-os-v2/` and the branch name. | Owner chose "visible + docs" scope |
+| 2026-10-15 | Logo is the Polaris mark (fixed star in circumpolar trails): `public/polaris-mark.png` in `Wordmark`, favicon from the same mark on a dark tile. Sources, PNGs and 5s stings in `brand/`. `FlintMark` glyph removed. | Owner request |
+
+## Open questions
+
+1. ~~Which backend endpoints from §5.4 exist?~~ Answered 2026-10-15 (T0.3): accounts partial, watchlists yes, the rest missing. Then built 2026-10-15 (see log).
+2. US broker sync: which broker or aggregator, and when? India brokers come first.
+3. Should Home show a compact "real net worth" figure for users with no broker connected, or prompt them to connect?
+4. Does PRD F12's rule ("no trade ticket on mobile") still hold now that paper trading is only one part of the app? The v3 docs currently allow the paper ticket on phone as a bottom sheet.
+
+## Noticed (not fixed)
+
+- `ui/Dialog.tsx` has the same structure the Sheet had (bordered `<dialog>` with UA `overflow:auto`), so it likely shows the same 1px scrollbars; not checked. It also hardcodes `id="dialog-title"` (duplicate ids if two mount). Fix in T2.9.
+- Below `lg` the footer (disclaimer + Privacy/Terms) is hidden, so phone users have no route to the legal pages or the disclaimer from the app shell. Candidate home: the More sheet. Owner call.
+- Backend `.env` points at the Neon **production** branch while `.neon` names `dev`. Decide which one local development should use.
+- Backend `ledger.positions` formats quantities with `str(d.normalize())`, which prints 10 as `1E+1`. Fixed in the new holdings/alerts code, not in positions (pre-existing).
+- Alerts only fire while the app is open (no worker on Vercel). A Vercel Cron calling an owner-role checker would make them fire in the background.
+- `/dev/app/settings` logs a Clerk `cannot_render_user_missing` error because the preview isn't signed in. Harmless; not present in the real app.
+- Chart colours written as `rgba()` still carry old v1/v2 palette values and were missed by the hex sweep: `Chart.tsx` MACD histogram (`47,191,113` / `229,72,77`), Bollinger (`164,172,168`), RSI guides (`132,140,136`); `EquityChart.tsx` buy-and-hold and drawdown (`148,163,184`, `248,113,113`). Move them to `cssVar` + alpha in T4.19/T4.21.
+
+- `src/app/(app)/markets/markets.module.css` is imported nowhere (dead). Its vars were migrated anyway; delete in T6.1.
+- Headless Chrome won't render below a 504px viewport; use the scratch CDP script (`Emulation.setDeviceMetricsOverride`) for 360/390 checks.
+- The radius scale changed under existing `rounded-lg/xl` classes (78 uses), which now render 12/16px. Review per screen when it's rebuilt.
+
+- 821 legacy alias uses across 27 files, 69 raw hex values, 60 inline styles and 166 arbitrary Tailwind values (counted 2026-10-11). Tracked in T1.6 and T1.9.
+- `graphify-out/GRAPH_REPORT.md` is from 2026-08-30 and still lists removed modules (Geotrade, magicui, three). Re-run graphify after Phase 1.
+- Clerk's hosted sign-in still says "Sign in to My Application": the app name is set in the Clerk dashboard, not in code.
+- `npx skills add -g` reports "PromptScript does not support global skill installation". That's harmless: the skills installed fine for Claude Code.

@@ -3,23 +3,28 @@ import Link from 'next/link';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Loader2 } from './icons';
 
-type Variant = 'primary' | 'secondary' | 'danger' | 'ghost';
-type Size = 'md' | 'sm';
+type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'paper';
+type Size = 'md' | 'sm' | 'lg';
 
 const base =
   'inline-flex items-center justify-center gap-2 rounded-sm border font-medium whitespace-nowrap ' +
-  'transition-colors duration-fast ease-out disabled:cursor-not-allowed disabled:opacity-50';
+  'transition-[background-color,border-color,color,transform] duration-fast ease-standard active:translate-y-px ' +
+  'disabled:cursor-not-allowed disabled:opacity-50';
 
 const variants: Record<Variant, string> = {
-  primary: 'border-transparent bg-up text-ink-0 hover:bg-[#46CC84]',
-  secondary: 'border-control bg-transparent text-fg hover:border-fg-2',
-  danger: 'border-down bg-transparent text-down hover:bg-down/10',
-  ghost: 'border-transparent bg-transparent text-fg-2 hover:bg-ink-2 hover:text-fg',
+  // White is the action; colour is reserved for meaning (docs/DESIGN.md §7.1).
+  primary: 'border-transparent bg-fg text-ink-0 hover:bg-white',
+  secondary: 'border-white/30 bg-black/30 text-fg backdrop-blur hover:border-white/40 hover:bg-white/[0.06]',
+  danger: 'border-down/60 bg-transparent text-down hover:bg-down/10',
+  ghost: 'border-transparent bg-transparent text-fg-2 hover:bg-white/[0.06] hover:text-fg',
+  // Placing paper (simulated) orders only.
+  paper: 'border-transparent bg-paper text-ink-0 hover:brightness-110',
 };
 
 const sizes: Record<Size, string> = {
-  md: 'min-h-11 px-4 text-body-sm',
+  md: 'min-h-11 px-5 text-body-sm',
   sm: 'min-h-8 px-3 text-caption',
+  lg: 'min-h-14 px-8 text-body',
 };
 
 export function buttonClass(variant: Variant = 'primary', size: Size = 'md', className?: string) {

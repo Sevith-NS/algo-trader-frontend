@@ -53,7 +53,7 @@ function StageRail({ stage, message, running }: {
 }) {
   const currentIndex = stage ? STAGE_ORDER.indexOf(stage) : -1;
   return (
-    <div className="rounded-xl border border-borderSubtle bg-ink-2 p-4">
+    <div className="rounded-xl well p-4">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
         {STAGE_ORDER.map((key, i) => {
           const done = i < currentIndex || (!running && currentIndex === STAGE_ORDER.length - 1 && i <= currentIndex);
@@ -63,9 +63,9 @@ function StageRail({ stage, message, running }: {
               <span
                 className={clsx(
                   'flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-caption transition-colors',
-                  active ? 'bg-accentPurple/15 text-accentPurple'
-                    : done ? 'text-accentGreen'
-                    : 'text-textMuted',
+                  active ? 'bg-fg text-ink-0'
+                    : done ? 'text-up'
+                    : 'text-fg-3',
                 )}
               >
                 {done ? <Check size={10} />
@@ -73,13 +73,13 @@ function StageRail({ stage, message, running }: {
                   : <CircleDot size={10} className="opacity-40" />}
                 {STAGE_LABELS[key]}
               </span>
-              {i < STAGE_ORDER.length - 1 && <span className="text-textMuted/40">·</span>}
+              {i < STAGE_ORDER.length - 1 && <span className="text-fg-3/40">·</span>}
             </div>
           );
         })}
       </div>
       {message && (
-        <p className="mt-2.5 border-t border-borderSubtle pt-2.5 text-[12px] text-textSecondary">
+        <p className="mt-2.5 border-t border-line pt-2.5 text-[12px] text-fg-2">
           {message}
         </p>
       )}
@@ -200,16 +200,16 @@ export default function TradingDeskSection({
   return (
     <div className="space-y-5">
       {/* ---- Header and controls ---- */}
-      <div className="glass-panel p-5">
+      <div className="glass rounded-xl p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <h3 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-textPrimary">
-              <Building2 size={15} className="text-accentPurple" /> Trading Desk
-              <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
+            <h3 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-fg">
+              <Building2 size={15} className="text-fg-2" /> Trading Desk
+              <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-caption text-fg-3">
                 analysts · debate · risk · sign-off
               </span>
             </h3>
-            <p className="mt-1.5 max-w-2xl text-xs leading-relaxed text-textSecondary">
+            <p className="mt-1.5 max-w-2xl text-xs leading-relaxed text-fg-2">
               Four specialist analysts read {symbol} separately, a bull and a bear argue it out
               over {rounds} {rounds === 1 ? 'round' : 'rounds'}, a trader turns the thesis into
               the quant engine&apos;s solved levels, three risk seats fight over position size,
@@ -221,7 +221,7 @@ export default function TradingDeskSection({
           <div className="flex flex-wrap items-center gap-3">
             <div>
               <MicroLabel className="mb-1">Debate rounds</MicroLabel>
-              <div className="flex overflow-hidden rounded-lg border border-borderSubtle">
+              <div className="flex overflow-hidden rounded-sm border border-white/15 bg-black/30">
                 {ROUND_OPTIONS.map((option) => (
                   <button
                     key={option}
@@ -230,8 +230,8 @@ export default function TradingDeskSection({
                     className={clsx(
                       'min-h-8 px-2.5 text-caption font-semibold tabular transition-colors disabled:opacity-50',
                       rounds === option
-                        ? 'bg-accentPurple/15 text-accentPurple'
-                        : 'text-textMuted hover:text-textSecondary',
+                        ? 'bg-fg text-ink-0'
+                        : 'text-fg-3 hover:text-fg-2',
                     )}
                   >
                     {option}
@@ -243,14 +243,14 @@ export default function TradingDeskSection({
             {running ? (
               <button
                 onClick={stop}
-                className="flex min-h-11 items-center gap-2 rounded-lg border border-borderStrong px-4 text-xs font-semibold text-textSecondary transition-colors hover:text-textPrimary"
+                className="flex min-h-11 items-center gap-2 rounded-sm border border-white/25 bg-black/30 px-4 text-xs font-semibold text-fg-2 transition-colors hover:text-fg"
               >
                 <Square size={13} /> Stop
               </button>
             ) : (
               <button
                 onClick={run}
-                className="flex min-h-11 items-center gap-2 rounded-lg border border-accentPurple/30 bg-accentPurple/5 px-4 text-xs font-semibold text-accentPurple transition-colors hover:bg-accentPurple/10"
+                className="flex min-h-11 items-center gap-2 rounded-lg border border-fg-2/30 bg-fg-2/5 px-4 text-xs font-semibold text-fg-2 transition-colors hover:bg-fg-2/10"
               >
                 <Play size={13} /> {started ? 'Run again' : `Convene the desk on ${symbol}`}
               </button>
@@ -260,34 +260,34 @@ export default function TradingDeskSection({
 
         {/* ---- Live context strip ---- */}
         {context && (
-          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-borderSubtle pt-3 text-caption text-textMuted">
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line pt-3 text-caption text-fg-3">
             <span>
-              <span className="ticker text-textSecondary">{context.symbol}</span>
+              <span className="ticker text-fg-2">{context.symbol}</span>
               {context.company !== context.symbol && ` · ${context.company}`}
             </span>
             <span>
               engine call{' '}
-              <span className="font-semibold text-textSecondary">{context.verdict.long_term.call}</span>
+              <span className="font-semibold text-fg-2">{context.verdict.long_term.call}</span>
             </span>
             {context.quant && (
               <span>
-                quant <span className="font-semibold text-textSecondary">{context.quant.signal}</span>
+                quant <span className="font-semibold text-fg-2">{context.quant.signal}</span>
               </span>
             )}
             <span>
               book{' '}
-              <span className="tabular text-textSecondary">
+              <span className="tabular text-fg-2">
                 {context.portfolio.has_book
                   ? formatMoney(context.portfolio.total_equity, account?.currency, 0)
                   : 'not connected'}
               </span>
             </span>
             {context.portfolio.existing_position && (
-              <span className="text-accentAmber">
+              <span className="text-warn">
                 already holding {context.portfolio.existing_position.shares} shares
               </span>
             )}
-            <span className={clsx('flex items-center gap-1', priorCalls > 0 && 'text-accentBlue')}>
+            <span className={clsx('flex items-center gap-1', priorCalls > 0 && 'text-fg-2')}>
               <Brain size={11} />
               {priorCalls > 0
                 ? `${priorCalls} prior call${priorCalls === 1 ? '' : 's'} on ${symbol} in memory`
@@ -303,21 +303,21 @@ export default function TradingDeskSection({
       </div>
 
       {error && (
-        <div className="glass-panel flex items-start gap-3 p-5">
-          <WifiOff size={16} className="mt-0.5 shrink-0 text-accentAmber" />
-          <p className="text-sm leading-relaxed text-textSecondary">{error}</p>
+        <div className="glass rounded-xl flex items-start gap-3 p-5">
+          <WifiOff size={16} className="mt-0.5 shrink-0 text-warn" />
+          <p className="text-sm leading-relaxed text-fg-2">{error}</p>
         </div>
       )}
 
       {/* The desk changed provider mid-run. Not an error — the run continued —
           but the reader deserves to know which model answered which seat. */}
       {state.failover && (
-        <div className="glass-panel flex items-start gap-3 p-4">
-          <Shuffle size={15} className="mt-0.5 shrink-0 text-accentAmber" />
+        <div className="glass rounded-xl flex items-start gap-3 p-4">
+          <Shuffle size={15} className="mt-0.5 shrink-0 text-warn" />
           <div className="min-w-0">
-            <p className="text-[13px] leading-relaxed text-textSecondary">{state.failover}</p>
+            <p className="text-[13px] leading-relaxed text-fg-2">{state.failover}</p>
             {state.fallbackCalls > 0 && (
-              <p className="mt-1 text-caption text-textMuted">
+              <p className="mt-1 text-caption text-fg-3">
                 <span className="tabular">{state.fallbackCalls}</span> of this run&apos;s seats were
                 served by the fallback.
               </p>
@@ -368,9 +368,9 @@ export default function TradingDeskSection({
       ) : (
         <button
           onClick={() => setShowJournal(true)}
-          className="glass-panel flex w-full items-center justify-center gap-2 p-4 text-xs font-semibold text-textSecondary transition-colors hover:text-textPrimary"
+          className="glass rounded-xl flex w-full items-center justify-center gap-2 p-4 text-xs font-semibold text-fg-2 transition-colors hover:text-fg"
         >
-          <BookOpen size={14} className="text-accentBlue" />
+          <BookOpen size={14} className="text-fg-2" />
           Show the decision journal: every past call, scored on alpha vs the S&amp;P
         </button>
       )}

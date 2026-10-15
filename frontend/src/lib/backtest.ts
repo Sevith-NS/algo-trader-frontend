@@ -142,13 +142,13 @@ export const shortDate = (iso: string | null | undefined) =>
 /** Green above zero, red below, muted at exactly nothing. */
 export const toneFor = (v: number | null | undefined) =>
   v === null || v === undefined || !Number.isFinite(v)
-    ? 'text-textMuted'
-    : v > 0 ? 'text-accentGreen' : v < 0 ? 'text-accentRed' : 'text-textSecondary';
+    ? 'text-fg-3'
+    : v > 0 ? 'text-up' : v < 0 ? 'text-down' : 'text-fg-2';
 
 export const VERDICT_COLOR: Record<string, string> = {
-  good: '#2FBF71',
-  warn: '#D9A23A',
-  bad: '#E5484D',
+  good: 'var(--green)',
+  warn: 'var(--amber)',
+  bad: 'var(--red)',
 };
 
 /** Timeframes the backtester accepts, with the history each one reaches. */

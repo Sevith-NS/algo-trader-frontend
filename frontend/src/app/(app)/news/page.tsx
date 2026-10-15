@@ -60,7 +60,7 @@ function cleanTitle(a: Article) {
 function MoodBar({ index }: { index: number }) {
   const word = moodWord(index);
   return (
-    <span aria-hidden="true" className="relative h-1.5 w-full bg-ink-2">
+    <span aria-hidden="true" className="relative h-1.5 w-full bg-white/[0.06]">
       <span className={clsx('absolute inset-y-0 left-0',
         word === 'Positive' ? 'bg-up' : word === 'Negative' ? 'bg-down' : 'bg-fg-3')}
             style={{ width: `${Math.max(0, Math.min(100, index))}%` }} />
@@ -112,7 +112,7 @@ export default function NewsPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-h3 font-bold">News</h1>
+          <h1 className="text-silver text-h2 font-normal tracking-[-0.03em] md:text-[40px] md:leading-[44px]">News</h1>
           <p className="max-w-prose text-body-sm text-fg-2">
             Headlines from public feeds, each scored for tone by a sentiment model. Tone is not a forecast.
           </p>
@@ -137,8 +137,8 @@ export default function NewsPage() {
             <p className="text-caption text-fg-3">0 is all negative, 50 neutral, 100 all positive.</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_17rem]">
-            <section aria-label="Headlines" className="flex min-w-0 flex-col gap-2">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
+            <section aria-label="Headlines" className="glass flex min-w-0 flex-col gap-2 rounded-2xl p-5 md:p-6">
               <Tabs idPrefix="news" label="Category" value={category} onChange={setCategory}
                     tabs={[{ id: 'all', label: 'All' }, ...keys.map((k) => ({ id: k, label: label(k) }))]} />
               <div role="tabpanel" id={`news-panel-${category}`} aria-labelledby={`news-tab-${category}`}>
@@ -152,8 +152,8 @@ export default function NewsPage() {
               </div>
             </section>
 
-            <section aria-labelledby="tone-h" className="flex flex-col gap-3">
-              <h2 id="tone-h" className="text-body font-bold">Tone by category</h2>
+            <section aria-labelledby="tone-h" className="glass rounded-2xl p-5 md:p-6 flex flex-col gap-3">
+              <h2 id="tone-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />Tone by category</h2>
               <ul className="flex flex-col">
                 {keys.map((k) => {
                   const idx = data.categories[k].mood_index;

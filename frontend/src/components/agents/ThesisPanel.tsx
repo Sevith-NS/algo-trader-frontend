@@ -23,11 +23,11 @@ export default function ThesisPanel({ judge }: { judge: JudgeEvent }) {
   const wColor = winnerColor(judge.winner);
 
   return (
-    <div className="glass-panel p-5">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
-        <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
+    <div className="glass rounded-xl p-5">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
+        <h4 className="flex items-center gap-2 text-sm font-semibold text-fg">
           <Gavel size={15} style={{ color: stanceColor }} /> Desk Thesis
-          <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
+          <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-caption text-fg-3">
             research manager
           </span>
         </h4>
@@ -46,7 +46,7 @@ export default function ThesisPanel({ judge }: { judge: JudgeEvent }) {
           <MicroLabel>vs computed engine</MicroLabel>
           <div className="mt-0.5 flex items-center gap-1.5">
             <Chip label={judge.computed_call} color={callColor(judge.computed_call)} />
-            <span className={judge.agrees_with_engine ? 'text-caption text-accentGreen' : 'text-caption text-accentAmber'}>
+            <span className={judge.agrees_with_engine ? 'text-caption text-up' : 'text-caption text-warn'}>
               {judge.agrees_with_engine ? 'agrees' : 'disagrees, so read the thesis'}
             </span>
           </div>
@@ -54,16 +54,16 @@ export default function ThesisPanel({ judge }: { judge: JudgeEvent }) {
       </div>
 
       {judge.thesis && (
-        <p className="mt-4 text-[13px] leading-relaxed text-textPrimary">{judge.thesis}</p>
+        <p className="mt-4 text-[13px] leading-relaxed text-fg">{judge.thesis}</p>
       )}
 
       {judge.decisive_argument && (
-        <TintPanel color="#A4ACA8" className="mt-4">
+        <TintPanel color="var(--fg-2)" className="mt-4">
           <div className="flex gap-2">
-            <Sparkle size={13} className="mt-0.5 shrink-0 text-accentPurple" />
+            <Sparkle size={13} className="mt-0.5 shrink-0 text-fg-2" />
             <div className="min-w-0">
               <MicroLabel>What settled it</MicroLabel>
-              <p className="mt-1 text-[12px] leading-relaxed text-textSecondary">{judge.decisive_argument}</p>
+              <p className="mt-1 text-[12px] leading-relaxed text-fg-2">{judge.decisive_argument}</p>
             </div>
           </div>
         </TintPanel>
@@ -72,19 +72,19 @@ export default function ThesisPanel({ judge }: { judge: JudgeEvent }) {
       {(judge.key_risk || judge.invalidation) && (
         <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
           {judge.key_risk && (
-            <div className="rounded-xl border border-accentAmber/25 bg-accentAmber/[0.06] p-3.5">
-              <h5 className="mb-1.5 flex items-center gap-1.5 text-caption font-semibold text-accentAmber">
+            <div className="rounded-xl border border-warn/25 bg-warn/[0.06] p-3.5">
+              <h5 className="mb-1.5 flex items-center gap-1.5 text-caption font-semibold text-warn">
                 <ShieldAlert size={12} /> Key risk
               </h5>
-              <p className="text-[12px] leading-relaxed text-textSecondary">{judge.key_risk}</p>
+              <p className="text-[12px] leading-relaxed text-fg-2">{judge.key_risk}</p>
             </div>
           )}
           {judge.invalidation && (
-            <div className="rounded-xl border border-accentRed/25 bg-down/[0.06] p-3.5">
-              <h5 className="mb-1.5 flex items-center gap-1.5 text-caption font-semibold text-accentRed">
+            <div className="rounded-xl border border-down/25 bg-down/[0.06] p-3.5">
+              <h5 className="mb-1.5 flex items-center gap-1.5 text-caption font-semibold text-down">
                 <Ban size={12} /> Thesis is wrong if
               </h5>
-              <p className="text-[12px] leading-relaxed text-textSecondary">{judge.invalidation}</p>
+              <p className="text-[12px] leading-relaxed text-fg-2">{judge.invalidation}</p>
             </div>
           )}
         </div>

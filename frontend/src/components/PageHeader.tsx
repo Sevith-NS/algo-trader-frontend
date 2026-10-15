@@ -59,16 +59,16 @@ export function PageHeader({
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           {eyebrow && (
-            <p className="mb-1 text-caption text-fg-3">
+            <p className="mb-3 text-micro uppercase text-fg-3">
               {eyebrow}
             </p>
           )}
-          <Heading className="flex items-center gap-3 text-h3 font-bold text-fg">
+          <Heading className="text-silver flex items-center gap-3 text-h2 font-normal tracking-[-0.03em] md:text-[40px] md:leading-[44px]">
             {icon}
             {title}
           </Heading>
           {description && (
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-textSecondary">
+            <p className="mt-3 max-w-2xl text-body-sm text-fg-2">
               {description}
             </p>
           )}
@@ -76,7 +76,7 @@ export function PageHeader({
         {actions && <div className="shrink-0 sm:text-right">{actions}</div>}
       </div>
       {meta && (
-        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] text-textMuted">
+        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 tabular text-caption text-fg-3">
           {meta}
         </div>
       )}
@@ -85,9 +85,9 @@ export function PageHeader({
 }
 
 /**
- * Section panel used across the product surfaces. Wraps the existing
- * .glass-panel token so panel styling lives in one place rather than being
- * re-derived per page.
+ * Section panel used across the product surfaces, on glass (docs/DESIGN.md
+ * §2.3) so panel styling lives in one place rather than being re-derived per
+ * page.
  */
 export function Panel({
   title,
@@ -96,6 +96,8 @@ export function Panel({
   children,
   className,
   bodyClassName,
+  level = 3,
+  id,
 }: {
   title?: string;
   icon?: React.ReactNode;
@@ -104,19 +106,24 @@ export function Panel({
   children: React.ReactNode;
   className?: string;
   bodyClassName?: string;
+  /** Heading level for the title: 2 when the panel is a top-level page section. */
+  level?: 2 | 3;
+  /** Heading id, so the section is labelled by its title. */
+  id?: string;
 }) {
+  const Heading = level === 2 ? 'h2' : 'h3';
   return (
-    <section className={clsx('glass-panel p-5', className)}>
+    <section aria-labelledby={title ? id : undefined} className={clsx('glass rounded-2xl p-5 md:p-6', className)}>
       {(title || aside) && (
-        <header className="mb-1 flex items-baseline justify-between gap-3">
+        <header className="mb-4 flex items-center justify-between gap-3">
           {title && (
-            <h3 className="flex items-center gap-2 text-body-sm font-medium text-fg-2">
-              {icon}
+            <Heading id={id} className="flex items-center gap-3 text-micro uppercase text-fg">
+              {icon ?? <span aria-hidden="true" className="ring-dot text-fg" />}
               {title}
-            </h3>
+            </Heading>
           )}
           {aside && (
-            <span className="tabular shrink-0 font-mono text-[11px] text-textMuted">
+            <span className="tabular shrink-0 text-caption text-fg-3">
               {aside}
             </span>
           )}

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1080px; overflow: hidden; background: #0b0b0c; }
+      #root { position: relative; width: 100%; height: 100%; }
+      .layer { position: absolute; inset: 0; width: 1080px; height: 1080px; }
+      #grain { opacity: 0.07; mix-blend-mode: screen; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="5" data-width="1080" data-height="1080">
+      <!-- construction hairlines -->
+      <svg id="guides" class="layer clip" data-start="0" data-duration="5" data-track-index="0" viewBox="0 0 1080 1080">
+        <g stroke="#2a2b2e" stroke-width="1" fill="none">
+          <line id="g-h" x1="120" y1="540" x2="960" y2="540" />
+          <line id="g-v" x1="540" y1="120" x2="540" y2="960" />
+          <circle id="g-c" cx="540" cy="540" r="330" />
+        </g>
+      </svg>
+      <svg id="mark" class="layer clip" data-start="0" data-duration="5" data-track-index="1" viewBox="-104 -104 720 720">
+        <defs>
+          <mask id="cut" maskUnits="userSpaceOnUse" x="-104" y="-104" width="720" height="720">
+            <rect x="-104" y="-104" width="720" height="720" fill="#fff" />
+            <polyline id="fracture" points="40,352 210,292 262,328 472,180" fill="none" stroke="#000" stroke-width="18" stroke-linejoin="miter" stroke-miterlimit="10" />
+          </mask>
+          <clipPath id="stone">
+            <polygon points="84,262 146,146 288,92 414,140 446,272 380,392 210,428 112,372" />
+          </clipPath>
+          <linearGradient id="spec" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#fff" stop-opacity="0" />
+            <stop offset="0.5" stop-color="#fff" stop-opacity="0.35" />
+            <stop offset="1" stop-color="#fff" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <g mask="url(#cut)" stroke-width="0.8" stroke-linejoin="round">
+          <polygon class="facet" data-dx="-14" data-dy="-12" points="84,262 146,146 288,92 300,236 236,312" fill="#C4C7CC" stroke="#C4C7CC" />
+          <polygon class="facet" data-dx="14" data-dy="-14" points="288,92 414,140 446,272 300,236" fill="#EDEEF0" stroke="#EDEEF0" />
+          <polygon class="facet" data-dx="16" data-dy="8" points="300,236 446,272 380,392 252,320" fill="#D9DCDF" stroke="#D9DCDF" />
+          <polygon class="facet" data-dx="-16" data-dy="10" points="84,262 236,312 300,236 252,320 210,428 112,372" fill="#8E9298" stroke="#8E9298" />
+          <polygon class="facet" data-dx="4" data-dy="18" points="252,320 380,392 210,428" fill="#62666C" stroke="#62666C" />
+          <g clip-path="url(#stone)">
+            <rect id="sweep" x="-60" y="40" width="90" height="440" fill="url(#spec)" opacity="0" transform="rotate(18 256 256)" />
+          </g>
+        </g>
+      </svg>
+      <svg id="grain" class="layer clip" data-start="0" data-duration="5" data-track-index="2" viewBox="0 0 1080 1080">
+        <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" /><feColorMatrix type="saturate" values="0" /></filter>
+        <rect width="1080" height="1080" filter="url(#n)" />
+      </svg>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      gsap.set("#fracture", { attr: { "stroke-dasharray": 520, "stroke-dashoffset": 520 } });
+      gsap.set(["#g-h", "#g-v"], { scale: 0, transformOrigin: "50% 50%" });
+      gsap.set("#g-c", { attr: { "stroke-dasharray": 2074, "stroke-dashoffset": 2074 } });
+
+      // build: construction draws, then the stone is knapped together
+      tl.to(["#g-h", "#g-v"], { scale: 1, duration: 1.1, ease: "expo.out", stagger: 0.08 }, 0.15);
+      tl.to("#g-c", { attr: { "stroke-dashoffset": 0 }, duration: 1.6, ease: "power2.inOut" }, 0.25);
+      document.querySelectorAll(".facet").forEach((f, i) => {
+        tl.from(f, { x: +f.dataset.dx * 3, y: +f.dataset.dy * 3, opacity: 0, duration: 0.9, ease: i % 2 ? "expo.out" : "power4.out" }, 0.35 + i * 0.09);
+      });
+
+      // signature: the fracture runs as a rising line
+      tl.to("#fracture", { attr: { "stroke-dashoffset": 0 }, duration: 0.85, ease: "power3.inOut" }, 1.55);
+
+      // one specular pass, no glow
+      tl.fromTo("#sweep", { attr: { x: -60 }, opacity: 0 }, { attr: { x: 520 }, opacity: 1, duration: 1.1, ease: "sine.inOut" }, 2.55);
+      tl.to("#sweep", { opacity: 0, duration: 0.3, ease: "power1.in" }, 3.35);
+
+      // resolve: guides recede, the mark holds still
+      tl.to("#guides", { opacity: 0, duration: 0.6, ease: "power2.in" }, 3.7);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

@@ -1,5 +1,5 @@
 /**
- * Flint's icon set: a few functional glyphs on a 16px grid, 1.5px stroke,
+ * Polaris's icon set: a few functional glyphs on a 16px grid, 1.5px stroke,
  * square ends. The design rule is text labels first; an icon appears only
  * where it does a job (close, search, menu, direction, refresh, a tool).
  *
@@ -91,6 +91,17 @@ export const CheckCircle2 = glyph('CheckCircle2', <>{circle}<path d="M5.5 8.25l1
 export const ShieldCheck = CheckCircle2;
 
 export const ChevronRight = glyph('ChevronRight', <path d="M6 4l4 4-4 4" />);
+
+// Navigation glyphs (shell only). Separate names, because the matching lucide
+// names above are deliberately blank wherever they were decorative.
+export const NavHome = glyph('NavHome', <path d="M2.5 7.5L8 3l5.5 4.5V13.5h-3.5v-4h-4v4H2.5z" />);
+export const NavMarkets = glyph('NavMarkets', <path d="M4 2.5v11M2.5 5h3v5h-3zM12 2.5v11M10.5 4h3v4.5h-3zM8 5v8M6.5 7h3v3.5h-3z" />);
+export const NavPortfolio = glyph('NavPortfolio', <><circle cx="8" cy="8" r="5.5" /><path d="M8 2.5V8l4 3.5" /></>);
+export const NavNews = glyph('NavNews', <path d="M2.5 3.5h9v9h-9zM11.5 6h2v6.5h-2M4.5 6h5M4.5 8.5h5M4.5 11h3" />);
+export const NavSettings = glyph('NavSettings', <><circle cx="8" cy="8" r="2" /><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4" /></>);
+export const NavMore = glyph('NavMore', <><circle cx="3.5" cy="8" r="1" /><circle cx="8" cy="8" r="1" /><circle cx="12.5" cy="8" r="1" /></>);
+export const PanelLeft = glyph('PanelLeft', <path d="M2.5 2.5h11v11h-11zM6 2.5v11" />);
+
 export const ArrowUpToLine = glyph('ArrowUpToLine', <path d="M3 2.5h10M8 14V6M4.5 9.5L8 6l3.5 3.5" />);
 export const ArrowDownToLine = glyph('ArrowDownToLine', <path d="M3 13.5h10M8 2v8M4.5 6.5L8 10l3.5-3.5" />);
 export const RotateCcw = glyph('RotateCcw', <path d="M3 8a5 5 0 1 0 1.46-3.54M3 2.5V5.5h3" />);

@@ -7,7 +7,7 @@ import { useRef, type KeyboardEvent } from 'react';
 
 const tabClass = (active: boolean) => clsx(
   'relative -mb-px flex min-h-11 shrink-0 items-center border-b-2 px-0.5 text-body-sm transition-colors duration-fast',
-  active ? 'border-up text-fg' : 'border-transparent text-fg-2 hover:text-fg',
+  active ? 'border-fg text-fg' : 'border-transparent text-fg-3 hover:text-fg',
 );
 
 /** Tabs that are links: each tab has its own URL, so it can be shared and reloaded. */

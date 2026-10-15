@@ -47,13 +47,13 @@ function Field({ label, children, hint }: {
     <div>
       <MicroLabel className="mb-1">{label}</MicroLabel>
       {children}
-      {hint && <p className="mt-0.5 text-caption text-textMuted">{hint}</p>}
+      {hint && <p className="mt-0.5 text-caption text-fg-3">{hint}</p>}
     </div>
   );
 }
 
 const inputClass =
-  'min-h-9 w-full rounded-lg border border-borderSubtle bg-ink-0 px-2.5 text-[12px] tabular text-textPrimary transition-colors hover:border-borderStrong focus:border-accentCyan/50';
+  'min-h-9 w-full rounded-lg border border-white/15 bg-black/30 px-2.5 text-[12px] tabular text-fg transition-colors hover:border-line-strong focus:border-fg-2/50';
 
 function NumberField({ label, value, onChange, step = 1, placeholder, hint }: {
   label: string; value: number | null; onChange: (v: number | null) => void;
@@ -203,16 +203,16 @@ export default function BacktestSection({ symbol, currency }: {
   return (
     <div className="space-y-5">
       {/* ---- Header and controls ---- */}
-      <div className="glass-panel p-5">
+      <div className="glass rounded-xl p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <h3 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-textPrimary">
-              <History size={15} className="text-accentCyan" /> Backtest
-              <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
+            <h3 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-fg">
+              <History size={15} className="text-fg-2" /> Backtest
+              <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-caption text-fg-3">
                 full history · costs · walk-forward
               </span>
             </h3>
-            <p className="mt-1.5 max-w-2xl text-xs leading-relaxed text-textSecondary">
+            <p className="mt-1.5 max-w-2xl text-xs leading-relaxed text-fg-2">
               Runs on every bar Yahoo has for {symbol}, decades on daily. Signals form at a
               bar&apos;s close and fill at the next open, commission and slippage are charged on
               both sides, and when one bar holds both a stop and a target the stop is assumed to
@@ -224,7 +224,7 @@ export default function BacktestSection({ symbol, currency }: {
             <button
               type="button"
               onClick={stop}
-              className="flex min-h-11 items-center gap-2 rounded-lg border border-borderStrong px-4 text-xs font-semibold text-textSecondary transition-colors hover:text-textPrimary"
+              className="flex min-h-11 items-center gap-2 rounded-sm border border-white/25 bg-black/30 px-4 text-xs font-semibold text-fg-2 transition-colors hover:text-fg"
             >
               <Square size={13} /> Stop
             </button>
@@ -233,7 +233,7 @@ export default function BacktestSection({ symbol, currency }: {
               type="button"
               onClick={run}
               disabled={!strategies.length}
-              className="flex min-h-11 items-center gap-2 rounded-lg border border-accentCyan/30 bg-accentCyan/5 px-4 text-xs font-semibold text-accentCyan transition-colors hover:bg-accentCyan/10 disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex min-h-11 items-center gap-2 rounded-lg border border-fg-2/30 bg-fg-2/5 px-4 text-xs font-semibold text-fg-2 transition-colors hover:bg-fg-2/10 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {result ? <RotateCw size={13} /> : <Play size={13} />}
               {result ? 'Run again' : `Backtest ${symbol}`}
@@ -242,7 +242,7 @@ export default function BacktestSection({ symbol, currency }: {
         </div>
 
         {/* ---- Primary controls ---- */}
-        <div className="mt-4 grid grid-cols-1 gap-3 border-t border-borderSubtle pt-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-4 grid grid-cols-1 gap-3 border-t border-line pt-4 sm:grid-cols-2 lg:grid-cols-4">
           <Field label="Strategy" hint={strategy?.doc}>
             <select
               value={strategyName}
@@ -278,7 +278,7 @@ export default function BacktestSection({ symbol, currency }: {
               ? `Clamped to ${result.range} ; the interval cannot reach further back`
               : undefined}
           >
-            <div className="flex overflow-hidden rounded-lg border border-borderSubtle">
+            <div className="flex overflow-hidden rounded-sm border border-white/15 bg-black/30">
               {RANGES.map((r) => (
                 <button
                   key={r.id}
@@ -286,8 +286,8 @@ export default function BacktestSection({ symbol, currency }: {
                   onClick={() => setRangeId(r.id)}
                   className={clsx(
                     'min-h-9 flex-1 px-1.5 text-caption font-semibold transition-colors',
-                    rangeId === r.id ? 'bg-accentCyan/15 text-accentCyan'
-                      : 'text-textMuted hover:text-textSecondary',
+                    rangeId === r.id ? 'bg-fg text-ink-0'
+                      : 'text-fg-3 hover:text-fg-2',
                   )}
                 >
                   {r.label}
@@ -297,7 +297,7 @@ export default function BacktestSection({ symbol, currency }: {
           </Field>
 
           <Field label="Out-of-sample hold-out" hint="Fit nothing to the tail, then look once">
-            <div className="flex overflow-hidden rounded-lg border border-borderSubtle">
+            <div className="flex overflow-hidden rounded-sm border border-white/15 bg-black/30">
               {[null, 0.2, 0.3, 0.4].map((f) => (
                 <button
                   key={String(f)}
@@ -305,8 +305,8 @@ export default function BacktestSection({ symbol, currency }: {
                   onClick={() => setOosFrac(f)}
                   className={clsx(
                     'min-h-9 flex-1 text-caption font-semibold transition-colors',
-                    oosFrac === f ? 'bg-accentCyan/15 text-accentCyan'
-                      : 'text-textMuted hover:text-textSecondary',
+                    oosFrac === f ? 'bg-fg text-ink-0'
+                      : 'text-fg-3 hover:text-fg-2',
                   )}
                 >
                   {f === null ? 'off' : `${f * 100}%`}
@@ -334,14 +334,14 @@ export default function BacktestSection({ symbol, currency }: {
           <button
             type="button"
             onClick={() => setShowCosts((v) => !v)}
-            className="flex items-center gap-1.5 text-caption text-textMuted transition-colors hover:text-textSecondary"
+            className="flex items-center gap-1.5 text-caption text-fg-3 transition-colors hover:text-fg-2"
           >
             <Settings2 size={12} />
             Costs, sizing and stops
             <ChevronDown size={12} className={clsx('transition-transform', showCosts && 'rotate-180')} />
           </button>
           {showCosts && (
-            <div className="mt-2 grid grid-cols-2 gap-3 rounded-xl border border-borderSubtle bg-ink-2 p-3 sm:grid-cols-4">
+            <div className="mt-2 grid grid-cols-2 gap-3 rounded-xl well p-3 sm:grid-cols-4">
               <NumberField label="Capital" value={capital} step={1000}
                            onChange={(v) => setCapital(v ?? 100_000)} placeholder="100000" />
               <NumberField
@@ -362,13 +362,13 @@ export default function BacktestSection({ symbol, currency }: {
               <NumberField label="ATR stop (×)" value={atrStop} step="any" onChange={setAtrStop}
                            hint="overrides stop loss %" />
               <label className="col-span-2 flex items-center gap-2 pt-1 sm:col-span-4">
-                <input type="checkbox" checked={allowShort} className="h-3.5 w-3.5 accent-accentCyan"
+                <input type="checkbox" checked={allowShort} className="h-3.5 w-3.5 accent-fg-2"
                        onChange={(e) => setAllowShort(e.target.checked)} />
-                <span className="text-caption text-textSecondary">Allow short entries</span>
+                <span className="text-caption text-fg-2">Allow short entries</span>
                 <span className="ml-4 flex items-center gap-2">
-                  <input type="checkbox" checked={monteCarlo} className="h-3.5 w-3.5 accent-accentCyan"
+                  <input type="checkbox" checked={monteCarlo} className="h-3.5 w-3.5 accent-fg-2"
                          onChange={(e) => setMonteCarlo(e.target.checked)} />
-                  <span className="text-caption text-textSecondary">Monte Carlo resample</span>
+                  <span className="text-caption text-fg-2">Monte Carlo resample</span>
                 </span>
               </label>
             </div>
@@ -381,14 +381,14 @@ export default function BacktestSection({ symbol, currency }: {
             <button
               type="button"
               onClick={() => setShowParams((v) => !v)}
-              className="flex items-center gap-1.5 text-caption text-textMuted transition-colors hover:text-textSecondary"
+              className="flex items-center gap-1.5 text-caption text-fg-3 transition-colors hover:text-fg-2"
             >
               <Settings2 size={12} />
               {strategy.name} parameters ({strategy.params.length})
               <ChevronDown size={12} className={clsx('transition-transform', showParams && 'rotate-180')} />
             </button>
             {showParams && (
-              <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl border border-borderSubtle bg-ink-2 p-3 sm:grid-cols-4 xl:grid-cols-6">
+              <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl well p-3 sm:grid-cols-4 xl:grid-cols-6">
                 {strategy.params.map((p) => (
                   <div key={p.name}>
                     <MicroLabel className="mb-0.5 truncate" >{p.name}</MicroLabel>
@@ -403,11 +403,11 @@ export default function BacktestSection({ symbol, currency }: {
                         else next[p.name] = p.type === 'string' ? e.target.value : Number(e.target.value);
                         return next;
                       })}
-                      className="min-h-8 w-full rounded border border-borderSubtle bg-ink-0 px-1.5 text-caption tabular text-textPrimary focus:border-accentCyan/50"
+                      className="min-h-8 w-full rounded border border-white/15 bg-black/30 px-1.5 text-caption tabular text-fg focus:border-fg-2/50"
                     />
                   </div>
                 ))}
-                <p className="col-span-2 text-caption text-textMuted sm:col-span-4 xl:col-span-6">
+                <p className="col-span-2 text-caption text-fg-3 sm:col-span-4 xl:col-span-6">
                   Blank uses the default shown. Booleans take 1 or 0.
                 </p>
               </div>
@@ -416,20 +416,20 @@ export default function BacktestSection({ symbol, currency }: {
         )}
 
         {error && (
-          <p className="mt-3 rounded-lg border border-accentRed/25 bg-accentRed/[0.06] p-2.5 text-[12px] text-accentRed">
+          <p className="mt-3 rounded-lg border border-down/25 bg-down/[0.06] p-2.5 text-[12px] text-down">
             {error}
           </p>
         )}
 
         {running && (
-          <p className="mt-3 flex items-center gap-2 text-[12px] text-textSecondary">
+          <p className="mt-3 flex items-center gap-2 text-[12px] text-fg-2">
             <RotateCw size={13} className="" />
             Pulling history and simulating every bar…
           </p>
         )}
 
         {result && !running && (
-          <p className="mt-3 border-t border-borderSubtle pt-3 text-caption text-textMuted">
+          <p className="mt-3 border-t border-line pt-3 text-caption text-fg-3">
             {result.bars.toLocaleString()} bars · {result.summary.n_trades} trades ·{' '}
             {result.config.commission_bps as number} + {result.config.slippage_bps as number} bps
             per side · simulated in {result.elapsed_ms.toLocaleString()} ms
@@ -449,8 +449,8 @@ export default function BacktestSection({ symbol, currency }: {
                 className={clsx(
                   'flex min-h-9 items-center gap-1.5 rounded-lg border px-3 text-caption font-semibold transition-colors',
                   tab === t.id
-                    ? 'border-accentCyan/30 bg-accentCyan/10 text-accentCyan'
-                    : 'border-borderSubtle text-textMuted hover:text-textSecondary',
+                    ? 'border-fg-2/30 bg-fg-2/10 text-fg-2'
+                    : 'border-line text-fg-3 hover:text-fg-2',
                 )}
               >
                 {t.icon} {t.label}
@@ -466,7 +466,7 @@ export default function BacktestSection({ symbol, currency }: {
             <div className="space-y-4">
               {result.oos
                 ? <OosPanel oos={result.oos} />
-                : <p className="text-[12px] text-textMuted">
+                : <p className="text-[12px] text-fg-3">
                     Turn the out-of-sample hold-out on and run again to see the split.
                   </p>}
               {result.monte_carlo && <MonteCarloPanel mc={result.monte_carlo} />}

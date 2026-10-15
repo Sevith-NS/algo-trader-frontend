@@ -32,11 +32,11 @@ export default function TradePlanPanel({
   const levels = plan.levels;
 
   return (
-    <div className="glass-panel p-5">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-borderSubtle pb-3">
-        <h4 className="flex items-center gap-2 text-sm font-semibold text-textPrimary">
+    <div className="glass rounded-xl p-5">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
+        <h4 className="flex items-center gap-2 text-sm font-semibold text-fg">
           <Briefcase size={15} style={{ color }} /> Trade Plan
-          <span className="rounded bg-ink-2 px-1.5 py-0.5 text-caption text-textMuted">
+          <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-caption text-fg-3">
             levels from the quant engine, not the model
           </span>
         </h4>
@@ -51,21 +51,21 @@ export default function TradePlanPanel({
       {levels ? (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Level label="Entry" value={levels.entry} currency={currency} color="#A4ACA8" />
-            <Level label="Stop" value={levels.stop_loss} currency={currency} color="#E5484D" />
-            <Level label="Target 1" value={levels.target_1} currency={currency} color="#2FBF71" />
-            <Level label="Target 2" value={levels.target_2} currency={currency} color="#2FBF71" />
+            <Level label="Entry" value={levels.entry} currency={currency} color="var(--fg-2)" />
+            <Level label="Stop" value={levels.stop_loss} currency={currency} color="var(--red)" />
+            <Level label="Target 1" value={levels.target_1} currency={currency} color="var(--green)" />
+            <Level label="Target 2" value={levels.target_2} currency={currency} color="var(--green)" />
           </div>
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 border-t border-borderSubtle pt-3 text-caption text-textMuted">
-            <span><span className="tabular text-textSecondary">{levels.r_multiple_1.toFixed(2)}</span>R to target 1</span>
-            <span><span className="tabular text-textSecondary">{(levels.fill_probability * 100).toFixed(0)}%</span> fill in 5d</span>
-            <span><span className="tabular text-textSecondary">{(levels.win_probability * 100).toFixed(0)}%</span> hit before stop</span>
-            <span>expectancy <span className="tabular text-textSecondary">{levels.expectancy_r >= 0 ? '+' : ''}{levels.expectancy_r.toFixed(2)}</span>R</span>
-            <span>risk <span className="tabular text-textSecondary">{fmtPrice(levels.risk_per_share, currency)}</span> / share</span>
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 border-t border-line pt-3 text-caption text-fg-3">
+            <span><span className="tabular text-fg-2">{levels.r_multiple_1.toFixed(2)}</span>R to target 1</span>
+            <span><span className="tabular text-fg-2">{(levels.fill_probability * 100).toFixed(0)}%</span> fill in 5d</span>
+            <span><span className="tabular text-fg-2">{(levels.win_probability * 100).toFixed(0)}%</span> hit before stop</span>
+            <span>expectancy <span className="tabular text-fg-2">{levels.expectancy_r >= 0 ? '+' : ''}{levels.expectancy_r.toFixed(2)}</span>R</span>
+            <span>risk <span className="tabular text-fg-2">{fmtPrice(levels.risk_per_share, currency)}</span> / share</span>
           </div>
         </>
       ) : (
-        <p className="text-[12px] text-textMuted">
+        <p className="text-[12px] text-fg-3">
           No solved levels for this symbol, so the trader worked without an executable plan.
         </p>
       )}
@@ -73,24 +73,24 @@ export default function TradePlanPanel({
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div>
           <MicroLabel>Horizon</MicroLabel>
-          <div className="mt-0.5 text-sm font-semibold tabular text-textPrimary">{plan.horizon_days}d</div>
+          <div className="mt-0.5 text-sm font-semibold tabular text-fg">{plan.horizon_days}d</div>
         </div>
         <div className="col-span-2">
           <MicroLabel>Entry style</MicroLabel>
-          <div className="mt-0.5 text-[13px] text-textSecondary">{plan.entry_style}</div>
+          <div className="mt-0.5 text-[13px] text-fg-2">{plan.entry_style}</div>
         </div>
       </div>
 
       {plan.rationale && (
-        <p className="mt-4 text-[13px] leading-relaxed text-textSecondary">{plan.rationale}</p>
+        <p className="mt-4 text-[13px] leading-relaxed text-fg-2">{plan.rationale}</p>
       )}
 
       {plan.abort_if && (
-        <div className="mt-3 flex gap-2 border-t border-borderSubtle pt-3">
-          <OctagonX size={13} className="mt-0.5 shrink-0 text-accentRed" />
+        <div className="mt-3 flex gap-2 border-t border-line pt-3">
+          <OctagonX size={13} className="mt-0.5 shrink-0 text-down" />
           <div className="min-w-0">
             <MicroLabel>Would not send the order if</MicroLabel>
-            <p className="mt-0.5 text-[12px] leading-relaxed text-textSecondary">{plan.abort_if}</p>
+            <p className="mt-0.5 text-[12px] leading-relaxed text-fg-2">{plan.abort_if}</p>
           </div>
         </div>
       )}

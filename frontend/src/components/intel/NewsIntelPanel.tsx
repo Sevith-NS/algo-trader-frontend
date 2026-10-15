@@ -51,9 +51,9 @@ export default function NewsIntelPanel({ data }: { data: NewsIntel | Failed | nu
   const shown = expanded ? data.articles : data.articles.slice(0, SHOWN);
 
   return (
-    <section aria-labelledby="news-intel-h" className="flex flex-col gap-4">
+    <section aria-labelledby="news-intel-h" className="glass rounded-2xl p-5 md:p-6 flex flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <h2 id="news-intel-h" className="text-h4 font-bold">News tone</h2>
+        <h2 id="news-intel-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />News tone</h2>
         <p className="text-body-sm text-fg-2">
           {data.article_count} stories from {data.distinct_outlets} outlets, newest weighted most.
         </p>
@@ -66,7 +66,7 @@ export default function NewsIntelPanel({ data }: { data: NewsIntel | Failed | nu
         </p>
         <p className="text-body-sm text-fg-2">Confidence <span className="font-medium text-fg">{data.confidence}</span></p>
         <div className="flex min-w-[14rem] flex-1 flex-col gap-1.5">
-          <span aria-hidden="true" className="flex h-1.5 w-full bg-ink-2">
+          <span aria-hidden="true" className="flex h-1.5 w-full bg-white/[0.06]">
             <span className="bg-up" style={{ width: `${(bullish / total) * 100}%` }} />
             <span className="bg-fg-3" style={{ width: `${(neutral / total) * 100}%` }} />
             <span className="bg-down" style={{ width: `${(bearish / total) * 100}%` }} />

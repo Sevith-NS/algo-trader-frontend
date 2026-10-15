@@ -1,0 +1,134 @@
+{
+  "ok": true,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "filesScanned": 1
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "layout": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 1,
+    "findings": [
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 0.278,
+        "selector": "#sky",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": -126.17,
+          "top": -126.17,
+          "right": 1206.17,
+          "bottom": 1206.17,
+          "width": 1332.35,
+          "height": 1332.35
+        },
+        "containerSelector": "#mark",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1080,
+          "bottom": 1080,
+          "width": 1080,
+          "height": 1080
+        },
+        "overflow": {
+          "left": 126.17,
+          "right": 126.17,
+          "top": 126.17,
+          "bottom": 126.17
+        },
+        "dataAttributes": {
+          "data-svg-origin": "256 256"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": -126.17,
+          "y": -126.17,
+          "width": 1332.35,
+          "height": 1332.35
+        },
+        "firstSeen": 0.278,
+        "lastSeen": 3.056,
+        "occurrences": 6,
+        "heldMs": 2778,
+        "times": [
+          0.278,
+          0.833,
+          1.389,
+          1.944,
+          2.5,
+          3.056
+        ]
+      }
+    ],
+    "duration": 5,
+    "samples": [
+      0.278,
+      0.833,
+      1.389,
+      1.944,
+      2.5,
+      3.056,
+      3.611,
+      4.167,
+      4.722
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 1,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": true,
+    "samples": [
+      0.278,
+      1.389,
+      2.5,
+      3.611,
+      4.722
+    ],
+    "checked": 0,
+    "passed": 0
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  }
+}

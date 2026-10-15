@@ -39,9 +39,9 @@ export function PlanSummary({ quant, currency, size, baseCurrency, riskPct, onTr
 }) {
   const l = quant?.levels;
   return (
-    <section aria-labelledby="plan-h" className="flex flex-col gap-3">
+    <section aria-labelledby="plan-h" className="glass rounded-2xl p-5 md:p-6 flex flex-col gap-3">
       <div className="flex items-baseline justify-between">
-        <h2 id="plan-h" className="text-h4 font-bold">Trade plan</h2>
+        <h2 id="plan-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />Trade plan</h2>
         <span className="text-caption text-fg-3">Daily bars</span>
       </div>
       {!quant || !l ? (
@@ -74,8 +74,8 @@ export function KeyStats({ quote, currency }: {
   currency: string;
 }) {
   return (
-    <section aria-labelledby="stats-h" className="flex flex-col gap-3">
-      <h2 id="stats-h" className="text-h4 font-bold">Key stats</h2>
+    <section aria-labelledby="stats-h" className="glass rounded-2xl p-5 md:p-6 flex flex-col gap-3">
+      <h2 id="stats-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />Key stats</h2>
       <dl>
         <KV label="Previous close">{formatMoney(quote?.previousClose, currency)}</KV>
         <KV label="52-week high">{formatMoney(quote?.fiftyTwoWeekHigh, currency)}</KV>
@@ -92,7 +92,7 @@ function FactorBar({ label, value }: { label: string; value: number }) {
   return (
     <div className="grid grid-cols-[8rem_1fr_3.5rem] items-center gap-3 py-1.5">
       <span className="text-body-sm capitalize text-fg-2">{label.replace(/_/g, ' ')}</span>
-      <span className="relative h-1.5 bg-ink-2" aria-hidden="true">
+      <span className="relative h-1.5 bg-white/[0.06]" aria-hidden="true">
         <span className="absolute inset-y-0 left-1/2 w-px bg-line-strong" />
         <span className={clsx('absolute inset-y-0', up ? 'left-1/2 bg-up' : 'right-1/2 bg-down')} style={{ width: `${width}%` }} />
       </span>
@@ -114,9 +114,9 @@ export function PlanDetail({ quant, ml, currency, price }: {
   const sz = quant.position_sizing;
   const ind = quant.indicators;
   return (
-    <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-      <section aria-labelledby="levels-h" className="flex flex-col gap-3">
-        <h2 id="levels-h" className="text-h4 font-bold">Levels and odds</h2>
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <section aria-labelledby="levels-h" className="glass rounded-2xl p-5 md:p-6 flex flex-col gap-3">
+        <h2 id="levels-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />Levels and odds</h2>
         <dl>
           <KV label="Entry (limit)" hint={l.fill_probability != null ? `${Math.round(l.fill_probability * 100)}% fill in 5 days` : undefined}>{formatMoney(l.entry, currency)}</KV>
           <KV label="Stop" hint={l.atr_stop_mult != null ? `${l.atr_stop_mult.toFixed(2)}× ATR or swing` : undefined}>{formatMoney(l.stop_loss, currency)}</KV>
@@ -127,16 +127,16 @@ export function PlanDetail({ quant, ml, currency, price }: {
       </section>
 
       {quant.factors && (
-        <section aria-labelledby="factors-h" className="flex flex-col gap-3">
-          <h2 id="factors-h" className="text-h4 font-bold">Factor votes</h2>
+        <section aria-labelledby="factors-h" className="glass rounded-2xl p-5 md:p-6 flex flex-col gap-3">
+          <h2 id="factors-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />Factor votes</h2>
           <p className="text-caption text-fg-3">Each factor votes from {'−'}1 (sell) to +1 (buy); the plan follows their weighted sum.</p>
           <div>{Object.entries(quant.factors).map(([k, v]) => <FactorBar key={k} label={k} value={v} />)}</div>
         </section>
       )}
 
       {sz && (
-        <section aria-labelledby="kelly-h" className="flex flex-col gap-3">
-          <h2 id="kelly-h" className="text-h4 font-bold">Kelly sizing</h2>
+        <section aria-labelledby="kelly-h" className="glass rounded-2xl p-5 md:p-6 flex flex-col gap-3">
+          <h2 id="kelly-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />Kelly sizing</h2>
           <p className="text-caption text-fg-3">An estimate from this symbol&apos;s unconditional daily returns, not from backtested trades of this signal. Your risk-per-trade size on Overview is the one to use.</p>
           <dl>
             <KV label="Half-Kelly allocation">{formatPct(sz.recommended_fraction * 100, 1).replace('+', '')} of equity</KV>
@@ -147,8 +147,8 @@ export function PlanDetail({ quant, ml, currency, price }: {
       )}
 
       {ind && (
-        <section aria-labelledby="tech-h" className="flex flex-col gap-3">
-          <h2 id="tech-h" className="text-h4 font-bold">Technical readout</h2>
+        <section aria-labelledby="tech-h" className="glass rounded-2xl p-5 md:p-6 flex flex-col gap-3">
+          <h2 id="tech-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />Technical readout</h2>
           <dl>
             <KV label="RSI (14)" hint={ind.rsi_14 >= 70 ? 'overbought' : ind.rsi_14 <= 30 ? 'oversold' : undefined}>{formatNumber(ind.rsi_14, 1)}</KV>
             <KV label="Z-score (20 days)">{formatNumber(ind.zscore_20d, 2)}</KV>
@@ -162,10 +162,10 @@ export function PlanDetail({ quant, ml, currency, price }: {
       )}
 
       {ml && (
-        <section aria-labelledby="ml-h" className="flex flex-col gap-3">
+        <section aria-labelledby="ml-h" className="glass rounded-2xl p-5 md:p-6 flex flex-col gap-3">
           <div className="flex items-baseline gap-3">
-            <h2 id="ml-h" className="text-h4 font-bold">Model forecasts</h2>
-            <span className="border border-warn px-1.5 text-caption text-warn">In-sample</span>
+            <h2 id="ml-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />Model forecasts</h2>
+            <span className="pill border-warn/50 bg-warn/10 text-warn">In-sample</span>
           </div>
           <p className="text-caption text-fg-3">These models are scored on the same history they learned from, so they overstate their own accuracy. Treat them as context, not a signal.</p>
           <dl>

@@ -1,26 +1,25 @@
 /**
- * Flint OS v2 tokens. Source of truth: docs/flint-os-v2/DESIGN.md, section 6.
+ * Polaris v3.2 "Glass" tokens. Source of truth: docs/DESIGN.md.
  *
- * Dark only. One accent (candle green); red only for losses and destructive
- * actions; amber only for stale or delayed data. Corners are 2px and nothing
- * casts a shadow: elevation is the ink steps plus a hairline.
- *
- * The legacy names (bgPrimary, textSecondary, accentGreen...) are kept as
- * aliases so components not yet rebuilt render in the new identity. The
- * off-brand hues (blue, purple, cyan) collapse to neutral text colours.
+ * Dark only. Colour carries meaning only: green gains, red losses and
+ * destructive actions, amber stale or delayed data, blue paper (simulated)
+ * money. Controls are sharp (2px); glass surfaces are soft (12/16/20px). Only
+ * overlays cast a shadow. Glass itself lives in globals.css (glass-* classes).
  */
-const ink0 = "#0A0B0B";
-const ink1 = "#111312";
-const ink2 = "#181B1A";
-const line = "#242927";
-const lineStrong = "#353C39";
-const control = "#626A66"; // 3:1 against every ink step: inputs and controls
-const fg = "#F2F4F3";
-const fg2 = "#A4ACA8";
-const fg3 = "#848C88";
-const green = "#2FBF71";
-const red = "#E5484D";
-const amber = "#D9A23A";
+const ink0 = "#0B0B0C";
+const ink1 = "#141414";
+const ink2 = "#1C1C1C";
+const ink3 = "#242424";
+const line = "#2A2A2A";
+const lineStrong = "#3A3A3A";
+const control = "#7A7A7A"; // 3:1 on ink-0 and on the brightest card sheen
+const fg = "#F5F5F5";
+const fg2 = "#B5B5B5";
+const fg3 = "#A0A0A0"; // 5.3:1 on the brightest card sheen
+const green = "#3DD68C";
+const red = "#FF7A75";
+const amber = "#E8B04A";
+const blue = "#86B7FF"; // paper money only
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -29,43 +28,30 @@ module.exports = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    // Replace, not extend: every rounded-* in the codebase becomes sharp.
+    // Replace, not extend: only these radii exist. Controls sharp, glass soft.
     borderRadius: {
-      none: "0", sm: "2px", DEFAULT: "2px", md: "2px", lg: "2px",
-      xl: "2px", "2xl": "2px", "3xl": "2px", full: "9999px",
+      none: "0", sm: "2px", DEFAULT: "4px", md: "4px", lg: "12px",
+      xl: "16px", "2xl": "20px", "3xl": "20px", full: "9999px",
     },
-    // No drop shadows anywhere.
+    // Only overlays cast a shadow. Everything else maps to none.
     boxShadow: {
       none: "none", sm: "none", DEFAULT: "none", md: "none", lg: "none",
       xl: "none", "2xl": "none", inner: "none", card: "none",
       glowGreen: "none", glowRed: "none",
+      overlay: "0 24px 48px -12px rgb(0 0 0 / 0.65)",
     },
     screens: { sm: "640px", md: "768px", lg: "1024px", xl: "1280px", "2xl": "1440px" },
     extend: {
       colors: {
-        ink: { 0: ink0, 1: ink1, 2: ink2 },
+        ink: { 0: ink0, 1: ink1, 2: ink2, 3: ink3 },
         line: { DEFAULT: line, strong: lineStrong },
         control,
         fg: { DEFAULT: fg, 2: fg2, 3: fg3 },
         up: green,
         down: red,
         warn: amber,
+        paper: blue,
 
-        // Legacy aliases, remapped.
-        bgPrimary: ink0,
-        bgSecondary: ink1,
-        bgElevated: ink2,
-        accentGreen: green,
-        accentRed: red,
-        accentAmber: amber,
-        accentBlue: fg2,
-        accentPurple: fg2,
-        accentCyan: fg2,
-        textPrimary: fg,
-        textSecondary: fg2,
-        textMuted: fg3,
-        borderSubtle: line,
-        borderStrong: lineStrong,
       },
       fontFamily: {
         sans: ['"Helvetica Neue"', "Helvetica", "Arial", "sans-serif"],
@@ -84,10 +70,17 @@ module.exports = {
         h4: ["20px", "28px"],
         h3: ["24px", "32px"],
         h2: ["32px", "36px"],
-        h1: ["48px", "52px"],
-        display: ["72px", "72px"],
+        h1: ["48px", { lineHeight: "52px", letterSpacing: "-0.02em", fontWeight: "400" }],
+        display: ["72px", { lineHeight: "72px", letterSpacing: "-0.035em", fontWeight: "400" }],
+        "display-xl": ["clamp(56px, 8vw, 120px)", { lineHeight: "0.95", letterSpacing: "-0.035em", fontWeight: "400" }],
+        figure: ["40px", { lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "500" }],
+        micro: ["11px", { lineHeight: "14px", letterSpacing: "0.06em", fontWeight: "500" }],
       },
-      transitionDuration: { fast: "120ms", base: "200ms" },
+      transitionDuration: { fast: "120ms", base: "200ms", slow: "320ms" },
+      transitionTimingFunction: {
+        standard: "cubic-bezier(0.2, 0, 0, 1)",
+        exit: "cubic-bezier(0.4, 0, 1, 1)",
+      },
       keyframes: {
         tickUp: { "0%": { color: green }, "100%": { color: "inherit" } },
         tickDown: { "0%": { color: red }, "100%": { color: "inherit" } },

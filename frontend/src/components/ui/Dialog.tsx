@@ -28,21 +28,21 @@ export function Dialog({ open, onClose, title, children, className }: {
       onClick={(e) => { if (e.target === ref.current) onClose(); }}
       aria-labelledby="dialog-title"
       className={clsx(
-        'm-0 mt-auto w-full max-w-none border border-line-strong bg-ink-2 p-0 text-fg backdrop:bg-black/70',
+        'glass-2 m-0 mt-auto w-full max-w-none rounded-t-2xl p-0 text-fg backdrop:bg-black/60 backdrop:backdrop-blur-sm sm:rounded-2xl',
         'sm:m-auto sm:w-[min(32rem,calc(100vw-2rem))]',
         className,
       )}
     >
       {open && (
         <div className="flex max-h-[85dvh] flex-col">
-          <div className="flex items-center justify-between gap-4 border-b border-line px-4 py-3">
+          <div className="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-3">
             <h2 id="dialog-title" className="text-body font-medium">{title}</h2>
             <button type="button" aria-label="Close" onClick={onClose}
                     className="grid min-h-11 min-w-11 place-items-center text-fg-2 hover:text-fg">
               <X />
             </button>
           </div>
-          <div className="overflow-y-auto p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">{children}</div>
+          <div className="overflow-y-auto p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))]">{children}</div>
         </div>
       )}
     </dialog>

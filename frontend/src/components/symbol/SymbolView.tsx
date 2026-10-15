@@ -103,11 +103,11 @@ export function SymbolView({ symbol }: { symbol: string }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-3">
+      <header className="glass flex flex-col gap-4 rounded-2xl p-5 md:p-6">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <h1 className="ticker text-h4">{symbol}</h1>
           {q?.shortName && q.shortName !== symbol && <span className="text-body-sm text-fg-2">{q.shortName}</span>}
-          <span className="border border-control px-1.5 text-caption text-fg-2">{info.assetClass}</span>
+          <span className="pill text-fg-2">{info.assetClass}</span>
           {(info.exchange || q) && (
             <span className="text-caption text-fg-3">{[info.exchange, q ? currency : null].filter(Boolean).join(' · ')}</span>
           )}
@@ -120,7 +120,7 @@ export function SymbolView({ symbol }: { symbol: string }) {
             <div className="flex flex-col gap-1.5">
               {q ? (
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <span className="text-h2 font-bold tabular tracking-[-0.02em]" aria-live="off">{formatMoney(price, currency)}</span>
+                  <span className="text-silver text-figure tabular md:text-[56px] md:leading-[60px]" aria-live="off">{formatMoney(price, currency)}</span>
                   <Change pct={q.regularMarketChangePercent}
                           amount={price != null && q.previousClose ? price - normalizeQuote({ ...q, regularMarketPrice: q.previousClose }).price! : null}
                           currency={currency} className="text-body" />
@@ -133,7 +133,7 @@ export function SymbolView({ symbol }: { symbol: string }) {
             </div>
             <div className="flex gap-2">
               <Button variant="secondary" onClick={watch} loading={watching}>Add to watchlist</Button>
-              <Button onClick={() => setTicketOpen(true)} disabled={!q || price === null}>Paper trade</Button>
+              <Button variant="paper" onClick={() => setTicketOpen(true)} disabled={!q || price === null}>Paper trade</Button>
             </div>
           </div>
         )}
@@ -145,9 +145,9 @@ export function SymbolView({ symbol }: { symbol: string }) {
       {!unknown && (
         <div className="min-h-[50vh]">
           {tab === 'overview' && (
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
               <ChartPanel symbol={symbol} levels={levels} />
-              <div className="flex flex-col gap-8">
+              <div className="flex flex-col gap-4">
                 {quantApi.loading && !quantApi.data ? <LoadingBlock lines={7} label="Loading trade plan" /> : (
                   <PlanSummary quant={quantApi.data} currency={currency} size={size} baseCurrency={base ?? currency}
                                riskPct={profile ? Number(profile.risk_per_trade_pct) : null}

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
+import { Panel } from '@/components/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Change } from '@/components/ui/Change';
 import { inputClass } from '@/components/ui/Field';
@@ -79,11 +80,8 @@ export function Watchlist() {
   };
 
   return (
-    <section aria-labelledby="watchlist-h" className="flex flex-col gap-3">
-      <div className="flex items-baseline justify-between">
-        <h2 id="watchlist-h" className="text-h4 font-bold">Watchlist</h2>
-        {list && <span className="text-caption text-fg-3">{list.symbols.length} of 100</span>}
-      </div>
+    <Panel level={2} id="watchlist-h" title="Watchlist" bodyClassName="flex flex-col gap-3"
+           aside={list ? `${list.symbols.length} of 100` : undefined}>
 
       <form onSubmit={add} className="flex gap-2" noValidate>
         <label htmlFor="wl-add" className="sr-only">Add a symbol</label>
@@ -105,7 +103,7 @@ export function Watchlist() {
             <table className="w-full min-w-[320px] text-table">
               <caption className="sr-only">Watchlist with last price and change today</caption>
               <thead>
-                <tr className="border-b border-line text-left text-caption text-fg-3">
+                <tr className="border-b border-white/10 text-left text-caption text-fg-3">
                   <th scope="col" className="py-2 font-normal">Symbol</th>
                   <th scope="col" className="py-2 text-right font-normal">Last</th>
                   <th scope="col" className="py-2 text-right font-normal">Today</th>
@@ -116,7 +114,7 @@ export function Watchlist() {
                 {list.symbols.map((s) => {
                   const q = quotes[s];
                   return (
-                    <tr key={s} className="border-b border-line">
+                    <tr key={s} className="border-b border-white/[0.07] last:border-0">
                       <th scope="row" className="py-2 text-left font-normal">
                         <Link href={`/s/${encodeURIComponent(s)}`} className="flex min-h-9 flex-col justify-center hover:underline">
                           <span className="ticker">{s}</span>
@@ -144,6 +142,6 @@ export function Watchlist() {
             </table>
           </div>
         )}
-    </section>
+    </Panel>
   );
 }

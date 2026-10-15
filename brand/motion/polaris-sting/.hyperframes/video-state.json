@@ -1,0 +1,189 @@
+{
+  "version": 1,
+  "historyId": "494d6cb0-b372-4c5e-a373-3c5f9c664c5b",
+  "currentRevision": null,
+  "pendingChanges": false,
+  "files": {
+    "AGENTS.md": {
+      "hash": "1d4f0c8ca2507b94fd7c9df709fff01416adbd51a0f922b9d6ed2f40129147d5",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\494d6cb0-b372-4c5e-a373-3c5f9c664c5b\\blobs\\1d\\1d4f0c8ca2507b94fd7c9df709fff01416adbd51a0f922b9d6ed2f40129147d5"
+    },
+    "CLAUDE.md": {
+      "hash": "1d4f0c8ca2507b94fd7c9df709fff01416adbd51a0f922b9d6ed2f40129147d5",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\494d6cb0-b372-4c5e-a373-3c5f9c664c5b\\blobs\\1d\\1d4f0c8ca2507b94fd7c9df709fff01416adbd51a0f922b9d6ed2f40129147d5"
+    },
+    "hyperframes.json": {
+      "hash": "e5da816b77f863aa4798d974bc68d65805329ca4d39ebcf353967c5b47e677a6",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\494d6cb0-b372-4c5e-a373-3c5f9c664c5b\\blobs\\e5\\e5da816b77f863aa4798d974bc68d65805329ca4d39ebcf353967c5b47e677a6"
+    },
+    "index.html": {
+      "hash": "fa750820bf169a702b88869bb8fcda2baa11815592ce8805951ae7fccded08bb",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\494d6cb0-b372-4c5e-a373-3c5f9c664c5b\\blobs\\fa\\fa750820bf169a702b88869bb8fcda2baa11815592ce8805951ae7fccded08bb"
+    },
+    "meta.json": {
+      "hash": "5a347904376a519cf3556ffc8bd0da278004e1d97a9eb9fe9567c7df34418ab6",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\494d6cb0-b372-4c5e-a373-3c5f9c664c5b\\blobs\\5a\\5a347904376a519cf3556ffc8bd0da278004e1d97a9eb9fe9567c7df34418ab6"
+    },
+    "package.json": {
+      "hash": "0589b8f3bb038b6c627a44d06abb15c6936c6a10c5dc84fb24a173f86dc7e692",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\494d6cb0-b372-4c5e-a373-3c5f9c664c5b\\blobs\\05\\0589b8f3bb038b6c627a44d06abb15c6936c6a10c5dc84fb24a173f86dc7e692"
+    }
+  },
+  "revisions": {},
+  "checks": {
+    "latest": {
+      "revision": null,
+      "id": "c5b3f872-a452-4728-8635-b86b9af784e4"
+    },
+    "revisions": {},
+    "unversioned": [
+      {
+        "id": "c5b3f872-a452-4728-8635-b86b9af784e4",
+        "scope": "project",
+        "report": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\brand\\motion\\polaris-sting\\.hyperframes\\artifacts\\checks\\c5b3f872-a452-4728-8635-b86b9af784e4.json",
+        "metadata": {
+          "ok": true,
+          "browserSkipped": false,
+          "options": {
+            "samples": 9,
+            "atTransitions": false,
+            "maxIssues": 80,
+            "collapseStatic": true,
+            "tolerance": 2,
+            "timeout": 3000,
+            "contrast": true,
+            "strict": false,
+            "snapshots": false,
+            "browserGpuMode": "auto"
+          }
+        },
+        "createdAt": 1792046912157,
+        "contentHash": "6de5853ad8dc5a33bcb859ca5aec6e852f7fac901eb9b6536d0e65105b504c16",
+        "revision": null,
+        "inputFingerprint": "94455ddccbd8b95681f4da95d6350d65ac2510c0f0ce2321d697200706f4ef7a",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  },
+  "snapshots": {
+    "latest": {
+      "revision": null,
+      "id": "bc7063e3-05f2-4386-b570-df300d718b09-4"
+    },
+    "revisions": {},
+    "unversioned": [
+      {
+        "scope": "full",
+        "id": "bc7063e3-05f2-4386-b570-df300d718b09-0",
+        "image": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\brand\\motion\\polaris-sting\\.hyperframes\\artifacts\\snapshots\\a269253e-e0e0-471f-be9c-7f98d07c442b\\frame-00-at-0.5s.png",
+        "time": 0.5,
+        "metadata": {
+          "width": 1080,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1792046945623,
+        "contentHash": "5de09e17f8057a1cee6bd8e65809d4b0ecb3808158eb6394ac364d017ace1e2a",
+        "revision": null,
+        "inputFingerprint": "94455ddccbd8b95681f4da95d6350d65ac2510c0f0ce2321d697200706f4ef7a",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "bc7063e3-05f2-4386-b570-df300d718b09-1",
+        "image": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\brand\\motion\\polaris-sting\\.hyperframes\\artifacts\\snapshots\\a269253e-e0e0-471f-be9c-7f98d07c442b\\frame-01-at-1.2s.png",
+        "time": 1.2,
+        "metadata": {
+          "width": 1080,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1792046945623,
+        "contentHash": "a6d5dd4b6c0a5fe1d698bf638de613a9699eabaa173fc933a5e8c81847268916",
+        "revision": null,
+        "inputFingerprint": "94455ddccbd8b95681f4da95d6350d65ac2510c0f0ce2321d697200706f4ef7a",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "bc7063e3-05f2-4386-b570-df300d718b09-2",
+        "image": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\brand\\motion\\polaris-sting\\.hyperframes\\artifacts\\snapshots\\a269253e-e0e0-471f-be9c-7f98d07c442b\\frame-02-at-2s.png",
+        "time": 2,
+        "metadata": {
+          "width": 1080,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1792046945623,
+        "contentHash": "8127df257330d94b86a690bfb8186b1da1466f2cc953663b1baa2737f69c5345",
+        "revision": null,
+        "inputFingerprint": "94455ddccbd8b95681f4da95d6350d65ac2510c0f0ce2321d697200706f4ef7a",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "bc7063e3-05f2-4386-b570-df300d718b09-3",
+        "image": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\brand\\motion\\polaris-sting\\.hyperframes\\artifacts\\snapshots\\a269253e-e0e0-471f-be9c-7f98d07c442b\\frame-03-at-2.9s.png",
+        "time": 2.9,
+        "metadata": {
+          "width": 1080,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1792046945624,
+        "contentHash": "05453f8c16101133aa05e1626a17aa07534588bec359afdefc3887d55e56e371",
+        "revision": null,
+        "inputFingerprint": "94455ddccbd8b95681f4da95d6350d65ac2510c0f0ce2321d697200706f4ef7a",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "bc7063e3-05f2-4386-b570-df300d718b09-4",
+        "image": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\brand\\motion\\polaris-sting\\.hyperframes\\artifacts\\snapshots\\a269253e-e0e0-471f-be9c-7f98d07c442b\\frame-04-at-4.8s.png",
+        "time": 4.8,
+        "metadata": {
+          "width": 1080,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1792046945624,
+        "contentHash": "4d1352ed433f71ef2ed7289c61e00a09d3a31471abda57298fcb90322c0e75ee",
+        "revision": null,
+        "inputFingerprint": "94455ddccbd8b95681f4da95d6350d65ac2510c0f0ce2321d697200706f4ef7a",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  },
+  "renders": {
+    "latest": {
+      "id": "9229e8c5-cc93-4797-ab49-3b98a9e08b64",
+      "completedAt": 1792047026695,
+      "output": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\brand\\polaris\\polaris-sting.mp4",
+      "status": "completed",
+      "revision": null
+    },
+    "retainedRevisions": []
+  },
+  "pendingArtifactCleanup": []
+}

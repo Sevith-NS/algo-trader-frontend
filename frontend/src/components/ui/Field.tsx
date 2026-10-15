@@ -2,8 +2,8 @@ import clsx from 'clsx';
 import type { ReactNode } from 'react';
 
 export const inputClass =
-  'block w-full rounded-sm border border-control bg-ink-0 px-3 py-2.5 text-body text-fg tabular ' +
-  'placeholder:text-fg-3 hover:border-fg-3 focus-visible:border-up aria-[invalid=true]:border-down';
+  'block w-full rounded-sm border border-control/70 bg-black/30 px-3 py-2.5 text-body text-fg tabular ' +
+  'placeholder:text-fg-3 transition-colors duration-fast hover:border-fg-3 focus-visible:border-fg aria-[invalid=true]:border-down';
 
 /**
  * A labelled form field. The hint and error are tied to the control with

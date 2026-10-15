@@ -47,12 +47,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
            className="pointer-events-none fixed inset-x-4 bottom-[calc(72px+env(safe-area-inset-bottom,0px))] z-[60] flex flex-col items-center gap-2 lg:bottom-6 lg:left-auto lg:right-6 lg:items-end">
         {toasts.map((t) => (
           <div key={t.id} role={t.tone === 'error' ? 'alert' : 'status'}
-               className={clsx('pointer-events-auto flex w-full max-w-sm items-center justify-between gap-3 border bg-ink-2 py-2 pl-3 pr-1 text-body-sm',
-                 t.tone === 'error' ? 'border-down/60' : 'border-line')}>
+               className={clsx('glass-2 pointer-events-auto relative flex w-full max-w-sm items-center justify-between gap-3 rounded-lg py-2 pl-4 pr-1 text-body-sm',
+                 t.tone === 'error' && 'glass-down')}>
             <span>{t.message}</span>
             <span className="flex items-center">
               {t.action && (
-                <button type="button" className="min-h-8 px-2 font-medium text-up hover:underline"
+                <button type="button" className="min-h-8 px-2 font-medium text-fg underline-offset-4 hover:underline"
                         onClick={() => { t.action?.onClick(); dismiss(t.id); }}>
                   {t.action.label}
                 </button>

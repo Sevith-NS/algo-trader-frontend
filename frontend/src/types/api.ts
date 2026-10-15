@@ -1,4 +1,4 @@
-/** Shapes returned by the Flint API's user-data routes. Money arrives as strings. */
+/** Shapes returned by the Polaris API's user-data routes. Money arrives as strings. */
 
 export type Market = 'india' | 'us' | 'europe' | 'asia' | 'crypto' | 'fx' | 'commodities' | 'bonds';
 

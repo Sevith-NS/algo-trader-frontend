@@ -88,18 +88,18 @@ export default function AIAssistant() {
     <>
       {!open && (
         <button ref={launcherRef} type="button" onClick={() => setOpen(true)}
-                className="fixed bottom-[calc(72px+env(safe-area-inset-bottom,0px))] right-4 z-30 flex min-h-11 items-center gap-2 border border-control bg-ink-1 px-3 text-body-sm text-fg hover:border-fg-3 lg:bottom-6 lg:right-6">
+                className="glass-2 fixed bottom-[calc(100px+env(safe-area-inset-bottom,0px))] right-4 z-30 flex min-h-11 items-center gap-2 rounded-full px-4 text-body-sm text-fg hover:brightness-125 lg:bottom-6 lg:right-6">
           <MessageSquare size={16} />
-          Ask Flint
+          Ask Polaris
         </button>
       )}
 
       {open && (
         <section role="dialog" aria-modal="false" aria-labelledby="assistant-h"
-                 className="fixed inset-0 z-50 flex flex-col border-line bg-ink-1 pt-[env(safe-area-inset-top,0px)] sm:inset-auto sm:bottom-6 sm:right-6 sm:h-[min(640px,80vh)] sm:w-[400px] sm:border">
-          <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-2">
+                 className="glass-2 fixed inset-0 z-50 flex flex-col pt-[env(safe-area-inset-top,0px)] sm:inset-auto sm:bottom-6 sm:right-6 sm:h-[min(640px,80vh)] sm:w-[400px] sm:rounded-2xl">
+          <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-2">
             <div>
-              <h2 id="assistant-h" className="text-body font-medium">Ask Flint</h2>
+              <h2 id="assistant-h" className="text-body font-medium">Ask Polaris</h2>
               <p className="text-caption text-fg-3">{symbol ? `Looking at ${symbol} and your portfolio` : 'Sees your paper portfolio'}</p>
             </div>
             <button type="button" onClick={close} aria-label="Close assistant"
@@ -111,10 +111,10 @@ export default function AIAssistant() {
           <div ref={scrollRef} aria-live="polite" className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4 text-body-sm">
             {messages.length === 0 && (
               <div className="flex flex-col gap-3">
-                <p className="text-fg-2">Ask about your positions, risk, or the plan on screen. Answers cite the live numbers Flint has.</p>
+                <p className="text-fg-2">Ask about your positions, risk, or the plan on screen. Answers cite the live numbers Polaris has.</p>
                 {SUGGESTIONS.map((s) => (
                   <button key={s} type="button" onClick={() => send(s)}
-                          className="min-h-11 border border-line px-3 text-left text-fg-2 hover:border-control hover:text-fg">
+                          className="min-h-11 rounded-lg border border-white/10 bg-black/20 px-3 text-left text-fg-2 hover:border-white/25 hover:text-fg">
                     {s}
                   </button>
                 ))}
@@ -122,9 +122,9 @@ export default function AIAssistant() {
             )}
             {messages.map((m, i) => (
               <div key={i} className={clsx('flex flex-col gap-1', m.role === 'user' && 'items-end')}>
-                <span className="text-caption text-fg-3">{m.role === 'user' ? 'You' : 'Flint'}</span>
+                <span className="text-caption text-fg-3">{m.role === 'user' ? 'You' : 'Polaris'}</span>
                 <div className={clsx('max-w-[90%] leading-6',
-                  m.role === 'user' ? 'border border-line bg-ink-2 px-3 py-2 text-fg' : m.error ? 'text-down' : 'text-fg-2')}>
+                  m.role === 'user' ? 'border border-line bg-white/[0.06] px-3 py-2 text-fg' : m.error ? 'text-down' : 'text-fg-2')}>
                   {render(m.content)}
                 </div>
               </div>
@@ -139,9 +139,9 @@ export default function AIAssistant() {
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send(); } }}
                         placeholder="Ask about a ticker, your risk, a plan"
-                        className="max-h-32 min-h-11 flex-1 resize-none border border-control bg-ink-0 px-3 py-2.5 text-body-sm text-fg placeholder:text-fg-3 focus-visible:border-up" />
+                        className="max-h-32 min-h-11 flex-1 resize-none rounded-lg border border-white/15 bg-black/30 px-3 py-2.5 text-body-sm text-fg placeholder:text-fg-3 focus-visible:border-up" />
               <button type="submit" disabled={!input.trim() || loading} aria-label="Send"
-                      className="grid min-h-11 min-w-11 place-items-center bg-up text-ink-0 disabled:opacity-40">
+                      className="grid min-h-11 min-w-11 place-items-center rounded-lg bg-fg text-ink-0 disabled:opacity-40">
                 <Send size={16} />
               </button>
             </div>

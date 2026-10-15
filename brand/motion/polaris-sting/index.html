@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1080px; overflow: hidden; background: #0b0b0c; }
+      #root { position: relative; width: 100%; height: 100%; }
+      .layer { position: absolute; inset: 0; width: 1080px; height: 1080px; }
+      #grain { opacity: 0.07; mix-blend-mode: screen; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="5" data-width="1080" data-height="1080">
+      <!-- meridian: the line to true north -->
+      <svg id="guides" class="layer clip" data-start="0" data-duration="5" data-track-index="0" viewBox="0 0 1080 1080">
+        <line id="meridian" x1="540" y1="80" x2="540" y2="1000" stroke="#2a2b2e" stroke-width="1" />
+      </svg>
+      <svg id="mark" class="layer clip" data-start="0" data-duration="5" data-track-index="1" viewBox="-104 -104 720 720">
+        <g id="sky" fill="none" stroke-linecap="butt">
+          <g id="a1"><circle cx="256" cy="256" r="168" stroke="#D6D9DD" stroke-width="10" stroke-dasharray="620 435.6" transform="rotate(-30 256 256)" /></g>
+          <g id="a2"><circle cx="256" cy="256" r="204" stroke="#A9ADB3" stroke-width="7" stroke-dasharray="420 90 380 391.7" transform="rotate(150 256 256)" /></g>
+          <g id="a3"><circle cx="256" cy="256" r="238" stroke="#6F7379" stroke-width="4" stroke-dasharray="260 1235.4" transform="rotate(60 256 256)" /></g>
+        </g>
+        <path id="star" d="M256,116 L267,245 L336,256 L267,267 L256,348 L245,267 L176,256 L245,245 Z" fill="#F2F3F5" />
+      </svg>
+      <svg id="grain" class="layer clip" data-start="0" data-duration="5" data-track-index="2" viewBox="0 0 1080 1080">
+        <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="11" /><feColorMatrix type="saturate" values="0" /></filter>
+        <rect width="1080" height="1080" filter="url(#n)" />
+      </svg>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      gsap.set("#meridian", { scaleY: 0, transformOrigin: "50% 0%" });
+      gsap.set("#star", { scale: 0.4, opacity: 0, svgOrigin: "256 256" });
+      gsap.set("#sky", { rotation: -60, svgOrigin: "256 256" });
+      gsap.set("#a1 circle", { attr: { "stroke-dasharray": "0 1055.6" } });
+      gsap.set("#a2 circle", { attr: { "stroke-dasharray": "0 510 0 771.7" } });
+      gsap.set("#a3 circle", { attr: { "stroke-dasharray": "0 1495.4" } });
+
+      // the fixed point arrives first and never moves again
+      tl.to("#meridian", { scaleY: 1, duration: 1.2, ease: "expo.out" }, 0.15);
+      tl.to("#star", { scale: 1, opacity: 1, duration: 0.8, ease: "back.out(1.4)" }, 0.25);
+
+      // trails expose as the sky turns around it
+      tl.to("#a1 circle", { attr: { "stroke-dasharray": "620 435.6" }, duration: 1.9, ease: "power2.out" }, 0.75);
+      tl.to("#a2 circle", { attr: { "stroke-dasharray": "420 90 380 391.7" }, duration: 2.1, ease: "power3.out" }, 0.9);
+      tl.to("#a3 circle", { attr: { "stroke-dasharray": "260 1235.4" }, duration: 2.3, ease: "power2.inOut" }, 1.05);
+      tl.to("#sky", { rotation: 0, duration: 3.6, ease: "sine.inOut" }, 0.6);
+
+      // resolve: meridian recedes, the mark holds
+      tl.to("#meridian", { opacity: 0, duration: 0.5, ease: "power2.in" }, 4.0);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

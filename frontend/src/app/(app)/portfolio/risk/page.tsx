@@ -46,7 +46,7 @@ function Bars({ data, label }: { data: Record<string, number>; label: string }) 
       {rows.map(([k, v]) => (
         <li key={k} className="grid grid-cols-[minmax(0,9rem)_1fr_3.5rem] items-center gap-3 text-body-sm">
           <span className="truncate text-fg-2">{k}</span>
-          <span className="h-1.5 bg-ink-2" aria-hidden="true"><span className="block h-full bg-fg-2" style={{ width: `${Math.max(1, v * 100)}%` }} /></span>
+          <span className="h-1.5 bg-white/[0.06]" aria-hidden="true"><span className="block h-full bg-fg-2" style={{ width: `${Math.max(1, v * 100)}%` }} /></span>
           <span className="text-right tabular">{(v * 100).toFixed(1)}%</span>
         </li>
       ))}
@@ -79,10 +79,10 @@ export default function Risk() {
 
   const r = data?.risk;
   return (
-    <div className="flex flex-col gap-10">
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-        <section aria-labelledby="risk-h" className="flex flex-col gap-3">
-          <h2 id="risk-h" className="text-h4 font-bold">How much could this lose?</h2>
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <section aria-labelledby="risk-h" className="glass rounded-2xl p-5 md:p-6 flex flex-col gap-3">
+          <h2 id="risk-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />How much could this lose?</h2>
           {loading && !data ? <LoadingBlock lines={6} label="Measuring risk" />
             : error ? <ErrorState error={error} title="Couldn't measure risk" onRetry={reload} />
             : r && (
@@ -113,8 +113,8 @@ export default function Risk() {
         </section>
 
         {data && (
-          <section aria-labelledby="mix-h" className="flex flex-col gap-6">
-            <h2 id="mix-h" className="text-h4 font-bold">Where the money sits</h2>
+          <section aria-labelledby="mix-h" className="glass rounded-2xl p-5 md:p-6 flex flex-col gap-6">
+            <h2 id="mix-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />Where the money sits</h2>
             <Bars data={data.weights} label="Weight by holding" />
             {Object.keys(data.sector_allocation).length > 1 && (
               <>

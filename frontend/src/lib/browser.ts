@@ -36,7 +36,7 @@ export function useNow(intervalMs = 60_000): Date | null {
 
 /*
  * Browser storage is per user. Several people can sign in on one browser, so
- * every key Flint stores is namespaced by the signed-in Clerk user id (set by
+ * every key Polaris stores is namespaced by the signed-in Clerk user id (set by
  * <UserStorage> before the app renders), and entries left by anyone else are
  * removed on sign-in. Nothing here is a secret: it is recent searches, chart
  * drawings and display preferences, all of which still must not leak.
@@ -82,7 +82,7 @@ export function removeStorage(key: string) {
   }
 }
 
-/** Drop every Flint entry that is not the signed-in user's, including pre-scoping keys. */
+/** Drop every Polaris entry that is not the signed-in user's, including pre-scoping keys. */
 export function purgeOtherUsers() {
   if (!storageUser) return;
   const own = `${PREFIX}${storageUser}:`;

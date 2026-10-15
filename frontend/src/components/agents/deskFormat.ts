@@ -1,19 +1,19 @@
-// Palette + label helpers for the trading desk panels. Colours are the tokens
-// from globals.css / tailwind.config.js as hex, because several of these are
-// consumed as inline style values (tinted panels keyed to a verdict).
+// Palette + label helpers for the trading desk panels. Colours are the
+// globals.css tokens as `var()`, because several of these are consumed as
+// inline style values (tinted panels keyed to a verdict; see lib/theme tint).
 
 import type {
   DeskAction, DeskCall, DebateSide, DebateWinner, Grade, RiskStance,
 } from '../../types/agents';
 
 export const ACCENT = {
-  green: '#2FBF71',
-  red: '#E5484D',
-  amber: '#A4ACA8',
-  cyan: '#A4ACA8',
-  purple: '#A4ACA8',
-  blue: '#A4ACA8',
-  muted: '#848C88',
+  green: 'var(--green)',
+  red: 'var(--red)',
+  amber: 'var(--fg-2)',
+  cyan: 'var(--fg-2)',
+  purple: 'var(--fg-2)',
+  blue: 'var(--fg-2)',
+  muted: 'var(--fg-3)',
 } as const;
 
 export const actionColor = (action: DeskAction | undefined) =>

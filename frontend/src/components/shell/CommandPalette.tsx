@@ -104,11 +104,11 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
       aria-label="Search symbols"
       // sm:bottom-auto: a modal dialog is pinned top and bottom by default, so
       // without it the box stretches to max-height instead of fitting results.
-      className="m-0 h-[100dvh] max-h-none w-full max-w-none border-0 bg-ink-1 p-0 text-fg backdrop:bg-black/70 sm:bottom-auto sm:mx-auto sm:mt-[12vh] sm:h-auto sm:max-h-[70vh] sm:w-[min(40rem,calc(100vw-2rem))] sm:border sm:border-line-strong"
+      className="glass-2 m-0 h-[100dvh] max-h-none w-full max-w-none p-0 text-fg backdrop:bg-black/60 backdrop:backdrop-blur-sm sm:bottom-auto sm:mx-auto sm:mt-[12vh] sm:h-auto sm:max-h-[70vh] sm:w-[min(40rem,calc(100vw-2rem))] sm:rounded-2xl"
     >
       {/* Focus shows on the row's bottom edge, inside the dialog; the field's
           own ring would be drawn outside it and over the dialog border. */}
-      <div className="flex items-center gap-2 border-b border-line px-3 focus-within:border-up">
+      <div className="flex items-center gap-2 border-b border-white/10 px-4 focus-within:border-fg">
         <Search className="shrink-0 text-fg-3" />
         <input
           ref={inputRef}
@@ -152,7 +152,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
                 onMouseDown={(e) => { e.preventDefault(); go(o.symbol); }}
                 // Phones: type and exchange drop to a second line so the name keeps its width.
                 className={clsx('flex min-h-12 cursor-pointer flex-col justify-center gap-0.5 px-4 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4',
-                  i === active ? 'bg-ink-2' : '')}>
+                  i === active ? 'bg-white/[0.06]' : '')}>
               <span className="flex min-w-0 items-baseline gap-3">
                 <span className="ticker shrink-0 text-body-sm">{o.symbol}</span>
                 {o.name && <span className="truncate text-body-sm text-fg-2">{o.name}</span>}
