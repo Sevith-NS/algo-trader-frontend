@@ -99,6 +99,7 @@ export const NavMarkets = glyph('NavMarkets', <path d="M4 2.5v11M2.5 5h3v5h-3zM1
 export const NavPortfolio = glyph('NavPortfolio', <><circle cx="8" cy="8" r="5.5" /><path d="M8 2.5V8l4 3.5" /></>);
 export const NavNews = glyph('NavNews', <path d="M2.5 3.5h9v9h-9zM11.5 6h2v6.5h-2M4.5 6h5M4.5 8.5h5M4.5 11h3" />);
 export const NavSettings = glyph('NavSettings', <><circle cx="8" cy="8" r="2" /><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4" /></>);
+export const NavAlerts = glyph('NavAlerts', <path d="M4 11.5V7a4 4 0 0 1 8 0v4.5l1 1H3zM6.5 14h3" />);
 export const NavMore = glyph('NavMore', <><circle cx="3.5" cy="8" r="1" /><circle cx="8" cy="8" r="1" /><circle cx="12.5" cy="8" r="1" /></>);
 export const PanelLeft = glyph('PanelLeft', <path d="M2.5 2.5h11v11h-11zM6 2.5v11" />);
 

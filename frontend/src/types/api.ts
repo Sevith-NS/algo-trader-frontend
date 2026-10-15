@@ -195,3 +195,34 @@ export type FxQuote = {
   as_of: string | null;
   stale: boolean;
 };
+
+
+export type AlertKind = 'price_above' | 'price_below' | 'move_pct';
+export type AlertStatus = 'active' | 'paused' | 'triggered';
+
+export type Alert = {
+  id: string;
+  symbol: string;
+  kind: AlertKind;
+  /** Decimal string: a price, or a percentage for move_pct. */
+  threshold: string;
+  status: AlertStatus;
+  note: string | null;
+  /** Price when the alert was created, when one was available. */
+  reference_price: string | null;
+  created_at: string;
+  triggered_at: string | null;
+  last_checked_at: string | null;
+};
+
+export type AlertFiring = {
+  id: string;
+  alert_id: string;
+  symbol: string;
+  kind: AlertKind;
+  threshold: string;
+  price: string;
+  change_pct: string | null;
+  fired_at: string;
+  seen: boolean;
+};

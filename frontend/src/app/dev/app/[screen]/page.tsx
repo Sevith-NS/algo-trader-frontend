@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { Suspense, type ReactNode } from 'react';
+import Alerts from '@/app/(app)/alerts/page';
 import Home from '@/app/(app)/home/page';
 import MarketsLayout from '@/app/(app)/markets/layout';
 import MarketsPage from '@/app/(app)/markets/page';
@@ -28,6 +29,7 @@ const SCREENS: Record<string, () => ReactNode> = {
   news: () => <NewsPage />,
   settings: () => <Settings />,
   'broker-callback': () => <BrokerCallback />,
+  alerts: () => <Alerts />,
   symbol: () => <SymbolView symbol="RELIANCE.NS" />,
 };
 

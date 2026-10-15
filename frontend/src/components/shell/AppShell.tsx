@@ -7,10 +7,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState, type ComponentType, type ReactNode } from 'react';
 import {
-  ChevronRight, NavHome, NavMarkets, NavMore, NavNews, NavPortfolio, NavSettings, Search, SlidersHorizontal,
+  ChevronRight, NavAlerts, NavHome, NavMarkets, NavMore, NavNews, NavPortfolio, NavSettings, Search, SlidersHorizontal,
   type IconProps,
 } from '@/components/ui/icons';
 import { Sheet } from '@/components/ui/Sheet';
+import { useAlertCount } from '@/lib/useAlertCount';
 import { CommandPalette } from './CommandPalette';
 
 type NavItem = { href: string; label: string; icon: ComponentType<IconProps> };
@@ -20,13 +21,17 @@ const NAV: NavItem[] = [
   { href: '/markets', label: 'Markets', icon: NavMarkets },
   { href: '/portfolio', label: 'Portfolio', icon: NavPortfolio },
   { href: '/news', label: 'News', icon: NavNews },
+  { href: '/alerts', label: 'Alerts', icon: NavAlerts },
 ];
 
+// Where the bell and the Alerts badges send you: what fired.
+const TRIGGERED_HREF = '/alerts?tab=triggered';
+
 // Phone tab bar: the first three NAV items sit in the bar; the rest live in
-// the "More" sheet. Watchlists and Alerts join it when their routes exist
-// (TASKS T4.25, T4.27).
+// the "More" sheet. Watchlists joins it when its route exists (TASKS T4.25).
 const MORE: NavItem[] = [
   NAV[3],
+  NAV[4],
   { href: '/settings', label: 'Settings', icon: NavSettings },
 ];
 
@@ -54,6 +59,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const isActive = useActive();
   const moreActive = MORE.some((m) => isActive(m.href));
+  const alertCount = useAlertCount();
+  const countFor = (href: string) => (href === '/alerts' ? alertCount : 0);
   const openSearch = useCallback(() => setSearchOpen(true), []);
 
   useEffect(() => {
@@ -96,7 +103,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </button>
 
         <nav aria-label="Main" className="mt-6 flex flex-col gap-1">
-          {NAV.map((n) => <SideLink key={n.href} item={n} active={isActive(n.href)} />)}
+          {NAV.map((n) => <SideLink key={n.href} item={n} active={isActive(n.href)} count={countFor(n.href)} />)}
         </nav>
 
         <div className="mt-auto flex flex-col gap-1">
@@ -121,6 +128,11 @@ export function AppShell({ children }: { children: ReactNode }) {
                     className="grid min-h-11 min-w-11 place-items-center rounded-lg text-fg-2 hover:text-fg">
               <Search size={18} />
             </button>
+            <Link href={TRIGGERED_HREF} aria-label={alertCount ? `Alerts, ${alertCount} new` : 'Alerts'}
+                  className="relative grid min-h-11 min-w-11 place-items-center rounded-lg text-fg-2 hover:text-fg">
+              <NavAlerts size={18} />
+              {alertCount > 0 && <CountBadge count={alertCount} className="absolute right-1 top-1.5" />}
+            </Link>
             <UserButton>
               <UserButton.MenuItems>
                 <UserButton.Link label="Settings" labelIcon={<SlidersHorizontal size={14} />} href="/settings" />
@@ -157,9 +169,11 @@ export function AppShell({ children }: { children: ReactNode }) {
         <TabLink item={NAV[2]} active={isActive(NAV[2].href)} />
         <button type="button" onClick={() => setMoreOpen(true)}
                 aria-haspopup="dialog" aria-expanded={moreOpen}
-                className={clsx('flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl text-caption transition-colors duration-fast',
+                aria-label={alertCount ? `More, ${alertCount} new alert${alertCount === 1 ? '' : 's'}` : undefined}
+                className={clsx('relative flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl text-caption transition-colors duration-fast',
                   moreActive ? 'bg-white/[0.08] text-fg' : 'text-fg-3 hover:text-fg')}>
           <NavMore size={18} />
+          {alertCount > 0 && <CountBadge count={alertCount} className="absolute right-[22%] top-1.5" />}
           More
           {moreActive && <span className="sr-only">(current section)</span>}
         </button>
@@ -175,6 +189,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                         isActive(href) ? 'bg-white/[0.08] text-fg' : 'text-fg-2 hover:bg-white/[0.04] hover:text-fg')}>
                   <Icon size={18} />
                   {label}
+                  {countFor(href) > 0 && <CountBadge count={countFor(href)} className="ml-1" />}
                   <ChevronRight size={14} className="ml-auto text-fg-3" />
                 </Link>
               </li>
@@ -188,10 +203,21 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
 }
 
-function SideLink({ item, active }: { item: NavItem; active: boolean }) {
+/** New-firings count. The number is the signal; screen readers get "N new" from the link's label. */
+function CountBadge({ count, className }: { count: number; className?: string }) {
+  return (
+    <span aria-hidden="true"
+          className={clsx('min-w-[1.125rem] rounded-full bg-fg px-1 text-center text-[11px] font-medium leading-[18px] text-ink-0 tabular', className)}>
+      {count > 99 ? '99+' : count}
+    </span>
+  );
+}
+
+function SideLink({ item, active, count = 0 }: { item: NavItem; active: boolean; count?: number }) {
   const Icon = item.icon;
   return (
-    <Link href={item.href} aria-current={active ? 'page' : undefined} title={item.label}
+    <Link href={count ? TRIGGERED_HREF : item.href} aria-current={active ? 'page' : undefined} title={item.label}
+          aria-label={count ? `${item.label}, ${count} new` : undefined}
           className={clsx(
             'relative flex h-11 items-center justify-center gap-3 rounded-lg px-3 text-body-sm transition-colors duration-fast xl:justify-start',
             active
@@ -201,6 +227,7 @@ function SideLink({ item, active }: { item: NavItem; active: boolean }) {
       {active && <span aria-hidden="true" className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-fg" />}
       <Icon size={18} />
       <span className="sr-only xl:not-sr-only">{item.label}</span>
+      {count > 0 && <CountBadge count={count} className="absolute right-2 top-1.5 xl:static xl:ml-auto" />}
     </Link>
   );
 }
