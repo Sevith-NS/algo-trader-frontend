@@ -1,9 +1,9 @@
 'use client';
 
-import { apiGet, apiPost } from './api';
+import { apiDelete, apiGet, apiPost } from './api';
 import type { Watchlist } from '@/types/api';
 
-/** Fired after any add, so every watchlist view on screen reloads. */
+/** Fired after any add or remove, so every watchlist view on screen reloads. */
 export const WATCHLIST_CHANGED = 'polaris:watchlist-changed';
 
 /**
@@ -19,4 +19,10 @@ export async function addToWatchlist(symbol: string, listId?: string): Promise<s
   await apiPost(`/api/watchlists/${id}/items`, { symbol });
   window.dispatchEvent(new Event(WATCHLIST_CHANGED));
   return id;
+}
+
+/** Remove a symbol from the given lists (every list holding it, usually). */
+export async function removeFromWatchlist(symbol: string, listIds: string[]): Promise<void> {
+  await Promise.all(listIds.map((id) => apiDelete(`/api/watchlists/${id}/items/${encodeURIComponent(symbol)}`)));
+  window.dispatchEvent(new Event(WATCHLIST_CHANGED));
 }

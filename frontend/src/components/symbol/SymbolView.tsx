@@ -14,13 +14,14 @@ import { DataChip, ErrorState, LoadingBlock, Skeleton } from '@/components/ui/St
 import { LinkTabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/Toast';
 import { usePortfolio } from '@/context/PortfolioContext';
-import { apiGet, apiPost, errorMessage } from '@/lib/api';
+import { errorMessage } from '@/lib/api';
 import { formatMoney } from '@/lib/format';
 import { useNow } from '@/lib/browser';
 import { describe, normalizeQuote, useFxRate } from '@/lib/instrument';
 import { exchangeFor, sessionState } from '@/lib/sessions';
 import { sizeByRisk } from '@/lib/sizing';
 import { useApi } from '@/lib/useApi';
+import { WATCHLIST_CHANGED, addToWatchlist, removeFromWatchlist } from '@/lib/watchlist';
 import type { Quote, Watchlist } from '@/types/api';
 import type { Failed, NewsIntel } from '@/types/intel';
 import type { MlInsights, QuantSignals } from '@/types/quant';
@@ -84,13 +85,27 @@ export function SymbolView({ symbol }: { symbol: string }) {
     });
   }, [book, profile, levels, fx, fractional]);
 
-  const watch = async () => {
+  const listsApi = useApi<{ watchlists: Watchlist[] }>('/api/watchlists');
+  const reloadLists = listsApi.reload;
+  useEffect(() => {
+    window.addEventListener(WATCHLIST_CHANGED, reloadLists);
+    return () => window.removeEventListener(WATCHLIST_CHANGED, reloadLists);
+  }, [reloadLists]);
+  const holding = (listsApi.data?.watchlists ?? []).filter((w) => w.symbols.includes(symbol)).map((w) => w.id);
+
+  const toggleWatch = async () => {
     setWatching(true);
     try {
-      const { watchlists } = await apiGet<{ watchlists: Watchlist[] }>('/api/watchlists');
-      const id = watchlists[0]?.id ?? (await apiPost<{ id: string }>('/api/watchlists', { name: 'Watchlist' })).id;
-      await apiPost(`/api/watchlists/${id}/items`, { symbol });
-      toast.show({ message: `${symbol} added to your watchlist` });
+      if (holding.length) {
+        await removeFromWatchlist(symbol, holding);
+        toast.show({
+          message: holding.length > 1 ? `${symbol} removed from ${holding.length} watchlists` : `${symbol} removed from your watchlist`,
+          action: { label: 'Undo', onClick: () => { void Promise.all(holding.map((id) => addToWatchlist(symbol, id))).catch((err) => toast.show({ message: errorMessage(err), tone: 'error' })); } },
+        });
+      } else {
+        await addToWatchlist(symbol, listsApi.data?.watchlists[0]?.id);
+        toast.show({ message: `${symbol} added to your watchlist` });
+      }
     } catch (err) {
       toast.show({ message: errorMessage(err), tone: 'error' });
     } finally {
@@ -132,7 +147,9 @@ export function SymbolView({ symbol }: { symbol: string }) {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="secondary" onClick={watch} loading={watching}>Add to watchlist</Button>
+              <Button variant="secondary" onClick={toggleWatch} loading={watching} disabled={!listsApi.data && !listsApi.error}>
+                {holding.length ? 'Remove from watchlist' : 'Add to watchlist'}
+              </Button>
               <Button variant="paper" onClick={() => setTicketOpen(true)} disabled={!q || price === null}>Paper trade</Button>
             </div>
           </div>

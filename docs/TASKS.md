@@ -111,7 +111,7 @@ Each primitive comes with all its states, keyboard support and a short usage com
 
 ### Watchlists and alerts (new)
 - [ ] **T4.25** `/watchlists` (add it to `MORE` in `AppShell.tsx`): list rail (create, rename, delete with undo) + table with sparklines; phone shows lists as a Segmented/Select. `[L]`
-- [ ] **T4.26** Add/remove from watchlist via the symbol header and palette. `[S]` *(palette add done; symbol header still open)*
+- [x] **T4.26** Add/remove from watchlist via the symbol header and palette. `[S]`
 - [x] **T4.27** `/alerts` list (add it to `MORE` in `AppShell.tsx`): Active, Triggered, Paused tabs. `[M]` `[BE]` alerts
 - [x] **T4.28** Create/edit alert sheet: price cross and % move first; validation; "checked every 60s, delayed data" note. `[M]` `[BE]` alerts
 - [ ] **T4.29** Alerts bell count + triggered list popover in the TopBar. `[S]` `[BE]` *(count done: sidebar badge, phone bell, More tab; all link to `/alerts?tab=triggered`. The popover waits for T2.11 and the TopBar for T3.2.)*
