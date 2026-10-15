@@ -7,6 +7,7 @@ import MarketsPage from '@/app/(app)/markets/page';
 import NewsPage from '@/app/(app)/news/page';
 import PortfolioLayout from '@/app/(app)/portfolio/layout';
 import Holdings from '@/app/(app)/portfolio/page';
+import Performance from '@/app/(app)/portfolio/performance/page';
 import Risk from '@/app/(app)/portfolio/risk/page';
 import BrokerCallback from '@/app/(app)/settings/brokers/callback/page';
 import Settings from '@/app/(app)/settings/page';
@@ -27,6 +28,7 @@ const SCREENS: Record<string, () => ReactNode> = {
   markets: () => <MarketsLayout><MarketsPage /></MarketsLayout>,
   portfolio: () => <PortfolioLayout><Holdings /></PortfolioLayout>,
   risk: () => <PortfolioLayout><Risk /></PortfolioLayout>,
+  performance: () => <PortfolioLayout><Performance /></PortfolioLayout>,
   news: () => <NewsPage />,
   settings: () => <Settings />,
   'broker-callback': () => <BrokerCallback />,

@@ -10,6 +10,7 @@ import { usePortfolioSelection } from './selection';
 
 const TABS = [
   { href: '/portfolio', label: 'Holdings', real: true },
+  { href: '/portfolio/performance', label: 'Performance', real: true },
   { href: '/portfolio/activity', label: 'Activity', real: false },
   { href: '/portfolio/risk', label: 'Risk', real: false },
   { href: '/portfolio/journal', label: 'Journal', real: false },

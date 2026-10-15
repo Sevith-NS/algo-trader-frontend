@@ -87,7 +87,7 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [ ] **T4.7** Portfolio header: switcher, ModeBadge, SyncBadge or "New paper order", Figure + StatStrip. Paper gets the blue top rule. `[M]`
 - [x] **T4.8** Holdings table: currency per row, converted value in base currency, day and total change, weight; real rows have no trade actions. `[L]` `[BE]` holdings
 - [ ] **T4.9** "All real" consolidated view: sums real accounts only, FX provenance chip. `[M]` `[BE]` fx *(view and sums done with T3.4/T4.8; FX provenance chip still open)*
-- [ ] **T4.10** Performance tab: TWR/XIRR toggle with a one-line explainer, period Segmented, chart vs benchmark. `[L]` `[BE]` performance
+- [x] **T4.10** Performance tab: TWR/XIRR toggle with a one-line explainer, period Segmented, chart vs benchmark. `[L]` `[BE]` performance
 - [ ] **T4.11** Allocation tab: by asset class, sector, currency and account (Allocation component). `[M]`
 - [ ] **T4.12** Restyle Risk, Activity and Journal tabs on v3 primitives (no behaviour change). `[M]`
 - [ ] **T4.13** Paper order ticket on `Sheet`: books only into paper, shows risk and stop before the button, blue primary, disclaimer. `[L]`

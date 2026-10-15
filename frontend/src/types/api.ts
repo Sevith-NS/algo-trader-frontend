@@ -226,3 +226,21 @@ export type AlertFiring = {
   fired_at: string;
   seen: boolean;
 };
+
+export type PerformancePeriod = '1m' | '3m' | '6m' | '1y' | 'ytd' | 'all';
+
+/** GET /api/accounts/{id}/performance. `index` is growth of 100 from `start`. */
+export type Performance = {
+  account_id: string;
+  kind: 'paper' | 'real';
+  currency: string;
+  period: PerformancePeriod;
+  start: string | null;
+  end: string | null;
+  method: string;
+  twr_pct: number | null;
+  xirr_pct: number | null;
+  xirr_note: string | null;
+  series: { date: string; value: number; index: number }[];
+  benchmark: { symbol: string; name: string; return_pct: number | null; series: { date: string; index: number }[] } | null;
+};
