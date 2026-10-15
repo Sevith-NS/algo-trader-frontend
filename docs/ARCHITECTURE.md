@@ -73,8 +73,7 @@ API
     /performance            TWR/XIRR vs benchmark                          (new)
     /allocation             By asset class, sector, currency, account       (new)
     /risk  /activity  /journal
-/(app)/watchlists           Named lists                                     (new)
-/(app)/watchlists/[id]
+/(app)/watchlists           Named lists; selected list in ?list=<id>         (new)
 /(app)/alerts               Active · Triggered · Paused                     (new)
 /(app)/news                 For you · Markets
 /(app)/settings             Profile · Security · Brokers (new) · Preferences · Data and privacy

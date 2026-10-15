@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState, type ComponentType, type ReactNode } from 'react';
 import {
-  ChevronRight, NavAlerts, NavHome, NavMarkets, NavMore, NavNews, NavPortfolio, NavSettings, Search, SlidersHorizontal,
+  ChevronRight, NavAlerts, NavHome, NavMarkets, NavMore, NavNews, NavPortfolio, NavSettings, NavWatchlists, Search, SlidersHorizontal,
   type IconProps,
 } from '@/components/ui/icons';
 import { Sheet } from '@/components/ui/Sheet';
@@ -20,6 +20,7 @@ const NAV: NavItem[] = [
   { href: '/home', label: 'Home', icon: NavHome },
   { href: '/markets', label: 'Markets', icon: NavMarkets },
   { href: '/portfolio', label: 'Portfolio', icon: NavPortfolio },
+  { href: '/watchlists', label: 'Watchlists', icon: NavWatchlists },
   { href: '/news', label: 'News', icon: NavNews },
   { href: '/alerts', label: 'Alerts', icon: NavAlerts },
 ];
@@ -28,10 +29,9 @@ const NAV: NavItem[] = [
 const TRIGGERED_HREF = '/alerts?tab=triggered';
 
 // Phone tab bar: the first three NAV items sit in the bar; the rest live in
-// the "More" sheet. Watchlists joins it when its route exists (TASKS T4.25).
+// the "More" sheet.
 const MORE: NavItem[] = [
-  NAV[3],
-  NAV[4],
+  ...NAV.slice(3),
   { href: '/settings', label: 'Settings', icon: NavSettings },
 ];
 

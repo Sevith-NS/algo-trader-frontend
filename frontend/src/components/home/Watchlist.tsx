@@ -129,7 +129,7 @@ export function Watchlist() {
  * results, Enter adds the highlighted one, or the typed ticker when nothing
  * is highlighted, so an exact ticker still works without picking.
  */
-function AddSymbol({ listId, have }: { listId?: string; have: string[] }) {
+export function AddSymbol({ listId, have }: { listId?: string; have: string[] }) {
   const toast = useToast();
   const listboxId = useId();
   const [input, setInput] = useState('');

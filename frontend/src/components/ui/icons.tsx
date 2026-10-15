@@ -97,6 +97,7 @@ export const ChevronRight = glyph('ChevronRight', <path d="M6 4l4 4-4 4" />);
 export const NavHome = glyph('NavHome', <path d="M2.5 7.5L8 3l5.5 4.5V13.5h-3.5v-4h-4v4H2.5z" />);
 export const NavMarkets = glyph('NavMarkets', <path d="M4 2.5v11M2.5 5h3v5h-3zM12 2.5v11M10.5 4h3v4.5h-3zM8 5v8M6.5 7h3v3.5h-3z" />);
 export const NavPortfolio = glyph('NavPortfolio', <><circle cx="8" cy="8" r="5.5" /><path d="M8 2.5V8l4 3.5" /></>);
+export const NavWatchlists = glyph('NavWatchlists', <path d="M8 2.5l1.7 3.5 3.8.5-2.8 2.6.7 3.8L8 11.1l-3.4 1.8.7-3.8-2.8-2.6 3.8-.5z" />);
 export const NavNews = glyph('NavNews', <path d="M2.5 3.5h9v9h-9zM11.5 6h2v6.5h-2M4.5 6h5M4.5 8.5h5M4.5 11h3" />);
 export const NavSettings = glyph('NavSettings', <><circle cx="8" cy="8" r="2" /><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4" /></>);
 export const NavAlerts = glyph('NavAlerts', <path d="M4 11.5V7a4 4 0 0 1 8 0v4.5l1 1H3zM6.5 14h3" />);

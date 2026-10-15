@@ -110,7 +110,7 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [ ] **T4.24** Restyle Overview, Movers, Ideas, Levels and Screens on DataTable/Card; not-advice line stays. `[L]`
 
 ### Watchlists and alerts (new)
-- [ ] **T4.25** `/watchlists` (add it to `MORE` in `AppShell.tsx`): list rail (create, rename, delete with undo) + table with sparklines; phone shows lists as a Segmented/Select. `[L]`
+- [x] **T4.25** `/watchlists` (add it to `MORE` in `AppShell.tsx`): list rail (create, rename, delete with undo) + table with sparklines; phone shows lists as a Segmented/Select. `[L]`
 - [x] **T4.26** Add/remove from watchlist via the symbol header and palette. `[S]`
 - [x] **T4.27** `/alerts` list (add it to `MORE` in `AppShell.tsx`): Active, Triggered, Paused tabs. `[M]` `[BE]` alerts
 - [x] **T4.28** Create/edit alert sheet: price cross and % move first; validation; "checked every 60s, delayed data" note. `[M]` `[BE]` alerts

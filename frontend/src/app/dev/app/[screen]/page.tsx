@@ -10,6 +10,7 @@ import Holdings from '@/app/(app)/portfolio/page';
 import Risk from '@/app/(app)/portfolio/risk/page';
 import BrokerCallback from '@/app/(app)/settings/brokers/callback/page';
 import Settings from '@/app/(app)/settings/page';
+import Watchlists from '@/app/(app)/watchlists/page';
 import { AppShell } from '@/components/shell/AppShell';
 import { SymbolView } from '@/components/symbol/SymbolView';
 import { ToastProvider } from '@/components/ui/Toast';
@@ -30,6 +31,7 @@ const SCREENS: Record<string, () => ReactNode> = {
   settings: () => <Settings />,
   'broker-callback': () => <BrokerCallback />,
   alerts: () => <Alerts />,
+  watchlists: () => <Watchlists />,
   symbol: () => <SymbolView symbol="RELIANCE.NS" />,
 };
 
