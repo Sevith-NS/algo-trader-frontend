@@ -49,6 +49,36 @@ export type BrokersResponse = {
 
 export type SyncResult = { account_id: string; holdings: number; skipped: number; synced_at: string };
 
+/** One synced holding of a real account. Money fields are decimal strings. */
+export type HoldingRow = {
+  symbol: string;
+  broker_symbol: string;
+  exchange: string;
+  isin: string | null;
+  quantity: string;
+  currency: string;
+  avg_price: string;
+  last_price: string | null;
+  market_value: string;
+  invested: string;
+  unrealized_pnl: string;
+  unrealized_pnl_pct: string | null;
+  day_change_pct: string | null;
+  fx_rate: string | null;
+  /** In the user's base currency; null when the FX rate is unavailable. */
+  market_value_base: string | null;
+};
+
+export type HoldingsResponse = {
+  account: { id: string; name: string; kind: 'real'; currency: string };
+  /** When the broker was last synced; prices are as of then. */
+  as_of: string | null;
+  base_currency: string;
+  holdings: HoldingRow[];
+  totals: { market_value: string; invested: string; unrealized_pnl: string;
+            unrealized_pnl_pct: string | null; market_value_base: string | null };
+};
+
 export type PositionRow = {
   symbol: string;
   quantity: string;

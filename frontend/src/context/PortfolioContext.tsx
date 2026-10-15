@@ -19,6 +19,8 @@ type PortfolioState = {
   loading: boolean;
   error: unknown;
   profile: Profile | null;
+  /** Every account, paper and real. `account` is the paper one this context trades. */
+  accounts: Account[];
   account: Account | null;
   book: PositionsResponse | null;
   /** Cash in the account currency. */
@@ -33,6 +35,7 @@ const PortfolioContext = createContext<PortfolioState | null>(null);
 
 export function PortfolioProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [account, setAccount] = useState<Account | null>(null);
   const [book, setBook] = useState<PositionsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,6 +48,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
         apiGet<{ accounts: Account[] }>('/api/accounts'),
       ]);
       setProfile(me);
+      setAccounts(accounts.accounts);
       // Real (broker) accounts are read-only; this context drives paper trading.
       const acct = accounts.accounts.find((a) => a.kind === 'paper') ?? null;
       setAccount(acct);
@@ -77,12 +81,12 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
   }, [account, refresh]);
 
   const value = useMemo<PortfolioState>(() => ({
-    loading, error, profile, account, book, refresh, placeOrder,
+    loading, error, profile, accounts, account, book, refresh, placeOrder,
     balance: book ? Number(book.cash) : 0,
     positions: (book?.positions ?? []).map((p) => ({
       symbol: p.symbol, shares: Number(p.quantity), averagePrice: Number(p.avg_cost),
     })),
-  }), [loading, error, profile, account, book, refresh, placeOrder]);
+  }), [loading, error, profile, accounts, account, book, refresh, placeOrder]);
 
   return <PortfolioContext.Provider value={value}>{children}</PortfolioContext.Provider>;
 }

@@ -52,7 +52,7 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [ ] **T2.9** `Dialog` v3 (radius 14, overlay shadow, scrim, focus trap and return). `[M]`
 - [x] **T2.10** `Sheet`: right panel on `lg`+, bottom sheet with a handle on phone; focus management; Escape; reduced-motion aware. `[L]`
 - [ ] **T2.11** `Popover`, `Menu` and `Tooltip` (positioning, Escape, outside click, APG menu keys). `[L]`
-- [ ] **T2.12** `Badge`/`Chip`, `ModeBadge` (Real/Paper), ~~`SyncBadge`~~ (done with T4.14). `[S]`
+- [ ] **T2.12** `Badge`/`Chip`, ~~`ModeBadge`~~ (done with T3.4), ~~`SyncBadge`~~ (done with T4.14). `[S]`
 - [ ] **T2.13** `Figure` and `StatStrip`. `[S]`
 - [ ] **T2.14** `Price` with tick flash and throttled `aria-live`; `Change` v3 (true minus, arrow, absolute and/or percent). `[M]`
 - [ ] **T2.15** `ProvenanceChip` (hover on pointer, inline on touch, amber when stale). `[M]`
@@ -68,7 +68,7 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [x] **T3.1** `Sidebar` (`lg`+): nav groups, active state (ink-3 + bar + text), collapse to a 64px rail with tooltips, collapse state saved per user. `[L]` *Needs:* T2.11
 - [ ] **T3.2** `TopBar`: title/breadcrumb, search trigger, alerts bell with count, user menu (Clerk `UserButton` themed). `[M]`
 - [x] **T3.3** `BottomTabs` (under `lg`): Home, Markets, Search, Portfolio, More; safe-area padding; "More" opens a sheet with News, Watchlists, Alerts, Settings. `[M]` *Needs:* T2.10
-- [ ] **T3.4** `PortfolioSwitcher`: grouped list (All real, real accounts, paper portfolios) with ModeBadge; writes `?p=`. `[M]` `[BE]` (`kind` on `/api/accounts`)
+- [x] **T3.4** `PortfolioSwitcher`: grouped list (All real, real accounts, paper portfolios) with ModeBadge; writes `?p=`. `[M]` `[BE]` (`kind` on `/api/accounts`)
 - [x] **T3.5** Rebuild `AppShell` from T3.1–T3.4; skip link stays; footer disclaimer. Remove the old top nav. `[M]`
 - [ ] **T3.6** `CommandPalette` v3 styling + "Go to" entries for the new routes + "Add to watchlist" action. `[M]`
 - [ ] **T3.7** Route-level `loading.tsx` and `error.tsx` for `(app)` using the shell skeleton and `ErrorState`. `[S]`
@@ -85,8 +85,8 @@ Each primitive comes with all its states, keyboard support and a short usage com
 
 ### Portfolio
 - [ ] **T4.7** Portfolio header: switcher, ModeBadge, SyncBadge or "New paper order", Figure + StatStrip. Paper gets the blue top rule. `[M]`
-- [ ] **T4.8** Holdings table: currency per row, converted value in base currency, day and total change, weight; real rows have no trade actions. `[L]` `[BE]` holdings
-- [ ] **T4.9** "All real" consolidated view: sums real accounts only, FX provenance chip. `[M]` `[BE]` fx
+- [x] **T4.8** Holdings table: currency per row, converted value in base currency, day and total change, weight; real rows have no trade actions. `[L]` `[BE]` holdings
+- [ ] **T4.9** "All real" consolidated view: sums real accounts only, FX provenance chip. `[M]` `[BE]` fx *(view and sums done with T3.4/T4.8; FX provenance chip still open)*
 - [ ] **T4.10** Performance tab: TWR/XIRR toggle with a one-line explainer, period Segmented, chart vs benchmark. `[L]` `[BE]` performance
 - [ ] **T4.11** Allocation tab: by asset class, sector, currency and account (Allocation component). `[M]`
 - [ ] **T4.12** Restyle Risk, Activity and Journal tabs on v3 primitives (no behaviour change). `[M]`

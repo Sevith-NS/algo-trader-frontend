@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { ButtonLink } from '@/components/ui/Button';
 import { Change } from '@/components/ui/Change';
+import { RealHoldings } from '@/components/portfolio/Real';
+import { usePortfolioSelection } from '@/components/portfolio/selection';
 import { EmptyState, ErrorState, LoadingBlock } from '@/components/ui/States';
 import { usePortfolio } from '@/context/PortfolioContext';
 import { formatMoney, formatNumber } from '@/lib/format';
@@ -16,6 +18,12 @@ function pnlPct(p: PositionRow) {
 const qtyDigits = (q: string) => (Number(q) % 1 === 0 ? 0 : 4);
 
 export default function Holdings() {
+  const { selection } = usePortfolioSelection();
+  if (selection.mode === 'real') return <RealHoldings key={selection.key} accounts={selection.accounts} />;
+  return <PaperHoldings />;
+}
+
+function PaperHoldings() {
   const { book, loading, error, refresh } = usePortfolio();
 
   if (loading && !book) return <LoadingBlock lines={6} label="Loading holdings" />;

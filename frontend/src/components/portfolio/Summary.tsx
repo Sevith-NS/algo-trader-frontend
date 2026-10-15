@@ -4,9 +4,18 @@ import { Change } from '@/components/ui/Change';
 import { ErrorState, Skeleton } from '@/components/ui/States';
 import { usePortfolio } from '@/context/PortfolioContext';
 import { formatMoney } from '@/lib/format';
+import { RealSummary } from './Real';
+import { usePortfolioSelection } from './selection';
 
-/** Account value, return since start, cash and position count. */
+/** The selected book's header: real (synced, read-only) or paper. */
 export function PortfolioPulse() {
+  const { selection } = usePortfolioSelection();
+  if (selection.mode === 'real') return <RealSummary key={selection.key} accounts={selection.accounts} label={selection.label} />;
+  return <PaperPulse />;
+}
+
+/** Paper account value, return since start, cash and position count. */
+function PaperPulse() {
   const { book, loading, error, refresh } = usePortfolio();
   if (loading && !book) {
     return <div className="glass flex flex-wrap gap-8 rounded-2xl p-6"><Skeleton className="h-10 w-56" /><Skeleton className="h-10 w-32" /></div>;
