@@ -411,6 +411,10 @@ select {
 @keyframes sheet-fade-in { from { opacity: 0; } }
 @keyframes sheet-fade-out { to { opacity: 0; } }
 
+/* Popover, Menu, Tooltip: fade + 4px rise (DESIGN.md §8). */
+.popover { animation: popover-in var(--dur-base) var(--ease-standard); }
+@keyframes popover-in { from { opacity: 0; transform: translateY(4px); } }
+
 @keyframes pulseSoft {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }

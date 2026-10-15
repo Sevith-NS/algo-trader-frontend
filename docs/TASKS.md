@@ -51,7 +51,7 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [ ] **T2.8** `Tabs` v3: URL-synced option, sliding underline, horizontal scroll on phone. `[M]`
 - [ ] **T2.9** `Dialog` v3 (radius 14, overlay shadow, scrim, focus trap and return). `[M]`
 - [x] **T2.10** `Sheet`: right panel on `lg`+, bottom sheet with a handle on phone; focus management; Escape; reduced-motion aware. `[L]`
-- [ ] **T2.11** `Popover`, `Menu` and `Tooltip` (positioning, Escape, outside click, APG menu keys). `[L]`
+- [x] **T2.11** `Popover`, `Menu` and `Tooltip` (positioning, Escape, outside click, APG menu keys). `[L]`
 - [ ] **T2.12** `Badge`/`Chip`, ~~`ModeBadge`~~ (done with T3.4), ~~`SyncBadge`~~ (done with T4.14). `[S]`
 - [ ] **T2.13** `Figure` and `StatStrip`. `[S]`
 - [ ] **T2.14** `Price` with tick flash and throttled `aria-live`; `Change` v3 (true minus, arrow, absolute and/or percent). `[M]`

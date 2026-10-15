@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { Change } from '@/components/ui/Change';
+import { OverlayDemo } from './OverlayDemo';
 import { SheetDemo } from './SheetDemo';
 
 /**
@@ -50,6 +51,10 @@ export default function UiGallery() {
             <p className="text-caption text-fg-3">Caption, the contrast floor</p>
             <p className="text-figure tabular">₹10,42,380.00</p>
           </div>
+        </Section>
+
+        <Section title="Popover, Menu, Tooltip">
+          <OverlayDemo />
         </Section>
 
         <Section title="Sheet">
