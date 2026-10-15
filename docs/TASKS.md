@@ -70,7 +70,7 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [x] **T3.3** `BottomTabs` (under `lg`): Home, Markets, Search, Portfolio, More; safe-area padding; "More" opens a sheet with News, Watchlists, Alerts, Settings. `[M]` *Needs:* T2.10
 - [x] **T3.4** `PortfolioSwitcher`: grouped list (All real, real accounts, paper portfolios) with ModeBadge; writes `?p=`. `[M]` `[BE]` (`kind` on `/api/accounts`)
 - [x] **T3.5** Rebuild `AppShell` from T3.1–T3.4; skip link stays; footer disclaimer. Remove the old top nav. `[M]`
-- [ ] **T3.6** `CommandPalette` v3 styling + "Go to" entries for the new routes + "Add to watchlist" action. `[M]`
+- [ ] **T3.6** `CommandPalette` v3 styling + "Go to" entries for the new routes + "Add to watchlist" action. `[M]` *("Add to watchlist" done 2026-10-15: row button + Shift+Enter)*
 - [ ] **T3.7** Route-level `loading.tsx` and `error.tsx` for `(app)` using the shell skeleton and `ErrorState`. `[S]`
 
 ## Phase 4: Screens
@@ -111,7 +111,7 @@ Each primitive comes with all its states, keyboard support and a short usage com
 
 ### Watchlists and alerts (new)
 - [ ] **T4.25** `/watchlists` (add it to `MORE` in `AppShell.tsx`): list rail (create, rename, delete with undo) + table with sparklines; phone shows lists as a Segmented/Select. `[L]`
-- [ ] **T4.26** Add/remove from watchlist via the symbol header and palette. `[S]`
+- [ ] **T4.26** Add/remove from watchlist via the symbol header and palette. `[S]` *(palette add done; symbol header still open)*
 - [x] **T4.27** `/alerts` list (add it to `MORE` in `AppShell.tsx`): Active, Triggered, Paused tabs. `[M]` `[BE]` alerts
 - [x] **T4.28** Create/edit alert sheet: price cross and % move first; validation; "checked every 60s, delayed data" note. `[M]` `[BE]` alerts
 - [ ] **T4.29** Alerts bell count + triggered list popover in the TopBar. `[S]` `[BE]` *(count done: sidebar badge, phone bell, More tab; all link to `/alerts?tab=triggered`. The popover waits for T2.11 and the TopBar for T3.2.)*

@@ -3,17 +3,18 @@
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { useEffect, useId, useRef, useState } from 'react';
-import { apiGet, errorMessage } from '@/lib/api';
+import { useToast } from '@/components/ui/Toast';
+import { errorMessage } from '@/lib/api';
 import { readStorage, writeStorage } from '@/lib/browser';
-import type { SearchResult } from '@/types/api';
+import { useApi } from '@/lib/useApi';
+import { toOption, useSymbolSearch, type SymbolOption } from '@/lib/useSymbolSearch';
+import { WATCHLIST_CHANGED, addToWatchlist } from '@/lib/watchlist';
+import type { Watchlist } from '@/types/api';
 import { Search, X } from '@/components/ui/icons';
 
 // Recent searches are the signed-in user's own: lib/browser namespaces the
 // key by user id and clears other users' entries on sign-in.
 const RECENT_KEY = 'recent-symbols.v1';
-
-/** Yahoo sends EQUITY / ETF / CRYPTOCURRENCY; show Equity, ETF, Cryptocurrency. */
-const sentenceCase = (s?: string) => (!s ? s : s.length <= 4 ? s : s[0] + s.slice(1).toLowerCase());
 
 function readRecent(): string[] {
   try {
@@ -31,18 +32,24 @@ export function rememberSymbol(symbol: string) {
 
 /**
  * Search, the way into every symbol. A combobox inside a native modal dialog:
- * arrow keys move, Enter opens, Escape closes and returns focus.
+ * arrow keys move, Enter opens, Shift+Enter adds to the watchlist, Escape
+ * closes and returns focus. Each row also has a "+ Watchlist" button for
+ * pointer and touch (kept out of the tab order: the combobox owns focus).
  */
 export function CommandPalette({ open, onClose }: { open: boolean; onClose: () => void }) {
   const router = useRouter();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listId = useId();
+  const hintId = useId();
+  const toast = useToast();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
   const [active, setActive] = useState(0);
-  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
-  const [error, setError] = useState('');
+  const [adding, setAdding] = useState<string | null>(null);
+  const { results, status, error } = useSymbolSearch(query);
+  const lists = useApi<{ watchlists: Watchlist[] }>(open ? '/api/watchlists' : null);
+  const watchlist = lists.data?.watchlists[0];
+  const reloadLists = lists.reload;
 
   useEffect(() => {
     const el = dialogRef.current;
@@ -55,29 +62,28 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
   }, [open]);
 
   useEffect(() => {
-    const q = query.trim();
-    if (!q) return;
-    const controller = new AbortController();
-    const timer = window.setTimeout(() => {
-      setStatus('loading');
-      setResults([]);
-      apiGet<{ quotes: SearchResult[] }>(`/api/search?q=${encodeURIComponent(q)}`, controller.signal)
-        .then((d) => { setResults(d.quotes); setActive(0); setStatus('idle'); })
-        .catch((err) => {
-          if ((err as Error).name === 'AbortError') return;
-          setError(errorMessage(err));
-          setStatus('error');
-        });
-    }, 180);
-    return () => { window.clearTimeout(timer); controller.abort(); };
-  }, [query]);
+    window.addEventListener(WATCHLIST_CHANGED, reloadLists);
+    return () => window.removeEventListener(WATCHLIST_CHANGED, reloadLists);
+  }, [reloadLists]);
 
   // Read on render while open: recents are a small, local convenience.
   const recent = open ? readRecent() : [];
-  const options: { symbol: string; name?: string; meta?: string }[] = query.trim()
-    ? results.map((r) => ({ symbol: r.symbol, name: r.shortname || r.longname,
-                            meta: [sentenceCase(r.quoteType), r.exchDisp].filter(Boolean).join(' · ') }))
-    : recent.map((s) => ({ symbol: s }));
+  const options: SymbolOption[] = query.trim() ? results.map(toOption) : recent.map((s) => ({ symbol: s }));
+  const current = Math.min(active, Math.max(options.length - 1, 0));
+  const inWatchlist = (symbol: string) => Boolean(watchlist?.symbols.includes(symbol));
+
+  const addToList = async (symbol: string) => {
+    if (inWatchlist(symbol) || adding) return;
+    setAdding(symbol);
+    try {
+      await addToWatchlist(symbol, watchlist?.id);
+      toast.show({ message: `Added ${symbol} to your watchlist` });
+    } catch (err) {
+      toast.show({ message: errorMessage(err), tone: 'error' });
+    } finally {
+      setAdding(null);
+    }
+  };
 
   const go = (symbol: string) => {
     rememberSymbol(symbol);
@@ -87,12 +93,14 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
   };
 
   const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowDown') { e.preventDefault(); setActive((a) => Math.min(a + 1, options.length - 1)); }
-    if (e.key === 'ArrowUp') { e.preventDefault(); setActive((a) => Math.max(a - 1, 0)); }
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActive(Math.min(current + 1, options.length - 1)); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); setActive(Math.max(current - 1, 0)); }
     if (e.key === 'Enter') {
       e.preventDefault();
-      const pick = options[active]?.symbol ?? query.trim().toUpperCase();
-      if (pick) go(pick);
+      const pick = options[current]?.symbol ?? query.trim().toUpperCase();
+      if (!pick) return;
+      if (e.shiftKey) void addToList(pick);
+      else go(pick);
     }
   };
 
@@ -104,7 +112,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
       aria-label="Search symbols"
       // sm:bottom-auto: a modal dialog is pinned top and bottom by default, so
       // without it the box stretches to max-height instead of fitting results.
-      className="glass-2 m-0 h-[100dvh] max-h-none w-full max-w-none p-0 text-fg backdrop:bg-black/60 backdrop:backdrop-blur-sm sm:bottom-auto sm:mx-auto sm:mt-[12vh] sm:h-auto sm:max-h-[70vh] sm:w-[min(40rem,calc(100vw-2rem))] sm:rounded-2xl"
+      className="glass-2 m-0 h-[100dvh] max-h-none w-full max-w-none overflow-hidden p-0 text-fg backdrop:bg-black/60 backdrop:backdrop-blur-sm sm:bottom-auto sm:mx-auto sm:mt-[12vh] sm:h-auto sm:max-h-[70vh] sm:w-[min(40rem,calc(100vw-2rem))] sm:rounded-2xl"
     >
       {/* Focus shows on the row's bottom edge, inside the dialog; the field's
           own ring would be drawn outside it and over the dialog border. */}
@@ -115,10 +123,11 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
           role="combobox"
           aria-expanded={options.length > 0}
           aria-controls={listId}
-          aria-activedescendant={options[active] ? `${listId}-${active}` : undefined}
+          aria-activedescendant={options[current] ? `${listId}-${current}` : undefined}
           aria-autocomplete="list"
+          aria-describedby={hintId}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => { setQuery(e.target.value); setActive(0); }}
           onKeyDown={onKeyDown}
           placeholder="Search stocks, ETFs, crypto, FX"
           maxLength={64}
@@ -146,21 +155,40 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
           </p>
         )}
         <ul id={listId} role="listbox" aria-label="Results" className="py-1">
-          {options.map((o, i) => (
-            <li key={o.symbol} id={`${listId}-${i}`} role="option" aria-selected={i === active}
-                onMouseEnter={() => setActive(i)}
-                onMouseDown={(e) => { e.preventDefault(); go(o.symbol); }}
-                // Phones: type and exchange drop to a second line so the name keeps its width.
-                className={clsx('flex min-h-12 cursor-pointer flex-col justify-center gap-0.5 px-4 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4',
-                  i === active ? 'bg-white/[0.06]' : '')}>
-              <span className="flex min-w-0 items-baseline gap-3">
-                <span className="ticker shrink-0 text-body-sm">{o.symbol}</span>
-                {o.name && <span className="truncate text-body-sm text-fg-2">{o.name}</span>}
-              </span>
-              {o.meta && <span className="truncate text-caption text-fg-3 sm:shrink-0">{o.meta}</span>}
-            </li>
-          ))}
+          {options.map((o, i) => {
+            const listed = inWatchlist(o.symbol);
+            return (
+              <li key={o.symbol} id={`${listId}-${i}`} role="option" aria-selected={i === current}
+                  onMouseEnter={() => setActive(i)}
+                  onMouseDown={(e) => { e.preventDefault(); go(o.symbol); }}
+                  className={clsx('flex min-h-12 cursor-pointer items-center justify-between gap-3 px-4 py-2',
+                    i === current ? 'bg-white/[0.06]' : '')}>
+                {/* Phones: type and exchange drop to a second line so the name keeps its width. */}
+                <span className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                  <span className="flex min-w-0 items-baseline gap-3">
+                    <span className="ticker shrink-0 text-body-sm">{o.symbol}</span>
+                    {o.name && <span className="truncate text-body-sm text-fg-2">{o.name}</span>}
+                  </span>
+                  {o.meta && <span className="truncate text-caption text-fg-3 sm:shrink-0">{o.meta}</span>}
+                </span>
+                {listed ? (
+                  <span className="shrink-0 text-caption text-fg-3">In watchlist</span>
+                ) : (
+                  <button type="button" tabIndex={-1} aria-label={`Add ${o.symbol} to watchlist`}
+                          // Own mousedown so the row's "open" doesn't fire as well.
+                          onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); void addToList(o.symbol); }}
+                          className="min-h-11 shrink-0 rounded-sm border border-white/15 px-2.5 text-caption text-fg-2 hover:border-white/30 hover:text-fg">
+                    {adding === o.symbol ? 'Adding' : '+ Watchlist'}
+                  </button>
+                )}
+              </li>
+            );
+          })}
         </ul>
+        {/* Hidden on phones (no Shift key); still read out through aria-describedby. */}
+        <p id={hintId} className="hidden border-t border-white/10 px-4 py-2 text-caption text-fg-3 sm:block">
+          Enter opens a symbol. Shift+Enter adds it to your watchlist.
+        </p>
       </div>
     </dialog>
   );
