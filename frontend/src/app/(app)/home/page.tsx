@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { PageHeader, Panel } from '@/components/PageHeader';
 import { IndicesStrip } from '@/components/home/IndicesStrip';
 import { MarketBreadth } from '@/components/home/MarketBreadth';
+import { TopMovers } from '@/components/home/TopMovers';
 import { Watchlist } from '@/components/home/Watchlist';
 import { PortfolioPulse } from '@/components/portfolio/Summary';
 import { Change } from '@/components/ui/Change';
@@ -98,6 +99,7 @@ export default function Home() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="flex min-w-0 flex-col gap-4">
           <MarketBreadth />
+          <TopMovers />
           <Watchlist />
         </div>
         <div className="flex flex-col gap-4">

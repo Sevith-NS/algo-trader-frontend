@@ -78,7 +78,7 @@ Each primitive comes with all its states, keyboard support and a short usage com
 ### Home (market pulse)
 - [x] **T4.1** Indices strip (India and US indices, session dots, horizontal scroll on phone). `[M]` `[BE]` pulse
 - [x] **T4.2** Breadth bar and sector heat table with India/US segmented control. `[M]` `[BE]` pulse
-- [ ] **T4.3** Movers table (Gainers, Losers, Volume) reusing `DataTable`. `[M]`
+- [ ] **T4.3** Movers table (Gainers, Losers, Volume) reusing `DataTable`. `[M]` *(Gainers/Losers × India/US done on Home, plain table until T2.16. **Volume waits on the API** `[BE]`: neither `/api/movers` nor `/api/market-overview` carries volume (overview hard-codes 0). US is a 15-stock large-cap basket, labelled as such; a real US scan needs a backend source too.)*
 - [ ] **T4.4** "Your day" column: real net worth Figure, paper P&L today (blue), triggered alerts, top 8 watchlist rows. `[M]` *Needs:* T3.4
 - [ ] **T4.5** News on holdings and watchlist (tone-tagged), 5 items + "All news". `[S]`
 - [ ] **T4.6** Assemble the Home layout per `DESIGN.md` §9.1 with phone ordering; all data states. `[M]`
