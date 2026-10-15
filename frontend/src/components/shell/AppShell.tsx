@@ -10,6 +10,7 @@ import {
   ChevronRight, NavAlerts, NavHome, NavMarkets, NavMore, NavNews, NavPortfolio, NavSettings, NavWatchlists, Search, SlidersHorizontal,
   type IconProps,
 } from '@/components/ui/icons';
+import { AlertsBell } from '@/components/alerts/AlertsBell';
 import { Sheet } from '@/components/ui/Sheet';
 import { useAlertCount } from '@/lib/useAlertCount';
 import { CommandPalette } from './CommandPalette';
@@ -25,7 +26,7 @@ const NAV: NavItem[] = [
   { href: '/alerts', label: 'Alerts', icon: NavAlerts },
 ];
 
-// Where the bell and the Alerts badges send you: what fired.
+// Where the Alerts badges send you: what fired. (The phone bell opens a popover of it.)
 const TRIGGERED_HREF = '/alerts?tab=triggered';
 
 // Phone tab bar: the first three NAV items sit in the bar; the rest live in
@@ -128,11 +129,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                     className="grid min-h-11 min-w-11 place-items-center rounded-lg text-fg-2 hover:text-fg">
               <Search size={18} />
             </button>
-            <Link href={TRIGGERED_HREF} aria-label={alertCount ? `Alerts, ${alertCount} new` : 'Alerts'}
-                  className="relative grid min-h-11 min-w-11 place-items-center rounded-lg text-fg-2 hover:text-fg">
+            <AlertsBell count={alertCount} className="relative grid min-h-11 min-w-11 place-items-center rounded-lg text-fg-2 hover:text-fg">
               <NavAlerts size={18} />
               {alertCount > 0 && <CountBadge count={alertCount} className="absolute right-1 top-1.5" />}
-            </Link>
+            </AlertsBell>
             <UserButton>
               <UserButton.MenuItems>
                 <UserButton.Link label="Settings" labelIcon={<SlidersHorizontal size={14} />} href="/settings" />

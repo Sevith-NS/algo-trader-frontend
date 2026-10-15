@@ -114,7 +114,7 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [x] **T4.26** Add/remove from watchlist via the symbol header and palette. `[S]`
 - [x] **T4.27** `/alerts` list (add it to `MORE` in `AppShell.tsx`): Active, Triggered, Paused tabs. `[M]` `[BE]` alerts
 - [x] **T4.28** Create/edit alert sheet: price cross and % move first; validation; "checked every 60s, delayed data" note. `[M]` `[BE]` alerts
-- [ ] **T4.29** Alerts bell count + triggered list popover in the TopBar. `[S]` `[BE]` *(count done: sidebar badge, phone bell, More tab; all link to `/alerts?tab=triggered`. The popover waits for T2.11 and the TopBar for T3.2.)*
+- [ ] **T4.29** Alerts bell count + triggered list popover in the TopBar. `[S]` `[BE]` *(count done: sidebar badge, phone bell, More tab. Popover done on the phone top-bar bell (`AlertsBell`). Desktop has no TopBar yet: add `AlertsBell` there with T3.2.)*
 
 ### News, onboarding, auth
 - [ ] **T4.30** News page: For you / Markets tabs, tone tags, source and time, filters. `[M]`
