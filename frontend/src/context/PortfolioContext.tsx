@@ -10,6 +10,7 @@
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { apiGet, apiPost } from '@/lib/api';
+import { onBrokersChanged } from '@/lib/brokers';
 import type { Account, OrderResult, PositionsResponse, Profile } from '@/types/api';
 
 /** Shape older components read (agents desk, assistant context). */
@@ -66,6 +67,9 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     const id = window.setTimeout(() => { void refresh(); }, 0);
     return () => window.clearTimeout(id);
   }, [refresh]);
+
+  // Broker accounts appear and go when a broker login finishes in another tab.
+  useEffect(() => onBrokersChanged(() => { void refresh(); }), [refresh]);
 
   const placeOrder = useCallback<PortfolioState['placeOrder']>(async (symbol, side, quantity, extra) => {
     if (!account) throw new Error('No paper account yet.');

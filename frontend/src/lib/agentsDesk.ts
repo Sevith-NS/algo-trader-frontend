@@ -1,4 +1,4 @@
-// Client for the multi-agent trading desk (backend/agents_desk.py).
+// Client for the research desk (backend/agents_desk.py).
 //
 // The run endpoint is POST — the paper portfolio travels in the body, not a
 // query string — which rules out EventSource, so the SSE frames are read off
@@ -118,7 +118,7 @@ export async function fetchJournal(symbol?: string, limit = 60): Promise<Journal
   const body = await res.json().catch(() => null);
   if (res.status === 429) throw new DeskRateLimited(retryAfterFrom(res, body));
   if (!res.ok) {
-    throw new Error((body as { error?: string })?.error || 'The decision journal is unavailable.');
+    throw new Error((body as { error?: string })?.error || 'Desk notes are unavailable.');
   }
   return body as JournalResponse;
 }

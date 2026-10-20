@@ -15,6 +15,14 @@ export type Profile = {
 
 export type SyncStatus = 'connected' | 'syncing' | 'needs_reconnect' | 'error';
 
+/** Brokers Polaris can read from (flint_api/brokers). */
+export type BrokerName = 'zerodha' | 'upstox' | 'groww' | 'angel' | 'fyers' | 'dhan' | 'indmoney' | 'binance';
+
+/** oauth: the broker's own login page. keys: the user pastes a read-only token or API key. */
+export type BrokerAuth = 'oauth' | 'keys';
+
+export type BrokerField = { name: string; label: string; secret: boolean };
+
 /** Paper accounts take simulated orders; real ones mirror a broker, read-only. */
 export type Account = {
   id: string;
@@ -24,32 +32,60 @@ export type Account = {
   /** Null for real accounts. */
   starting_cash: string | null;
   created_at: string;
-  broker: 'zerodha' | null;
+  broker: BrokerName | null;
   sync: { connection_id: string; status: SyncStatus; last_synced_at: string | null } | null;
 };
 
 export type BrokerConnection = {
   id: string;
-  broker: 'zerodha';
+  broker: BrokerName;
+  label: string;
+  auth: BrokerAuth;
+  currency: string;
   broker_user_id: string;
   broker_user_name: string | null;
   status: SyncStatus;
-  account_id: string | null;
-  last_synced_at: string | null;
-  token_expires_at: string | null;
+  /** The real account this connection appears as in /api/accounts (same id). */
+  account_id: string;
+  token_expires_at: string;
+  connected_at: string;
+  /** When this browser forgets the connection and its keys, as the user chose. */
+  kept_until: string;
+  /** Kept only until the browser closes. */
+  session_only: boolean;
   last_error: string | null;
   scopes: string[];
-  created_at: string;
 };
+
+/** How long to keep a connection, like a GitHub token's expiration. */
+export type BrokerKeep = 'session' | 'token' | '7d' | '30d' | '90d' | 'custom';
 
 export type BrokersResponse = {
   connections: BrokerConnection[];
-  available: { broker: 'zerodha'; label: string; markets: string[]; configured: boolean }[];
+  max_keep_days: number;
+  available: {
+    broker: BrokerName; label: string; markets: string[]; configured: boolean;
+    /** oauth: the user's own broker-app keys. keys: a pasted read-only token or key. */
+    auth: BrokerAuth; fields: BrokerField[]; help: string; help_url: string;
+    /** Polaris's callback path, to save as the broker app's Redirect URL (oauth only). */
+    callback_path: string | null;
+  }[];
 };
 
-export type SyncResult = { account_id: string; holdings: number; skipped: number; synced_at: string };
+/** One symbol of a broker watchlist: held quantity and today's net position, live from the broker. */
+export type BrokerWatchlistItem = {
+  symbol: string;
+  broker_symbol: string;
+  exchange: string;
+  held: string | null;
+  position: string | null;
+};
 
-/** One synced holding of a real account. Money fields are decimal strings. */
+/** Read-only, one per broker connection; separate from the user's own watchlists. */
+export type BrokerWatchlist = { connection: BrokerConnection; as_of: string; items: BrokerWatchlistItem[] };
+
+/** One holding of a real account, live from the broker. Money fields are decimal strings; cost and
+ * P&L are null where the broker keeps no cost (crypto balances), value where no price is available. */
 export type HoldingRow = {
   symbol: string;
   broker_symbol: string;
@@ -57,11 +93,11 @@ export type HoldingRow = {
   isin: string | null;
   quantity: string;
   currency: string;
-  avg_price: string;
+  avg_price: string | null;
   last_price: string | null;
-  market_value: string;
-  invested: string;
-  unrealized_pnl: string;
+  market_value: string | null;
+  invested: string | null;
+  unrealized_pnl: string | null;
   unrealized_pnl_pct: string | null;
   day_change_pct: string | null;
   fx_rate: string | null;
@@ -71,7 +107,7 @@ export type HoldingRow = {
 
 export type HoldingsResponse = {
   account: { id: string; name: string; kind: 'real'; currency: string };
-  /** When the broker was last synced; prices are as of then. */
+  /** When the holdings were read live from the broker. */
   as_of: string | null;
   base_currency: string;
   holdings: HoldingRow[];

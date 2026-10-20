@@ -7,14 +7,14 @@ import { apiPost, errorMessage } from '../../lib/api';
 import { usePostQuery } from '../../lib/useApi';
 import type { HoldingIntel } from '../../types/intel';
 import {
-  stanceColor, callColor, gradeColor, phaseColor, PHASE_LABELS,
+  stanceColor, gradeColor, phaseColor, PHASE_LABELS,
 } from './format';
 import { tint } from '../../lib/theme';
 
 /**
  * Holdings Intelligence: the same teardown engine that powers the screener,
- * run across every open position — health grade, news stance, market phase
- * and the two-horizon verdict, so a deteriorating holding surfaces itself.
+ * run across every open position — health grade, news stance and market
+ * phase, so a deteriorating holding surfaces itself. Readings, never calls.
  */
 export default function HoldingsIntel({ positions }: { positions: { symbol: string }[] }) {
   // Re-run only when the set of symbols changes, not on every price tick.
@@ -36,7 +36,7 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
         <h2 className="flex items-center gap-2 text-sm font-semibold text-fg">
           <BrainCircuit size={15} className="text-fg-2" /> Holdings Intelligence
           <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-caption text-fg-3">
-            news sweep · fundamentals · phase · verdict
+            news sweep · fundamentals · phase
           </span>
         </h2>
         <button
@@ -68,8 +68,6 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
             }
             const sColor = stanceColor(h.news_stance);
             const pColor = phaseColor(h.phase);
-            const lt = h.verdict?.long_term;
-            const st = h.verdict?.short_term;
             return (
               <div key={h.symbol} className="flex flex-col rounded-xl well p-4">
                 <div className="flex items-start justify-between gap-2">
@@ -106,27 +104,6 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
                     </span>
                   )}
                 </div>
-
-                {(lt || st) && (
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    {lt && (
-                      <div className="rounded-lg bg-white/[0.06] p-2">
-                        <div className="text-caption text-fg-3">Long term</div>
-                        <div className="text-sm font-bold" style={{ color: callColor(lt.call) }}>
-                          {lt.call} <span className="text-caption font-medium text-fg-3">{lt.conviction_10}/10</span>
-                        </div>
-                      </div>
-                    )}
-                    {st && (
-                      <div className="rounded-lg bg-white/[0.06] p-2">
-                        <div className="text-caption text-fg-3">Short term</div>
-                        <div className="text-sm font-bold" style={{ color: callColor(st.call) }}>
-                          {st.call} <span className="text-caption font-medium text-fg-3">{st.conviction_10}/10</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
 
                 {h.top_red_flag && (
                   <div className="mt-2 flex items-center gap-1.5 text-caption text-warn">
@@ -168,8 +145,8 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
       )}
 
       <p className="mt-3 border-t border-line pt-2 text-caption text-fg-3">
-        Same engine as the Terminal teardown, batched across your book. Educational paper-trading
-        research, not investment advice.
+        Same engine as the symbol deep dive, batched across your book. Information only, not
+        investment advice or a recommendation.
       </p>
     </section>
   );

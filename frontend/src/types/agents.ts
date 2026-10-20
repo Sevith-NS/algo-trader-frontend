@@ -1,18 +1,13 @@
-// Wire types for the multi-agent trading desk (backend/agents_desk.py).
+// Wire types for the research desk (backend/agents_desk.py).
 //
 // The backend streams one event per agent turn, so these mirror the event
-// shapes rather than one big response object. Every enum below is already
-// clamped to a closed set server-side — model output never reaches here raw.
+// shapes rather than one big response object. The desk explains and never
+// advises: no event carries a buy/sell call, conviction, target or size of its
+// own. Model output is clamped and trimmed server-side before it gets here.
 
-export type DeskStage =
-  | 'gather' | 'analysts' | 'debate' | 'judge' | 'trader' | 'risk' | 'pm';
+export type DeskStage = 'gather' | 'analysts' | 'debate' | 'summary';
 
-export type DeskCall = 'BUY' | 'HOLD' | 'AVOID';
-export type DeskAction = 'BUY' | 'SELL' | 'HOLD';
 export type DebateSide = 'BULL' | 'BEAR';
-export type DebateWinner = 'BULL' | 'BEAR' | 'SPLIT';
-export type RiskStance = 'SIZE UP' | 'HOLD SIZE' | 'SIZE DOWN' | 'NO TRADE';
-export type Grade = 'HIT' | 'MISS' | 'FLAT' | 'DODGED' | 'MISSED';
 
 export interface QuantLevels {
   entry: number;
@@ -48,20 +43,6 @@ export interface DeskBook {
   top_weights: Record<string, number> | null;
 }
 
-export interface MemoryEntry {
-  id: string;
-  symbol: string;
-  date: string;
-  action: DeskAction;
-  decision: 'APPROVE' | 'REJECT';
-  conviction_10: number | null;
-  size_pct: number | null;
-  thesis: string;
-  grade: Grade | null;
-  alpha_pct: number | null;
-  days_held: number | null;
-}
-
 export interface StatusEvent {
   type: 'status';
   stage: DeskStage;
@@ -75,25 +56,17 @@ export interface ContextEvent {
   company: string;
   price: number | null;
   rounds: number;
-  verdict: {
-    long_term: { call: DeskCall; score: number; conviction_10: number };
-    short_term: { call: DeskCall; score: number; conviction_10: number };
-    pillars: Record<string, number>;
-    interesting_price: number | null;
-  };
+  /** Five pillars, −1…+1, null when a source is down. Readings, never a call. */
+  readings: { pillars: Record<string, number | null> };
   quant: {
-    signal: string;
     composite_score: number;
-    conviction: number;
     factors: Record<string, number>;
-    levels: QuantLevels;
-    position_sizing: Record<string, number>;
+    levels: QuantLevels | null;
   } | null;
   technical: Record<string, unknown> | null;
   news: Record<string, unknown> | null;
   fundamentals: Record<string, unknown> | null;
   portfolio: DeskBook;
-  memory: { same_ticker: MemoryEntry[]; lessons: MemoryEntry[] };
   engines: Record<string, boolean>;
 }
 
@@ -102,9 +75,11 @@ export interface AnalystEvent {
   role: 'fundamentals' | 'technical' | 'news' | 'sentiment';
   label: string;
   report: string;
+  /** How weak (−1) or strong (+1) this slice of the data looks. */
   score: number;
   confidence: number;
   key_points: string[];
+  /** Observable things that would change the reading. */
   flags: string[];
   error?: string;
 }
@@ -121,128 +96,60 @@ export interface DebateEvent {
   error?: string;
 }
 
-export interface JudgeEvent {
-  type: 'judge';
+export interface SummaryEvent {
+  type: 'summary';
   label: string;
-  winner: DebateWinner;
-  stance: DeskCall;
-  conviction_10: number;
-  thesis: string;
-  decisive_argument: string | null;
-  key_risk: string | null;
-  invalidation: string | null;
-  computed_call: DeskCall;
-  agrees_with_engine: boolean;
+  summary: string;
+  going_well: string | null;
+  could_go_wrong: string | null;
+  disagreement: string | null;
+  what_to_watch: string[];
+  plan_explained: string | null;
   error?: string;
 }
 
-export interface TradePlanEvent {
-  type: 'trade_plan';
+/** What the user's own risk-per-trade rule implies. Arithmetic, no model. */
+export interface RulesEvent {
+  type: 'rules';
   label: string;
-  action: DeskAction;
-  horizon_days: number;
-  conviction_10: number;
-  entry_style: string;
-  rationale: string;
-  abort_if: string | null;
-  levels: QuantLevels | null;
-  error?: string;
+  risk_pct: number | null;
+  side: 'long' | 'short' | null;
+  entry: number | null;
+  stop: number | null;
+  equity: number | null;
+  cash: number;
+  existing_position: ExistingPosition | null;
+  risk: Record<string, number | null> | null;
+  top_weights: Record<string, number> | null;
+  shares: number | null;
+  risk_amount: number | null;
+  position_value: number | null;
+  pct_of_equity_after: number | null;
+  capped_by_cash: boolean;
+  notes: string[];
 }
 
-export interface RiskEvent {
-  type: 'risk';
-  seat: 'aggressive' | 'neutral' | 'conservative';
-  label: string;
-  stance: RiskStance;
-  size_pct: number;
-  argument: string;
-  hard_constraint: string | null;
-  error?: string;
-}
-
-export interface DeskSizing {
-  shares: number;
-  notional: number;
-  price: number | null;
-  pct_of_equity: number;
-  capped_at_holding: boolean;
-  note: string | null;
-}
-
-export interface VerdictEvent {
-  type: 'verdict';
-  label: string;
-  decision: 'APPROVE' | 'REJECT';
-  action: DeskAction;
-  size_pct: number;
-  rationale: string;
-  conditions: string[];
-  review_in_days: number;
-  sizing: DeskSizing;
-  committee_average_pct: number;
-  half_kelly_pct: number;
-  error?: string;
-}
-
-export interface JournalOutcome {
-  scored_at: number;
-  days_held: number;
-  bars: number;
-  price_then: number;
-  price_now: number;
-  return_pct: number;
-  benchmark_return_pct: number;
-  alpha_pct: number;
-  signed_alpha_pct: number;
-  grade: Grade;
-}
-
+/**
+ * A note of one desk run. Notes from before 2026-10-20 also carry the old
+ * fields (thesis, action, conviction); the UI reads only the ones below.
+ */
 export interface JournalEntry {
   id: string;
   symbol: string;
   company: string;
   ts: number;
   date: string;
-  decision: 'APPROVE' | 'REJECT';
-  action: DeskAction;
-  size_pct: number;
-  shares: number;
   price: number | null;
-  conviction_10: number;
-  stance: DeskCall;
-  debate_winner: DebateWinner;
   rounds: number;
-  thesis: string | null;
-  key_risk: string | null;
-  invalidation: string | null;
-  trader_action: DeskAction;
-  horizon_days: number;
-  review_in_days: number;
-  analyst_scores: Record<string, number>;
-  computed_call: DeskCall;
-  levels: QuantLevels | null;
-  outcome: JournalOutcome | null;
-}
-
-export interface JournalStats {
-  total: number;
-  graded: number;
-  directional: number;
-  hits: number;
-  misses: number;
-  hit_rate: number | null;
-  avg_signed_alpha_pct: number | null;
-  stand_aside: number;
-  dodged: number;
-  missed_moves: number;
-  best: { id: string; symbol: string; action: DeskAction; date: string; grade: Grade; signed_alpha_pct: number } | null;
-  worst: { id: string; symbol: string; action: DeskAction; date: string; grade: Grade; signed_alpha_pct: number } | null;
+  summary?: string | null;
+  thesis?: string | null;
+  what_to_watch?: string[] | null;
+  analyst_scores?: Record<string, number>;
 }
 
 export interface JournalEvent {
   type: 'journal';
   entry: JournalEntry;
-  stats: JournalStats | null;
 }
 
 /**
@@ -274,9 +181,8 @@ export interface ErrorEvent {
 }
 
 export type DeskEvent =
-  | StatusEvent | ContextEvent | AnalystEvent | DebateEvent | JudgeEvent
-  | TradePlanEvent | RiskEvent | VerdictEvent | JournalEvent | NoticeEvent
-  | DoneEvent | ErrorEvent;
+  | StatusEvent | ContextEvent | AnalystEvent | DebateEvent | SummaryEvent
+  | RulesEvent | JournalEvent | NoticeEvent | DoneEvent | ErrorEvent;
 
 /** Snapshot of GET /api/agents/routing — where desk calls are currently going. */
 export interface RoutingStatus {
@@ -291,6 +197,4 @@ export interface RoutingStatus {
 
 export interface JournalResponse {
   entries: JournalEntry[];
-  stats: JournalStats;
-  rescored: number;
 }

@@ -6,6 +6,7 @@ import { Change } from '@/components/ui/Change';
 import { ModeBadge } from '@/components/ui/ModeBadge';
 import { EmptyState, ErrorState, LoadingBlock, Skeleton } from '@/components/ui/States';
 import { SyncBadge } from '@/components/ui/SyncBadge';
+import { BROKER_LABEL } from '@/lib/brokers';
 import { formatMoney, formatNumber, timeAgo } from '@/lib/format';
 import type { Account, HoldingRow } from '@/types/api';
 import { useRealHoldings } from './useRealHoldings';
@@ -25,10 +26,13 @@ function sumBase(values: (string | null)[]): number | null {
 }
 
 function useReal(accounts: Account[]) {
-  const { data, error, loading, reload } = useRealHoldings(accounts.map((a) => a.id));
+  // Holdings are read live; a broker that needs a reconnect can't be read, and the summary says so.
+  const live = accounts.filter((a) => a.sync?.status === 'connected');
+  const { data: fetched, error, loading, reload } = useRealHoldings(live.map((a) => a.id));
+  const data = live.length ? fetched : [];
   const rows: Row[] = (data ?? []).flatMap((h) =>
     h.holdings.map((r) => ({ ...r, accountName: h.account.name })));
-  return { data, rows, error, loading, reload };
+  return { data, rows, error, loading, reload, live };
 }
 
 /** Header figures for one real account or all of them together. Never mixed with paper. */
@@ -43,8 +47,10 @@ export function RealSummary({ accounts, label }: { accounts: Account[]; label: s
 
   const base = data[0]?.base_currency ?? accounts[0]?.currency ?? 'INR';
   const value = sumBase(data.map((h) => h.totals.market_value_base));
-  const pnl = sumBase(rows.map((r) => (r.fx_rate === null ? null : String(Number(r.unrealized_pnl) * Number(r.fx_rate)))));
-  const invested = sumBase(rows.map((r) => (r.fx_rate === null ? null : String(Number(r.invested) * Number(r.fx_rate)))));
+  // Rows without a known cost (crypto balances) count towards value, not P&L.
+  const costed = rows.filter((r) => r.unrealized_pnl !== null && r.invested !== null);
+  const pnl = sumBase(costed.map((r) => (r.fx_rate === null ? null : String(Number(r.unrealized_pnl) * Number(r.fx_rate)))));
+  const invested = sumBase(costed.map((r) => (r.fx_rate === null ? null : String(Number(r.invested) * Number(r.fx_rate)))));
   const oldest = data.map((h) => h.as_of).filter((t): t is string => Boolean(t)).sort()[0];
   const attention = accounts.filter((a) => a.sync && a.sync.status !== 'connected');
 
@@ -78,17 +84,17 @@ export function RealSummary({ accounts, label }: { accounts: Account[]; label: s
       </dl>
       <div className="mt-4 flex flex-wrap items-center gap-2">
         {accounts.map((a) => a.sync && (
-          <SyncBadge key={a.id} broker={accounts.length > 1 ? a.name : 'Zerodha'} status={a.sync.status}
+          <SyncBadge key={a.id} broker={accounts.length > 1 || !a.broker ? a.name : BROKER_LABEL[a.broker]} status={a.sync.status}
                      lastSyncedAt={a.sync.last_synced_at} />
         ))}
       </div>
       <p className="mt-3 text-caption text-fg-3">
-        Prices as of the last sync{oldest ? ` (${timeAgo(oldest)})` : ''}, not live.
+        Read live from your broker{oldest ? ` ${timeAgo(oldest)}` : ''}. Polaris stores none of it.
         {value === null && ' An exchange rate is unavailable, so the total in your base currency is left out.'}
       </p>
       {attention.length > 0 && (
         <p className="mt-3 text-body-sm text-warn">
-          {attention.length === 1 ? `${attention[0].name} needs` : 'Some accounts need'} your attention to sync again.{' '}
+          {attention.length === 1 ? `${attention[0].name} needs` : 'Some accounts need'} a reconnect before Polaris can read them.{' '}
           <Link href="/settings#brokers-h" className="underline underline-offset-4">Open Brokers in Settings</Link>
         </p>
       )}
@@ -98,7 +104,7 @@ export function RealSummary({ accounts, label }: { accounts: Account[]; label: s
 
 /** Holdings table for real accounts: currency per row, value in the base currency, no trade actions. */
 export function RealHoldings({ accounts }: { accounts: Account[] }) {
-  const { data, rows, error, loading, reload } = useReal(accounts);
+  const { data, rows, error, loading, reload, live } = useReal(accounts);
   const multi = accounts.length > 1;
 
   if (loading && !data) return <LoadingBlock lines={6} label="Loading holdings" />;
@@ -108,9 +114,11 @@ export function RealHoldings({ accounts }: { accounts: Account[] }) {
 
   if (!rows.length) {
     return (
-      <EmptyState title="No holdings synced"
+      <EmptyState title={live.length ? 'No holdings' : 'Reconnect to see holdings'}
                   action={<ButtonLink href="/settings#brokers-h" variant="secondary">Open Brokers</ButtonLink>}>
-        Zerodha returned no equity holdings at the last sync. Sync again from Settings if you&apos;ve bought since.
+        {live.length
+          ? 'Your broker has no NSE or BSE holdings on this account right now.'
+          : 'Your broker session has ended. Reconnect in Settings and your holdings load live again.'}
       </EmptyState>
     );
   }
@@ -121,7 +129,7 @@ export function RealHoldings({ accounts }: { accounts: Account[] }) {
     <section aria-label="Real holdings" className="glass flex flex-col gap-4 rounded-2xl p-5 md:p-6">
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-table">
-          <caption className="sr-only">Real holdings, read-only, as of the last broker sync</caption>
+          <caption className="sr-only">Real holdings, read-only, live from the broker</caption>
           <thead>
             <tr className="border-b border-white/10 text-left text-caption text-fg-3">
               <th scope="col" className="py-2 font-normal">Symbol</th>
@@ -143,13 +151,15 @@ export function RealHoldings({ accounts }: { accounts: Account[] }) {
                 </th>
                 {multi && <td className="py-3 text-fg-2">{r.accountName}</td>}
                 <td className="py-3 text-right tabular">{formatNumber(r.quantity, qtyDigits(r.quantity))}</td>
-                <td className="py-3 text-right tabular">{formatMoney(r.avg_price, r.currency)}</td>
+                <td className="py-3 text-right tabular">{r.avg_price !== null ? formatMoney(r.avg_price, r.currency) : '–'}</td>
                 <td className="py-3 text-right tabular">{r.last_price !== null ? formatMoney(r.last_price, r.currency) : '–'}</td>
                 <td className="py-3 text-right">{r.day_change_pct !== null ? <Change pct={r.day_change_pct} /> : '–'}</td>
                 <td className="py-3 text-right tabular">
                   {r.market_value_base !== null ? formatMoney(r.market_value_base, base) : <span className="text-warn">Unavailable</span>}
                 </td>
-                <td className="py-3 text-right"><Change amount={r.unrealized_pnl} pct={r.unrealized_pnl_pct} currency={r.currency} /></td>
+                <td className="py-3 text-right">
+                  {r.unrealized_pnl !== null ? <Change amount={r.unrealized_pnl} pct={r.unrealized_pnl_pct} currency={r.currency} /> : '–'}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -163,7 +173,8 @@ export function RealHoldings({ accounts }: { accounts: Account[] }) {
               <span className="flex min-w-0 flex-col">
                 <span className="ticker">{r.broker_symbol}</span>
                 <span className="text-caption text-fg-3 tabular">
-                  {formatNumber(r.quantity, qtyDigits(r.quantity))} at {formatMoney(r.avg_price, r.currency)}
+                  {formatNumber(r.quantity, qtyDigits(r.quantity))}
+                  {r.avg_price !== null && ` at ${formatMoney(r.avg_price, r.currency)}`}
                   {multi && ` · ${r.accountName}`}
                 </span>
               </span>
@@ -171,14 +182,16 @@ export function RealHoldings({ accounts }: { accounts: Account[] }) {
                 <span className="tabular">
                   {r.market_value_base !== null ? formatMoney(r.market_value_base, base) : <span className="text-warn">Unavailable</span>}
                 </span>
-                <Change amount={r.unrealized_pnl} pct={r.unrealized_pnl_pct} currency={r.currency} className="text-caption" />
+                {r.unrealized_pnl !== null
+                  && <Change amount={r.unrealized_pnl} pct={r.unrealized_pnl_pct} currency={r.currency} className="text-caption" />}
               </span>
             </Link>
           </li>
         ))}
       </ul>
       <p className="text-caption text-fg-3">
-        Read-only. Prices are from the last broker sync; values in {base} use the latest exchange rate. Polaris can&apos;t trade {multi ? 'these accounts' : 'this account'}.
+        Read-only and live from your broker; values in {base} use the latest exchange rate. Crypto balances carry no
+        purchase price, so they have no P&amp;L. Polaris can&apos;t trade {multi ? 'these accounts' : 'this account'}.
       </p>
     </section>
   );

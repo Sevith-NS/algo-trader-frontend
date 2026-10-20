@@ -1,13 +1,13 @@
 /**
- * The landing page's example plan. Illustrative numbers, labelled as such on
- * the page. They are internally consistent: 34 shares x (2,902.00 - 2,861.40)
- * = 1,380.40 at risk, which is 1% of a 1,38,040 paper balance.
+ * The landing page's example plan. `price` only places the lines on the
+ * illustrative chart and is never shown; the page shows each level's rule.
+ * R is the risk per share, entry minus stop.
  */
 export const LEVELS = [
-  { key: 't2', label: 'Target 2', price: 3023.8, note: '3R' },
-  { key: 't1', label: 'Target 1', price: 2963.0, note: '1.5R' },
-  { key: 'entry', label: 'Entry', price: 2902.0, note: 'limit' },
-  { key: 'stop', label: 'Stop', price: 2861.4, note: '1.5× ATR' },
+  { key: 't2', label: 'Target 2', price: 3023.8, rule: 'Entry + 3 × risk', note: '3R' },
+  { key: 't1', label: 'Target 1', price: 2963.0, rule: 'Entry + 1.5 × risk', note: '1.5R' },
+  { key: 'entry', label: 'Entry', price: 2902.0, rule: 'Your limit price', note: 'limit' },
+  { key: 'stop', label: 'Stop', price: 2861.4, rule: 'Entry − 1.5 × ATR', note: 'ATR' },
 ] as const;
 
 export const LAST_PRICE = 2914.5;
@@ -40,10 +40,3 @@ export const CANDLES: Candle[] = (() => {
   }
   return out;
 })();
-
-const inr = new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-/** ₹2,902.00, or −₹1,380.40 with a true minus sign. */
-export function formatInr(value: number) {
-  return `${value < 0 ? '−' : ''}₹${inr.format(Math.abs(value))}`;
-}

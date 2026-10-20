@@ -128,7 +128,7 @@ function DataAndPrivacy() {
   return (
     <div className="flex max-w-xl flex-col gap-6">
       <div className="flex flex-col items-start gap-2">
-        <p className="text-body-sm text-fg-2">Download everything Polaris stores about you: profile, paper account, every fill, watchlists, your decision journal, broker connections (never their access tokens), synced holdings and alerts.</p>
+        <p className="text-body-sm text-fg-2">Download everything Polaris stores about you: profile, paper account, every fill, watchlists, your desk notes, broker connections (never their access tokens), synced holdings and alerts.</p>
         <Button variant="secondary" onClick={exportData} loading={exporting}>Export my data</Button>
       </div>
       <div className="flex flex-col items-start gap-2 border-t border-line pt-6">

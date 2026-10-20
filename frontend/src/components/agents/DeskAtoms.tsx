@@ -37,38 +37,6 @@ export function ScoreBar({ score, height = 6 }: { score: number; height?: number
   );
 }
 
-/** Conviction /10 as a filled meter. */
-export function ConvictionMeter({ value, color }: { value: number; color: string }) {
-  return (
-    <div className="flex items-center gap-2">
-      <div className="h-1.5 w-20 overflow-hidden bg-white/[0.06]">
-        <div
-          className="h-full"
-          style={{ width: `${Math.max(0, Math.min(10, value)) * 10}%`, background: color }}
-        />
-      </div>
-      <span className="text-caption tabular text-fg-2">{value}/10</span>
-    </div>
-  );
-}
-
-/** A coloured pill for a call, action, stance or grade. */
-export function Chip({
-  label, color, size = 'sm', title,
-}: { label: string; color: string; size?: 'sm' | 'lg'; title?: string }) {
-  return (
-    <span
-      title={title}
-      className={clsx(
-        'inline-block whitespace-nowrap rounded-md font-semibold',
-        size === 'lg' ? 'px-2.5 py-0.5 text-lg font-bold tracking-tight' : 'px-1.5 py-0.5 text-caption',
-      )}
-      style={{ color, background: tint(color, 10) }}
-    >
-      {label}
-    </span>
-  );
-}
 
 /** A tinted panel keyed to an accent, matching the AI Deep Dive treatment. */
 export function TintPanel({

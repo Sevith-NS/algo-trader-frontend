@@ -20,12 +20,6 @@ export function KV({ label, children, hint }: { label: string; children: ReactNo
   );
 }
 
-export function SignalLabel({ action }: { action?: string }) {
-  if (action === 'buy') return <span className="text-up"><span aria-hidden="true">{'▲'} </span>Long</span>;
-  if (action === 'sell') return <span className="text-down"><span aria-hidden="true">{'▼'} </span>Short</span>;
-  return <span className="text-fg-2">No trade</span>;
-}
-
 /** Overview column: the plan in one glance, sized to the user's own risk. */
 export function PlanSummary({ quant, currency, size, baseCurrency, riskPct, onTrade, canTrade, fractional }: {
   quant: QuantSignals | undefined;
@@ -50,7 +44,7 @@ export function PlanSummary({ quant, currency, size, baseCurrency, riskPct, onTr
         </EmptyState>
       ) : (
         <dl>
-          <KV label="Signal" hint={`${Math.round(quant.conviction * 100)}% conviction`}><SignalLabel action={quant.action} /></KV>
+          <KV label="Plan side">{l.side === 'short' ? 'Short' : 'Long'}</KV>
           <KV label="Entry" hint="limit">{formatMoney(l.entry, currency)}</KV>
           <KV label="Stop" hint={l.atr_stop_mult ? `${l.atr_stop_mult.toFixed(1)}× ATR` : undefined}>{formatMoney(l.stop_loss, currency)}</KV>
           <KV label="Target 1" hint={l.r_multiple_1 ? `${l.r_multiple_1.toFixed(1)}R` : undefined}>{formatMoney(l.target_1, currency)}</KV>
@@ -64,6 +58,7 @@ export function PlanSummary({ quant, currency, size, baseCurrency, riskPct, onTr
         </dl>
       )}
       {size?.cappedByCash && <p className="text-caption text-warn">Cash limits this size below your risk budget.</p>}
+      <p className="text-caption text-fg-3">Levels computed from price history by a published formula. Not a recommendation; you decide whether to trade.</p>
       <Button onClick={onTrade} disabled={!canTrade}>Paper trade</Button>
     </section>
   );
@@ -104,14 +99,13 @@ function FactorBar({ label, value }: { label: string; value: number }) {
 }
 
 /** Plan tab: how the plan was reached, every input visible. */
-export function PlanDetail({ quant, ml, currency, price }: {
-  quant: QuantSignals | undefined; ml: MlInsights | undefined; currency: string; price: number | null;
+export function PlanDetail({ quant, ml, currency }: {
+  quant: QuantSignals | undefined; ml: MlInsights | undefined; currency: string;
 }) {
   if (!quant?.levels) {
     return <EmptyState title="No plan for this symbol">There isn&apos;t enough clean price history to compute a plan.</EmptyState>;
   }
   const l = quant.levels;
-  const sz = quant.position_sizing;
   const ind = quant.indicators;
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -128,21 +122,9 @@ export function PlanDetail({ quant, ml, currency, price }: {
 
       {quant.factors && (
         <section aria-labelledby="factors-h" className="glass rounded-2xl p-5 md:p-6 flex flex-col gap-3">
-          <h2 id="factors-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />Factor votes</h2>
-          <p className="text-caption text-fg-3">Each factor votes from {'−'}1 (sell) to +1 (buy); the plan follows their weighted sum.</p>
+          <h2 id="factors-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />Factor readings</h2>
+          <p className="text-caption text-fg-3">Each factor reads from {'−'}1 (weaker on that measure) to +1 (stronger). The levels are solved from their weighted sum, the composite score.</p>
           <div>{Object.entries(quant.factors).map(([k, v]) => <FactorBar key={k} label={k} value={v} />)}</div>
-        </section>
-      )}
-
-      {sz && (
-        <section aria-labelledby="kelly-h" className="glass rounded-2xl p-5 md:p-6 flex flex-col gap-3">
-          <h2 id="kelly-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />Kelly sizing</h2>
-          <p className="text-caption text-fg-3">An estimate from this symbol&apos;s unconditional daily returns, not from backtested trades of this signal. Your risk-per-trade size on Overview is the one to use.</p>
-          <dl>
-            <KV label="Half-Kelly allocation">{formatPct(sz.recommended_fraction * 100, 1).replace('+', '')} of equity</KV>
-            <KV label="Historical win rate">{formatPct(sz.win_rate * 100, 1).replace('+', '')}</KV>
-            <KV label="Payoff ratio">{sz.payoff_ratio}{'×'}</KV>
-          </dl>
         </section>
       )}
 
@@ -170,9 +152,6 @@ export function PlanDetail({ quant, ml, currency, price }: {
           <p className="text-caption text-fg-3">These models are scored on the same history they learned from, so they overstate their own accuracy. Treat them as context, not a signal.</p>
           <dl>
             <KV label="Next day up (XGBoost)">{formatPct(ml.xgboost_probability * 100, 0).replace('+', '')}</KV>
-            <KV label="7-day forecast (Prophet)" hint={price ? formatPct(((ml.prophet_7d_forecast - price) / price) * 100, 1) : undefined}>
-              {formatMoney(ml.prophet_7d_forecast, currency)}
-            </KV>
             <KV label="News sentiment">{ml.fear_greed_index} of 100</KV>
           </dl>
         </section>

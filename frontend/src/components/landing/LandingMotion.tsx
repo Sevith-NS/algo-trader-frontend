@@ -7,7 +7,6 @@ import { SplitText } from 'gsap/SplitText';
 import { useGSAP } from '@gsap/react';
 import type LocomotiveScroll from 'locomotive-scroll';
 import 'locomotive-scroll/locomotive-scroll.css';
-import { formatInr } from './planData';
 
 gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP);
 
@@ -15,7 +14,7 @@ gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP);
  * All landing-page motion (docs/DESIGN.md §6.3). The markup is server-rendered
  * finished; this only animates it, so no-JS and reduced-motion visitors get a
  * complete static page. Locomotive Scroll (Lenis underneath) runs on GSAP's
- * ticker so ScrollTrigger stays in sync. Two pinned sections at most.
+ * ticker so ScrollTrigger stays in sync. One pinned section (real/paper).
  */
 export function LandingMotion({ children }: { children: React.ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
@@ -140,13 +139,13 @@ export function LandingMotion({ children }: { children: React.ReactNode }) {
           .to(realFace, { autoAlpha: 0, y: -24, scale: 0.98, duration: 1 }, 0.3)
           .to(paperFace, { autoAlpha: 1, y: 0, duration: 1 }, 0.5);
 
-        /* ------------------------------------------- pinned 2: the plan -- */
-        const plan = q('[data-pin-plan]')[0];
+        /* ------------------------------------------------------ the plan -- */
+        // Not pinned or scrubbed: the chart draws itself once as the section
+        // comes into view, so it's never left half drawn mid-scroll.
+        const plan = q('[data-plan]')[0];
         const tl = gsap.timeline({
           defaults: { ease: 'power2.out' },
-          scrollTrigger: pinning
-            ? { trigger: plan, start: 'top top', end: '+=200%', pin: true, scrub: 0.8, anticipatePin: 1 }
-            : { trigger: plan, start: 'top 70%', end: 'bottom 70%', scrub: 0.8 },
+          scrollTrigger: { trigger: plan, start: 'top 65%', toggleActions: 'play none none none' },
         });
         tl.from(q('[data-candle]'), { scaleY: 0, autoAlpha: 0, transformOrigin: '50% 50%', stagger: 0.03, duration: 0.4 })
           .from(q('[data-zone]'), { autoAlpha: 0, duration: 0.4 }, '>-0.2');
@@ -155,30 +154,9 @@ export function LandingMotion({ children }: { children: React.ReactNode }) {
             .from(q('[data-level-label]')[i], { x: 16, autoAlpha: 0, duration: 0.3 }, '<0.2');
         });
 
-        // Count-ups write textContent, which GSAP's revert won't undo: restore.
-        const restore: (() => void)[] = [];
-        const countUp = (out: HTMLElement, onto: gsap.core.Timeline | null) => {
-          const target = Number(out.dataset.count);
-          const kind = out.dataset.kind;
-          const final = out.textContent;
-          restore.push(() => { out.textContent = final; });
-          const c = { v: 0 };
-          const write = () => {
-            out.textContent = kind === 'inr' ? formatInr(c.v)
-              : kind === 'int-in' ? Math.round(c.v).toLocaleString('en-IN')
-              : kind === 'dec' ? c.v.toFixed(final?.includes('.') ? 1 : 0)
-              : `${Math.round(c.v)}`;
-          };
-          const vars = { v: target, duration: onto ? 0.45 : 1.4, ease: 'power2.out', onUpdate: write, onComplete: () => { out.textContent = final; } };
-          if (onto) onto.to(c, vars, '<');
-          else gsap.to(c, { ...vars, scrollTrigger: { trigger: out, start: 'top 85%', once: true } });
-        };
         q('[data-ticket-row]').forEach((row) => {
           tl.from(row.children, { autoAlpha: 0.15, duration: 0.25 }, '>-0.1');
-          const out = row.querySelector<HTMLElement>('[data-count]');
-          if (out) countUp(out, tl);
         });
-        q<HTMLElement>('dl [data-count]').forEach((out) => { if (!out.closest('[data-ticket-row]')) countUp(out, null); });
 
         document.fonts?.ready.then(() => ScrollTrigger.refresh());
 
@@ -187,7 +165,6 @@ export function LandingMotion({ children }: { children: React.ReactNode }) {
           anchors.forEach((a) => a.removeEventListener('click', onAnchor));
           logo?.removeEventListener('click', onLogo);
           loco?.destroy();
-          restore.forEach((fn) => fn());
           gsap.ticker.lagSmoothing(500, 33);
         };
       },

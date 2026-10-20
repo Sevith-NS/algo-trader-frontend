@@ -70,6 +70,7 @@ async function forward(req: NextRequest, { params }: Ctx) {
         authorization: `Bearer ${token}`,
         accept: req.headers.get('accept') ?? 'application/json',
         ...(body ? { 'content-type': req.headers.get('content-type') ?? 'application/json' } : {}),
+        ...brokerSessions(req),
       },
       body,
       cache: 'no-store',
@@ -85,8 +86,52 @@ async function forward(req: NextRequest, { params }: Ctx) {
     const value = upstream.headers.get(name);
     if (value) headers.set(name, value);
   }
+  setBrokerCookies(headers, upstream.headers.get(BROKER_COOKIES_HEADER));
   // Streams (SSE) pass straight through, unbuffered.
   return new Response(upstream.body, { status: upstream.status, headers });
+}
+
+// Broker connections are sealed cookies (flint_api/broker_jar.py), never stored
+// server side. httpOnly: no script in the page can read them; only this
+// handler passes them to the API and writes back what the API returns.
+const BROKER_COOKIE = /^pb_(state|[0-9a-f]{32})$/;
+// Browsers keep cookies up to ~4096 bytes including the name and attributes.
+const BROKER_VALUE = /^[A-Za-z0-9_-]{1,3900}$/;
+const BROKER_COOKIES_HEADER = 'x-broker-cookies';
+
+function brokerSessions(req: NextRequest): Record<string, string> {
+  const pairs = req.cookies.getAll()
+    .filter((c) => BROKER_COOKIE.test(c.name) && BROKER_VALUE.test(c.value))
+    .map((c) => `${c.name}=${c.value}`);
+  return pairs.length ? { 'x-broker-sessions': pairs.join(';') } : {};
+}
+
+// Path: only this handler ever needs them, so page loads don't carry them.
+// Strict: the callback page reads them with a same-origin fetch after the
+// broker's redirect lands, never on the cross-site navigation itself.
+const BROKER_COOKIE_ATTRS = 'Path=/api/backend; HttpOnly; SameSite=Strict';
+
+function setBrokerCookies(headers: Headers, raw: string | null) {
+  if (!raw) return;
+  // max_age null: a browser-session cookie (the user chose "this session").
+  let changes: { name: string; value: string | null; max_age: number | null }[];
+  try {
+    changes = JSON.parse(raw);
+  } catch {
+    return;
+  }
+  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
+  for (const c of changes) {
+    if (!BROKER_COOKIE.test(c.name) || (c.value !== null && !BROKER_VALUE.test(c.value))) continue;
+    if (c.value === null) {
+      headers.append('set-cookie', `${c.name}=; ${BROKER_COOKIE_ATTRS}; Max-Age=0${secure}`);
+      // Cookies set before the path was narrowed lived at Path=/.
+      headers.append('set-cookie', `${c.name}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax${secure}`);
+      continue;
+    }
+    const maxAge = c.max_age === null ? '' : `; Max-Age=${Math.max(0, Math.floor(c.max_age))}`;
+    headers.append('set-cookie', `${c.name}=${c.value}; ${BROKER_COOKIE_ATTRS}${maxAge}${secure}`);
+  }
 }
 
 export const GET = forward;

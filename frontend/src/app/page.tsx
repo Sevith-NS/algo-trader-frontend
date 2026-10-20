@@ -2,51 +2,40 @@ import { Show, SignInButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { LandingMotion } from '@/components/landing/LandingMotion';
+import { FxCard, MarketCard, getLandingMarkets, tapeItems, Change } from '@/components/landing/LiveMarkets';
 import { PlanChart } from '@/components/landing/PlanChart';
-import { LEVELS, formatInr } from '@/components/landing/planData';
+import { LEVELS } from '@/components/landing/planData';
 import { Wordmark } from '@/components/shell/AppShell';
 import { buttonClass } from '@/components/ui/Button';
 
 /**
  * Landing page, brand register (docs/DESIGN.md §9.6). Server-rendered in its
  * finished state; LandingMotion only animates it, so no-JS and reduced-motion
- * visitors get the complete page. Every figure is sample data and says so.
+ * visitors get the complete page. No invented figures: market numbers are
+ * live (LiveMarkets, sourced and timed), and the plan chart is marked illustrative.
+ * Copy describes and explains; it never recommends a trade (SEBI IA/RA rules).
  */
 
 const gutter = 'px-4 md:px-8 xl:px-12';
 const micro = 'text-micro uppercase';
 
 const TAPE = [
-  ['NIFTY 50', '24,812.35', 0.62], ['SENSEX', '81,377.90', 0.54], ['BANK NIFTY', '52,104.10', -0.21],
-  ['S&P 500', '5,812.44', 0.31], ['NASDAQ', '18,402.77', 0.88], ['USD/INR', '84.07', -0.04],
-  ['RELIANCE', '2,914.50', 1.33], ['NVDA', '138.21', 2.14], ['INFY', '1,886.00', -1.94], ['HDFCBANK', '1,712.60', 1.21],
+  'NIFTY 50', 'SENSEX', 'BANK NIFTY', 'NIFTY MIDCAP 100', 'S&P 500', 'NASDAQ', 'DOW JONES', 'USD/INR',
+  'NSE', 'BSE', 'NYSE', 'NASDAQ GS',
 ] as const;
 
 const DESK = [
-  { seat: 'Technical', verdict: 'Long bias', body: 'Price reclaimed the 50-day average on 1.8× volume. RSI 58, not stretched.', src: 'Daily bars · 15m delayed' },
-  { seat: 'Fundamentals', verdict: 'Neutral', body: 'P/E 24 against a 5-year median of 26. Margins flat for three quarters.', src: 'Quarterly filings' },
-  { seat: 'News', verdict: 'Mildly positive', body: 'Two sources on capacity expansion. One single-source rumour ignored.', src: '14 articles · tone scored' },
-  { seat: 'Risk committee', verdict: 'Size capped', body: 'Adding this takes energy to 31% of the book. Size cut to keep it under 25%.', src: 'Your rules · your portfolio' },
+  { seat: 'Technical', focus: 'Trend and momentum', body: 'Where price sits against its moving averages and how volume compares, with the bars it read.', src: 'Daily bars · delay shown' },
+  { seat: 'Fundamentals', focus: 'Valuation', body: 'Valuation against the company’s own history, and the margin trend from its filings.', src: 'Quarterly filings' },
+  { seat: 'News', focus: 'Coverage', body: 'What sources report, with single-source claims flagged instead of counted.', src: 'Linked articles · tone scored' },
+  { seat: 'Risk committee', focus: 'Your rules', body: 'Checks the idea against limits you set, like the most one name may take of your book.', src: 'Your rules · your portfolio' },
 ];
 
 const RISK = [
-  { label: 'One-day VaR, 95%', value: 18200, kind: 'inr', note: 'On a bad day, 1 in 20, you could lose about this much.' },
-  { label: 'Max drawdown, 1 year', value: 8.4, kind: 'pct-down', note: 'The deepest peak-to-trough fall your holdings took.' },
-  { label: 'Largest position', value: 31, kind: 'pct', note: 'Share of the book in one name. Your rule says 25%.' },
+  { label: 'One-day VaR, 95%', title: 'A bad day', note: 'About how much your holdings could lose on a bad day, one day in twenty.' },
+  { label: 'Max drawdown', title: 'Deepest fall', note: 'The biggest peak-to-trough drop your holdings took over the period.' },
+  { label: 'Concentration', title: 'Largest position', note: 'Share of the book in one name, checked against the limit you set.' },
 ];
-
-function Sign({ up }: { up: boolean }) {
-  return <span aria-hidden="true" className="text-[0.75em]">{up ? '▲' : '▼'}</span>;
-}
-
-function Pct({ value, className = '' }: { value: number; className?: string }) {
-  const up = value >= 0;
-  return (
-    <span className={`inline-flex items-center gap-1 tabular ${up ? 'text-up' : 'text-down'} ${className}`}>
-      <Sign up={up} />{up ? '+' : '−'}{Math.abs(value).toFixed(2)}%
-    </span>
-  );
-}
 
 function SectionHead({ kicker, title, body, id }: { kicker: string; title: ReactNode; body?: string; id: string }) {
   return (
@@ -60,58 +49,31 @@ function SectionHead({ kicker, title, body, id }: { kicker: string; title: React
   );
 }
 
-/* ------------------------------------------------------- hero cards -- */
+/* ------------------------------------------------- compare and FAQ -- */
 
-function AllocationCard() {
-  return (
-    <div data-hero-card className="glass-hero w-full rounded-2xl p-6">
-      <p className="flex items-center gap-3"><span aria-hidden="true" className="ring-dot text-fg" /><span className={`${micro} text-fg`}>Allocation</span></p>
-      <div className="mt-5 flex items-baseline gap-5 pl-[34px]">
-        <p><span className="block text-h1 tabular">64%</span><span className="text-body-sm text-fg-2">India</span></p>
-        <span aria-hidden="true" className="text-h1 text-fg-2">/</span>
-        <p><span className="block text-h1 tabular">36%</span><span className="text-body-sm text-fg-2">US</span></p>
-      </div>
-      <p className="mt-6 pl-[34px]"><span className="pill text-fg">Rebalance needed</span></p>
-      <p className="mt-2 pl-[34px] text-body-sm text-fg-2">US equities drifted 4.2% over target</p>
-    </div>
-  );
-}
+// Only claims checked against each company's own pages (Oct 2026). Facts, no adjectives.
+const COMPARE: { row: string; cells: [string, string, string, string] }[] = [
+  { row: 'What it is', cells: ['Read-only tracker and paper desk', 'Model portfolios you buy through your broker', 'Research and screener platform', 'Back office for a Zerodha account'] },
+  { row: 'Who decides what to buy', cells: ['You. Polaris never recommends', 'SEBI-registered basket managers', 'You. Content is informational', 'You'] },
+  { row: 'SEBI status', cells: ['Not registered; a software tool', 'Managers are registered RAs, RIAs or PMS', 'No RA or IA licence', 'Registered stockbroker'] },
+  { row: 'Price', cells: ['Free during the beta', '₹100 or 1.5% per buy, plus any manager fee', 'Free tier; Pro from ₹399 a month', 'Included with the account'] },
+];
 
-function NetWorthCard() {
-  return (
-    <div data-hero-card className="glass-hero w-full rounded-2xl p-6">
-      <p className="flex items-center justify-between">
-        <span className={`${micro} text-fg`}>Real net worth</span>
-        <span className="text-caption text-fg-2">Zerodha · Upstox</span>
-      </p>
-      <p className="mt-4 flex flex-wrap items-baseline gap-3">
-        <span className="text-[40px] font-medium leading-none tracking-[-0.03em] tabular">₹1,84,20,500</span>
-        <Pct value={2.4} className="text-body-sm" />
-      </p>
-      <svg viewBox="0 0 400 120" className="dot-grid mt-5 h-28 w-full" aria-hidden="true">
-        <path data-draw d="M0 104 C40 96 60 76 96 80 S150 98 186 86 236 46 276 54 330 74 360 58 392 30 400 28"
-              fill="none" stroke="rgb(255 255 255 / 0.75)" strokeWidth="2" />
-      </svg>
-    </div>
-  );
-}
-
-function PaperCard() {
-  return (
-    <div data-hero-card className="glass-hero glass-paper w-full rounded-2xl p-6">
-      <p className="flex items-center justify-between">
-        <span className="pill text-paper">Paper</span>
-        <span className="text-caption text-fg-2">Swing book</span>
-      </p>
-      <p className="mt-4 text-body-sm text-fg-2">Today, simulated</p>
-      <p className="mt-1 flex items-baseline gap-3"><span className="text-h3 tabular">+₹8,420.00</span><Pct value={0.84} className="text-body-sm" /></p>
-    </div>
-  );
-}
+const FAQ: [string, ReactNode][] = [
+  ['Is this investment advice?', 'No. Polaris is a software tool. It is not registered with SEBI as an Investment Adviser or Research Analyst, and never tells you what to buy or sell. You pick the stock, the method and the risk; Polaris does the arithmetic and shows its working.'],
+  ['Who sets the entry and stop?', 'You do, by choosing the method and your risk per trade. Every formula and every input is on screen, and plans only place paper orders.'],
+  ['Where does the data come from, and how old is it?', 'Market data comes from Yahoo Finance and NSE public pages, and news from Google News. Quotes can be delayed. Every figure shows its source and time.'],
+  ['What can Polaris do with my broker login?', 'Read your holdings and today’s positions. Nothing else: there is no order button on a real account. The access token is encrypted into a cookie in your own browser, sent only to read your holdings, and never stored on our servers. Disconnect any time and it is gone.'],
+  ['How does Polaris make money?', 'It doesn’t yet; it’s free during the beta. We take no commissions from brokers, basket managers or referrals, and no stock is ever featured for pay.'],
+  ['When do US brokers come?', 'US markets are live today. Syncing US broker holdings is planned; until then Polaris says so plainly instead of pretending.'],
+  ['How do I delete my data?', 'Settings → Delete account removes everything Polaris stores, and Settings → Export gives you a copy first.'],
+];
 
 /* ------------------------------------------------------------- page -- */
 
-export default function Landing() {
+export default async function Landing() {
+  const markets = await getLandingMarkets();
+  const tape = tapeItems(markets, TAPE);
   return (
     <LandingMotion>
       <div className="relative min-h-[100dvh] overflow-x-clip bg-ink-0">
@@ -128,6 +90,7 @@ export default function Landing() {
               <a href="#plan" data-anchor className="hover:text-fg">Plans</a>
               <a href="#desk" data-anchor className="hover:text-fg">AI desk</a>
               <a href="#trust" data-anchor className="hover:text-fg">Security</a>
+              <a href="#faq" data-anchor className="hover:text-fg">FAQ</a>
             </nav>
             <div className="ml-auto flex items-center gap-3">
               <Show when="signed-out">
@@ -146,14 +109,13 @@ export default function Landing() {
         <main>
           {/* ------------------------------------------------------ hero -- */}
           <section data-hero aria-labelledby="hero-h" className="relative isolate grid min-h-[100dvh] lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-            <div className={`relative flex flex-col items-center justify-center gap-8 pb-16 pt-32 text-center ${gutter}`}>
-              <span data-hero-in className={`pill ${micro} text-fg`}>India + US · Real + paper</span>
+            <div className={`relative flex flex-col items-center justify-center gap-8 pb-16 lg:mt-10 md:mt-36 mt-44 text-center ${gutter}`}>
               <h1 id="hero-h" data-hero-title
-                  className="text-silver max-w-[16ch] text-[clamp(3rem,6.2vw,6.25rem)] font-normal leading-[0.98] tracking-[-0.04em]">
-                See everything you own. Test everything you don&apos;t.
+                  className="text-silver max-w-[16ch] text-[clamp(3rem,6.2vw,6.25rem)] pb-[0.14em] font-normal leading-[0.98] tracking-[-0.04em]">
+                India and US markets. One honest view.
               </h1>
               <p data-hero-in className="max-w-xl text-body text-fg-2 md:text-h4 md:font-normal">
-                Polaris reads your Zerodha and Upstox holdings, tracks India and US markets, and gives you a paper desk for every idea before real money moves.
+                Sync your Indian broker read-only, follow both markets live, and test every idea on paper with maths you can see. US holdings coming.
               </p>
               <div data-hero-in className="flex flex-wrap justify-center gap-4">
                 <Show when="signed-out">
@@ -164,19 +126,19 @@ export default function Landing() {
                   <Link href="/home" className={buttonClass('primary', 'lg')}>Open Polaris</Link>
                 </Show>
               </div>
-              <p data-hero-in className="mt-6 text-caption text-fg-3">
-                Reads from Zerodha and Upstox · Markets NSE, BSE, NYSE, NASDAQ · Invite only
+              <p data-hero-in className="text-caption text-fg-3 mb-20">
+                Broker sync: Zerodha · Markets NSE, BSE, NYSE, NASDAQ · No commissions · Invite only
               </p>
             </div>
 
             <div className="relative flex flex-col justify-center gap-4 px-4 pb-16 pt-10 sm:px-10 lg:pt-28 xl:px-16">
               <div aria-hidden="true" className="bloom left-[40%] top-[40%] h-[min(1000px,100vw)] w-[min(1000px,80vw)] -translate-x-1/2 -translate-y-1/2" />
               <div data-light-cards className="relative mx-auto flex w-full max-w-[420px] flex-col gap-4">
-                <AllocationCard />
-                <NetWorthCard />
-                <PaperCard />
+                <MarketCard title="India" market={markets?.india ?? null} />
+                <MarketCard title="United States" market={markets?.us ?? null} />
+                <FxCard fx={markets?.fx ?? null} />
                 <p data-hero-card className="text-center">
-                  <span className="pill bg-ink-0/85 text-fg">Sample data</span>
+                  <span className="pill bg-ink-0/85 text-fg">Live, delayed market data</span>
                 </p>
               </div>
             </div>
@@ -190,11 +152,11 @@ export default function Landing() {
             <div className="bloom left-[-10%] top-[calc(50%+460px)] h-[min(1500px,200vw)] w-[min(1700px,220vw)] -translate-x-1/2 -translate-y-1/2 [--b:0.65]" />
             <div className="overflow-hidden py-6 [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
               <div data-tape className="flex w-max gap-10 whitespace-nowrap">
-                {[...TAPE, ...TAPE].map(([name, value, pct], i) => (
+                {[...tape, ...tape].map((t, i) => (
                   <span key={i} className="flex items-center gap-3 text-body-sm">
-                    <span className={`${micro} text-fg-2`}>{name}</span>
-                    <span className="tabular text-fg">{value}</span>
-                    <Pct value={pct} />
+                    <span className={`${micro} text-fg-2`}>{t.name}</span>
+                    {t.value !== null && <span className="tabular text-fg">{t.value}</span>}
+                    {t.value !== null && <Change pct={t.pct} />}
                   </span>
                 ))}
               </div>
@@ -217,7 +179,7 @@ export default function Landing() {
           </section>
 
           {/* ------------------------------------------ pinned 2: plan -- */}
-          <section id="plan" data-pin-plan aria-labelledby="plan-h" className={`relative isolate py-24 md:py-32 ${gutter}`}>
+          <section id="plan" data-plan aria-labelledby="plan-h" className={`relative isolate py-24 md:py-32 ${gutter}`}>
             <div className="mx-auto flex max-w-[1400px] flex-col gap-12 lg:min-h-[90dvh] lg:justify-center">
               <SectionHead id="plan-h" kicker="From symbol to plan" title="The plan comes before the button."
                            body="Entry, stop, two targets and a size that risks exactly what you chose. Shown before any paper order, every time." />
@@ -225,8 +187,8 @@ export default function Landing() {
                 <div aria-hidden="true" className="bloom left-[62%] top-[55%] h-[min(1200px,170vw)] w-[min(1900px,200vw)] -translate-x-1/2 -translate-y-1/2 [--b:0.85]" />
                 <div className="glass rounded-2xl p-4 md:p-6">
                   <p className="mb-4 flex items-center justify-between">
-                    <span className={`${micro} text-fg`}>RELIANCE.NS · Daily</span>
-                    <span className="text-caption text-fg-3">Illustrative</span>
+                    <span className={`${micro} text-fg`}>Example · Daily candles</span>
+                    <span className="text-caption text-fg-3">Illustrative, not market data</span>
                   </p>
                   <PlanChart />
                 </div>
@@ -236,18 +198,17 @@ export default function Landing() {
                     {[...LEVELS].reverse().map((l) => (
                       <div key={l.key} data-ticket-row className="flex items-baseline justify-between border-t border-white/[0.07] py-3">
                         <dt className="text-body-sm text-fg-2">{l.label}</dt>
-                        <dd className={`tabular ${l.key === 'stop' ? 'text-down' : 'text-fg'}`}>
-                          <span data-count={l.price} data-kind="inr">{formatInr(l.price)}</span>
-                          <span className="ml-2 text-caption text-fg-3">{l.note}</span>
+                        <dd className={`text-right ${l.key === 'stop' ? 'text-down' : 'text-fg'}`}>
+                          {l.rule}<span className="ml-2 text-caption text-fg-3">{l.note}</span>
                         </dd>
                       </div>
                     ))}
                     <div data-ticket-row className="flex items-baseline justify-between border-t border-white/[0.07] py-3">
                       <dt className="text-body-sm text-fg-2">Size</dt>
-                      <dd className="tabular"><span data-count="34" data-kind="int">34</span> shares <span className="ml-2 text-caption text-fg-3">1% risk</span></dd>
+                      <dd className="text-right">Risk ÷ (entry − stop)<span className="ml-2 text-caption text-fg-3">you pick the risk</span></dd>
                     </div>
                   </dl>
-                  <p className="mt-auto pt-4 text-caption text-fg-3">Risk if stopped: ₹1,380.40, 1% of the book.</p>
+                  <p className="mt-auto pt-4 text-caption text-fg-3">Prices fill in from the live quote when you open a symbol. You set every rule.</p>
                 </div>
               </div>
             </div>
@@ -257,14 +218,14 @@ export default function Landing() {
           <section id="desk" aria-labelledby="desk-h" className={`relative isolate py-24 md:py-32 ${gutter}`}>
             <div className="mx-auto flex max-w-[1400px] flex-col gap-12">
               <SectionHead id="desk-h" kicker="AI desk" title="An AI desk that shows its work."
-                           body="Four seats argue the trade with their sources on the table. When a model is down, the card says so instead of guessing." />
+                           body="Four seats explain what they see, with their sources on the table. They describe and never tell you to buy or sell. When a model is down, the card says so instead of guessing." />
               <div className="relative isolate">
                 <div aria-hidden="true" className="bloom left-1/2 top-1/2 h-[min(700px,150vw)] w-[min(1400px,170vw)] -translate-x-1/2 -translate-y-1/2 [--b:0.6]" />
               <div data-stagger className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 {DESK.map((d, i) => (
                   <article key={d.seat} className={`glass flex flex-col gap-4 rounded-2xl p-6 ${i === 3 ? 'glass-warn' : ''}`}>
                     <p className="flex items-center gap-3"><span aria-hidden="true" className="ring-dot text-fg" /><span className={`${micro} text-fg`}>{d.seat}</span></p>
-                    <p className="text-h4 font-medium">{d.verdict}</p>
+                    <p className="text-h4 font-medium">{d.focus}</p>
                     <p className="text-body-sm text-fg-2">{d.body}</p>
                     <p className="mt-auto border-t border-white/[0.07] pt-3 text-caption text-fg-3">{d.src}</p>
                   </article>
@@ -284,13 +245,7 @@ export default function Landing() {
                 {RISK.map((r) => (
                   <div key={r.label} className="glass flex flex-col gap-3 rounded-2xl p-6">
                     <dt className={`${micro} text-fg-3`}>{r.label}</dt>
-                    <dd className="text-silver text-[clamp(2.5rem,4.5vw,4rem)] font-normal leading-none tracking-[-0.03em] tabular">
-                      {r.kind === 'inr' ? '₹' : r.kind === 'pct-down' ? '−' : ''}
-                      <span data-count={r.value} data-kind={r.kind === 'inr' ? 'int-in' : 'dec'}>
-                        {r.kind === 'inr' ? r.value.toLocaleString('en-IN') : r.value.toFixed(r.kind === 'pct' ? 0 : 1)}
-                      </span>
-                      {r.kind === 'inr' ? '' : '%'}
-                    </dd>
+                    <dd className="text-silver text-[clamp(2rem,3.5vw,3rem)] font-normal leading-none tracking-[-0.03em]">{r.title}</dd>
                     <dd className="text-body-sm text-fg-2">{r.note}</dd>
                   </div>
                 ))}
@@ -306,9 +261,13 @@ export default function Landing() {
               <ul data-stagger className="flex flex-col">
                 {[
                   ['Read-only broker access', 'Polaris can see your holdings. It can never place an order on a real account.'],
+                  ['Your broker token stays with you', 'It is encrypted into a cookie in your own browser and only used to read. Nothing about your broker account is stored on our servers.'],
+                  ['No commissions, no featured stocks', 'We take nothing from brokers, basket managers or referrals, and never promote a stock for pay.'],
                   ['Your login, protected', 'Sign-in by Clerk with two-step verification. Polaris never stores a password.'],
-                  ['Paper is always labelled', 'Simulated money is marked in blue on every screen and never added to real totals.'],
+                  ['Paper is always labelled', 'Simulated money is marked in blue on every screen and never added to real totals. Every paper trade stays on record, losers included.'],
                   ['Your data, your call', 'Export everything or delete your account from Settings at any time.'],
+                  ['Every number shows its source', 'Each figure says where it came from and how old it is. NSE and US quotes can be delayed.'],
+                  ['Information, not advice', 'Polaris is not registered with SEBI as an Investment Adviser or Research Analyst, or with the SEC or FINRA. Nothing here is a recommendation to buy or sell.'],
                 ].map(([t, b]) => (
                   <li key={t} className="flex gap-4 border-t border-white/10 py-6">
                     <span aria-hidden="true" className="ring-dot mt-0.5 shrink-0 text-fg" />
@@ -316,6 +275,56 @@ export default function Landing() {
                   </li>
                 ))}
               </ul>
+            </div>
+          </section>
+
+          {/* -------------------------------------------------- compare -- */}
+          <section id="compare" aria-labelledby="compare-h" className={`py-24 md:py-32 ${gutter}`}>
+            <div className="mx-auto flex max-w-[1400px] flex-col gap-12">
+              <SectionHead id="compare-h" kicker="Compared" title="Where Polaris fits."
+                           body="Polaris doesn't replace a broker or a basket. It shows what you own across markets and lets you test ideas first." />
+              <div data-reveal className="glass overflow-x-auto rounded-2xl">
+                <table className="w-full min-w-[760px] text-left text-body-sm">
+                  <caption className="sr-only">Polaris compared with smallcase, Tickertape and Zerodha Console</caption>
+                  <thead>
+                    <tr className="text-caption text-fg-3">
+                      <th scope="col" className="p-4 font-normal"><span className="sr-only">Feature</span></th>
+                      {['Polaris', 'smallcase', 'Tickertape', 'Zerodha Console'].map((h, i) => (
+                        <th key={h} scope="col" className={`p-4 font-normal ${micro} ${i === 0 ? 'text-fg' : ''}`}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {COMPARE.map(({ row, cells }) => (
+                      <tr key={row} className="border-t border-white/[0.07] align-top">
+                        <th scope="row" className="p-4 font-normal text-fg-2">{row}</th>
+                        {cells.map((c, i) => <td key={i} className={`p-4 ${i === 0 ? 'text-fg' : 'text-fg-2'}`}>{c}</td>)}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <p className="border-t border-white/[0.07] p-4 text-caption text-fg-3">
+                  From each company&apos;s public pages, October 2026. Something changed? Tell us and we&apos;ll correct it.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* ------------------------------------------------------ faq -- */}
+          <section id="faq" aria-labelledby="faq-h" className={`py-24 md:py-32 ${gutter}`}>
+            <div className="mx-auto grid max-w-[1400px] gap-12 lg:grid-cols-2">
+              <SectionHead id="faq-h" kicker="FAQ" title="Straight answers." />
+              <div data-stagger className="flex flex-col">
+                {FAQ.map(([q, a]) => (
+                  <details key={q} className="group border-t border-white/10 py-5">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-h4 font-medium">
+                      {q}
+                      <span aria-hidden="true" className="text-fg-3 transition-transform group-open:rotate-45">+</span>
+                    </summary>
+                    <p className="mt-3 max-w-xl text-body-sm text-fg-2">{a}</p>
+                  </details>
+                ))}
+              </div>
             </div>
           </section>
 
@@ -343,7 +352,11 @@ export default function Landing() {
 
         <div aria-hidden="true" className="mx-auto h-px max-w-[1400px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
         <footer className={`flex flex-wrap items-center justify-between gap-4 py-8 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] text-caption text-fg-3 ${gutter}`}>
-          <span>Paper trading is simulated. Analytics are educational, not investment advice.</span>
+          <span className="max-w-3xl">
+            Paper trading is simulated. Analytics are for information only, not investment advice or a
+            recommendation. Polaris is not a SEBI-registered Investment Adviser or Research Analyst, nor a US broker-dealer
+            or investment adviser. Quotes can be delayed. Investments in securities are subject to market risks.
+          </span>
           <span className="flex gap-6">
             <Link href="/legal/privacy" className="py-3 hover:text-fg">Privacy</Link>
             <Link href="/legal/terms" className="py-3 hover:text-fg">Terms</Link>
@@ -359,34 +372,27 @@ export default function Landing() {
 function PortfolioFace({ mode }: { mode: 'real' | 'paper' }) {
   const paper = mode === 'paper';
   const rows = paper
-    ? [['RELIANCE', '34', '₹99,093.00', 1.33], ['NVDA', '12', '$1,658.52', 2.14], ['INFY', '20', '₹37,720.00', -1.94]]
-    : [['HDFCBANK', '120', '₹2,05,512.00', 1.21], ['ITC', '400', '₹1,90,840.00', 0.42], ['AAPL', '18', '$4,106.70', -0.36]];
+    ? [['Orders', 'Filled at the live quote, simulated'], ['Cash and P&L', 'The book’s own, from its fills'], ['Plans', 'Entry, stop and size before every order']]
+    : [['Holdings', 'Live from your broker on every view'], ['Currency', 'INR and USD side by side'], ['Orders', 'None. Real accounts are read-only']];
   return (
     <div data-face={mode} aria-label={paper ? 'Paper book, simulated' : 'Real holdings, synced read-only'}
          className={`glass-hero rounded-2xl p-6 ${paper ? 'glass-paper' : ''}`}>
       {paper && <span aria-hidden="true" className="absolute inset-x-6 top-0 h-0.5 rounded-full bg-paper" />}
       <p className="flex items-center justify-between">
         <span className={`pill ${paper ? 'text-paper' : 'text-fg'}`}>{paper ? 'Paper' : 'Real'}</span>
-        <span className="text-caption text-fg-2">{paper ? 'Swing book · simulated' : 'Zerodha · synced 2m ago'}</span>
+        <span className="text-caption text-fg-2">{paper ? 'Swing book · simulated' : 'Zerodha · read-only'}</span>
       </p>
-      <p className="mt-5 text-body-sm text-fg-2">{paper ? 'Paper value' : 'Holdings value'}</p>
-      <p className="mt-1 flex flex-wrap items-baseline gap-3">
-        <span className="text-[44px] font-medium leading-none tracking-[-0.03em] tabular">{paper ? '₹2,74,330' : '₹1,84,20,500'}</span>
-        <Pct value={paper ? 0.84 : 2.4} className="text-body-sm" />
+      <p className="mt-5 text-[clamp(1.75rem,3vw,2.5rem)] font-medium leading-none tracking-[-0.03em]">
+        {paper ? 'Your paper book' : 'Your broker holdings'}
       </p>
-      <table className="mt-6 w-full text-body-sm">
-        <thead><tr className="text-left text-caption text-fg-3"><th className="pb-2 font-normal">Symbol</th><th className="pb-2 text-right font-normal">Qty</th><th className="pb-2 text-right font-normal">Value</th><th className="pb-2 text-right font-normal">Today</th></tr></thead>
-        <tbody>
-          {rows.map(([s, q, v, c]) => (
-            <tr key={s as string} className="border-t border-white/[0.07]">
-              <td className="py-3 font-bold">{s}</td>
-              <td className="py-3 text-right tabular text-fg-2">{q}</td>
-              <td className="py-3 text-right tabular">{v}</td>
-              <td className="py-3 text-right"><Pct value={c as number} /></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <dl className="mt-6 text-body-sm">
+        {rows.map(([t, d]) => (
+          <div key={t} className="flex justify-between gap-4 border-t border-white/[0.07] py-3">
+            <dt className="font-bold">{t}</dt>
+            <dd className="text-right text-fg-2">{d}</dd>
+          </div>
+        ))}
+      </dl>
       <p className="mt-4 text-caption text-fg-3">{paper ? 'Never added to your real net worth.' : 'Read-only. No order buttons on real accounts.'}</p>
     </div>
   );

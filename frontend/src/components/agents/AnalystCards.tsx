@@ -40,9 +40,9 @@ function AnalystCard({ card }: { card: AnalystEvent }) {
       <div className="mt-2.5">
         <ScoreBar score={card.score} />
         <div className="mt-1 flex justify-between text-caption text-fg-3">
-          <span>bearish</span>
+          <span>weaker</span>
           <span className="tabular">confidence {(card.confidence * 100).toFixed(0)}%</span>
-          <span>bullish</span>
+          <span>stronger</span>
         </div>
       </div>
 

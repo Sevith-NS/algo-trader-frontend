@@ -26,9 +26,6 @@ export const fmtBig = (val: number | null | undefined, currency = 'USD') => {
 export const stanceColor = (stance: string | null | undefined) =>
   stance === 'bullish' ? 'var(--green)' : stance === 'bearish' ? 'var(--red)' : 'var(--fg-2)';
 
-export const callColor = (call: string | undefined) =>
-  call === 'BUY' ? 'var(--green)' : call === 'AVOID' ? 'var(--red)' : 'var(--fg-2)';
-
 export const gradeColor = (grade: string | undefined) => {
   if (!grade) return 'var(--fg-3)';
   if (grade.startsWith('A')) return 'var(--green)';

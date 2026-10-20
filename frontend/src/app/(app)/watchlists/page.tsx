@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState, type FormEvent } from 'react';
 import { AddSymbol } from '@/components/home/Watchlist';
 import { PageHeader } from '@/components/PageHeader';
+import { BrokerWatchlists } from '@/components/watchlists/BrokerWatchlists';
 import { WatchlistTable } from '@/components/watchlists/WatchlistTable';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
@@ -196,6 +197,8 @@ function WatchlistsPage() {
             </section>
           </div>
         )}
+
+      <BrokerWatchlists />
 
       <NameDialog open={dialog.open} list={dialog.list} onClose={() => setDialog((d) => ({ ...d, open: false }))}
                   onSaved={(id) => { reload(); select(id); }} />

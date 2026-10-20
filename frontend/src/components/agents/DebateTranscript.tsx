@@ -44,7 +44,7 @@ function Turn({ turn }: { turn: DebateEvent }) {
                     <div className="flex gap-2">
                       <Crosshair size={12} className="mt-0.5 shrink-0 text-fg-3" />
                       <div className="min-w-0">
-                        <MicroLabel>Attacking</MicroLabel>
+                        <MicroLabel>Answering</MicroLabel>
                         <p className="mt-0.5 text-caption leading-relaxed text-fg-3">{turn.rebuts}</p>
                       </div>
                     </div>
@@ -69,9 +69,9 @@ function Turn({ turn }: { turn: DebateEvent }) {
 }
 
 /**
- * The bull/bear transcript, laid out as an argument rather than a document:
- * bull left, bear right, grouped by round. From round two each speaker is
- * required to attack a named claim, which is why "Attacking" is a first-class
+ * The strength/caution transcript, laid out as an argument rather than a document:
+ * strength left, caution right, grouped by round. From round two each speaker is
+ * required to answer a named claim, which is why "Answering" is a first-class
  * field instead of buried in the prose.
  */
 export default function DebateTranscript({
@@ -90,14 +90,14 @@ export default function DebateTranscript({
     <div className="glass rounded-xl p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
         <h4 className="flex items-center gap-2 text-sm font-semibold text-fg">
-          <Swords size={15} className="text-fg-2" /> Research Debate
+          <Swords size={15} className="text-fg-2" /> Debate
           <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-caption text-fg-3">
             {rounds} {rounds === 1 ? 'round' : 'rounds'} · rebuttal required
           </span>
         </h4>
         <div className="flex items-center gap-3 text-caption text-fg-3">
-          <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-up" /> Bull</span>
-          <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-down" /> Bear</span>
+          <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-up" /> Strength</span>
+          <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-down" /> Caution</span>
         </div>
       </div>
 

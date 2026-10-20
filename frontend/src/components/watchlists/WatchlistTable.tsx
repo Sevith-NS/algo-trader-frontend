@@ -30,7 +30,7 @@ function useSeen<T extends Element>() {
  * screen: a 100-symbol list would otherwise fire 200 requests at once, past
  * the API's burst limit.
  */
-function Row({ symbol, onRemove }: { symbol: string; onRemove: (s: string) => void }) {
+function Row({ symbol, detail, onRemove }: { symbol: string; detail?: string; onRemove?: (s: string) => void }) {
   const [ref, seen] = useSeen<HTMLTableRowElement>();
   const enc = encodeURIComponent(symbol);
   const quote = useApi<Quote>(seen ? `/api/quote?symbol=${enc}` : null, { refreshMs: 60_000 });
@@ -45,6 +45,7 @@ function Row({ symbol, onRemove }: { symbol: string; onRemove: (s: string) => vo
         <Link href={`/s/${enc}`} className="flex min-h-11 flex-col justify-center hover:underline">
           <span className="ticker truncate">{symbol}</span>
           {q?.shortName && q.shortName !== symbol && <span className="truncate text-caption text-fg-3">{q.shortName}</span>}
+          {detail && <span className="truncate text-caption text-fg-2 tabular">{detail}</span>}
         </Link>
       </th>
       <td className="whitespace-nowrap py-2 text-right tabular">
@@ -63,17 +64,22 @@ function Row({ symbol, onRemove }: { symbol: string; onRemove: (s: string) => vo
           </span>
         )}
       </td>
-      <td className="py-2 text-right">
-        <button type="button" onClick={() => onRemove(symbol)} aria-label={`Remove ${symbol}`}
-                className="ml-auto grid min-h-11 min-w-11 place-items-center text-fg-3 hover:text-fg">
-          <X size={14} />
-        </button>
-      </td>
+      {onRemove && (
+        <td className="py-2 text-right">
+          <button type="button" onClick={() => onRemove(symbol)} aria-label={`Remove ${symbol}`}
+                  className="ml-auto grid min-h-11 min-w-11 place-items-center text-fg-3 hover:text-fg">
+            <X size={14} />
+          </button>
+        </td>
+      )}
     </tr>
   );
 }
 
-export function WatchlistTable({ name, symbols, onRemove }: { name: string; symbols: string[]; onRemove: (s: string) => void }) {
+/** Without `onRemove` the table is read-only (broker watchlists). `details` adds a line under a symbol. */
+export function WatchlistTable({ name, symbols, details, onRemove }: {
+  name: string; symbols: string[]; details?: Record<string, string>; onRemove?: (s: string) => void;
+}) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-table">
@@ -84,11 +90,11 @@ export function WatchlistTable({ name, symbols, onRemove }: { name: string; symb
             <th scope="col" className="py-2 text-right font-normal">Last</th>
             <th scope="col" className="py-2 text-right font-normal">Today</th>
             <th scope="col" className="hidden py-2 pl-4 text-right font-normal sm:table-cell">1 month</th>
-            <th scope="col" className="w-11 py-2"><span className="sr-only">Remove</span></th>
+            {onRemove && <th scope="col" className="w-11 py-2"><span className="sr-only">Remove</span></th>}
           </tr>
         </thead>
         <tbody>
-          {symbols.map((s) => <Row key={s} symbol={s} onRemove={onRemove} />)}
+          {symbols.map((s) => <Row key={s} symbol={s} detail={details?.[s]} onRemove={onRemove} />)}
         </tbody>
       </table>
     </div>

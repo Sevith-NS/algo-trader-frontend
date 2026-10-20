@@ -3,14 +3,14 @@ import { timeAgo } from '@/lib/format';
 import type { SyncStatus } from '@/types/api';
 
 const LABEL: Record<SyncStatus, string> = {
-  connected: 'Synced',
+  connected: 'Connected',
   syncing: 'Syncing',
   needs_reconnect: 'Needs reconnect',
   error: 'Sync failed',
 };
 
 /**
- * Broker name · last sync time · state (docs/DESIGN.md §7). Amber for anything
+ * Broker name · when the data was read (if shown) · state (docs/DESIGN.md §7). Amber for anything
  * that needs the person to act; the words carry the state, never colour alone.
  */
 export function SyncBadge({ broker, status, lastSyncedAt, className }: {
@@ -23,8 +23,12 @@ export function SyncBadge({ broker, status, lastSyncedAt, className }: {
       attention ? 'text-warn' : 'text-fg-2', className)}>
       <span aria-hidden="true" className={clsx('h-1.5 w-1.5 rounded-full', attention ? 'bg-warn' : 'bg-fg-3')} />
       <span className="text-fg">{broker}</span>
-      <span aria-hidden="true">·</span>
-      <span>{lastSyncedAt ? `synced ${timeAgo(lastSyncedAt)}` : 'never synced'}</span>
+      {lastSyncedAt && (
+        <>
+          <span aria-hidden="true">·</span>
+          <span>updated {timeAgo(lastSyncedAt)}</span>
+        </>
+      )}
       <span aria-hidden="true">·</span>
       <span>{LABEL[status]}</span>
     </span>

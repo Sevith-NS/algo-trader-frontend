@@ -1,4 +1,4 @@
-import { CANDLES, LEVELS, formatInr } from './planData';
+import { CANDLES, LEVELS } from './planData';
 
 /**
  * The landing page's example plan chart. Hollow candles close up, filled
@@ -29,7 +29,7 @@ export function PlanChart() {
   return (
     <div className="relative aspect-[1000/560] w-full">
       <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 h-full w-full" role="img"
-           aria-label="Daily candles for RELIANCE.NS with the plan's entry, stop and two targets drawn as horizontal levels.">
+           aria-label="Illustrative daily candles with a plan's entry, stop and two targets drawn as horizontal levels.">
         {[2850, 2900, 2950, 3000].map((p) => (
           <line key={p} x1="0" x2={W} y1={y(p)} y2={y(p)} stroke="rgb(255 255 255 / 0.06)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
         ))}
@@ -66,7 +66,7 @@ export function PlanChart() {
              className={`absolute right-0 w-[14%] -translate-y-1/2 pl-2 text-[10px] font-bold uppercase leading-tight tracking-[0.06em] sm:text-[11px] ${l.key === 'stop' ? 'text-down' : 'text-fg'}`}
              style={{ top: `${(y(l.price) / H) * 100}%` }}>
           <span className="block">{l.label}</span>
-          <span className="hidden font-normal tabular-nums text-fg-2 sm:block">{formatInr(l.price).slice(1)}</span>
+          <span className="hidden font-normal text-fg-2 sm:block">{l.note}</span>
         </div>
       ))}
     </div>

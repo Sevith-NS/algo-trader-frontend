@@ -8,7 +8,6 @@ import { MarketBreadth } from '@/components/home/MarketBreadth';
 import { TopMovers } from '@/components/home/TopMovers';
 import { Watchlist } from '@/components/home/Watchlist';
 import { PortfolioPulse } from '@/components/portfolio/Summary';
-import { Change } from '@/components/ui/Change';
 import { EmptyState, ErrorState, LoadingBlock, Skeleton } from '@/components/ui/States';
 import { useNow } from '@/lib/browser';
 import { EXCHANGES, sessionState } from '@/lib/sessions';
@@ -47,44 +46,35 @@ function Sessions() {
   );
 }
 
-function RecentDecisions() {
+function RecentNotes() {
   const { data, error, loading, reload } = useApi<JournalResponse>('/api/journal?limit=3');
   return (
-    <Panel level={2} id="journal-h" title="Recent desk decisions" bodyClassName="flex flex-col gap-3"
-           aside={<Link href="/portfolio/journal" className="text-body-sm text-fg-2 underline-offset-4 hover:text-fg hover:underline">Journal</Link>}>
-      {loading && !data ? <LoadingBlock lines={3} label="Loading decisions" />
+    <Panel level={2} id="journal-h" title="Recent desk notes" bodyClassName="flex flex-col gap-3"
+           aside={<Link href="/portfolio/journal" className="text-body-sm text-fg-2 underline-offset-4 hover:text-fg hover:underline">All notes</Link>}>
+      {loading && !data ? <LoadingBlock lines={3} label="Loading notes" />
         : error ? <ErrorState error={error} onRetry={reload} />
         : !data?.entries.length ? (
-          <EmptyState title="No decisions yet">
-            Open a symbol and run the AI desk. Each verdict is saved here and scored against the market later.
+          <EmptyState title="No notes yet">
+            Open a symbol and run the research desk. Each run keeps a note here: its summary and what to watch.
           </EmptyState>
         ) : (
           <ul className="divide-y divide-white/[0.07]">
             {data.entries.map((e) => (
               <li key={e.id}>
                 <Link href={`/s/${encodeURIComponent(e.symbol)}?tab=desk`}
-                      className="-mx-2 flex min-h-14 items-center justify-between gap-4 rounded-lg px-2 py-2 hover:bg-white/[0.04]">
-                  <span className="flex flex-col">
+                      className="-mx-2 flex min-h-14 flex-col justify-center gap-0.5 rounded-lg px-2 py-2 hover:bg-white/[0.04]">
+                  <span className="flex items-baseline justify-between gap-4">
                     <span className="ticker text-body-sm">{e.symbol}</span>
-                    <span className="text-caption text-fg-3">{e.date} · conviction {e.conviction_10}/10</span>
+                    <span className="text-caption text-fg-3">{e.date}</span>
                   </span>
-                  <span className="flex flex-col items-end text-body-sm">
-                    <span className={clsx('font-medium', e.decision === 'APPROVE' ? 'text-fg' : 'text-fg-2')}>
-                      {e.decision === 'APPROVE' ? `${e.action} approved` : 'Rejected'}
-                    </span>
-                    {e.outcome ? <span className="text-caption"><Change pct={e.outcome.alpha_pct} /> <span className="text-fg-3">vs S&amp;P</span></span>
-                      : <span className="text-caption text-fg-3">Not scored yet</span>}
-                  </span>
+                  {(e.summary || e.thesis) && (
+                    <span className="line-clamp-1 text-caption text-fg-2">{e.summary || e.thesis}</span>
+                  )}
                 </Link>
               </li>
             ))}
           </ul>
         )}
-      {data?.stats?.hit_rate != null && (
-        <p className="text-caption text-fg-3 tabular">
-          {data.stats.hits} of {data.stats.directional} scored calls right ({data.stats.hit_rate.toFixed(0)}%).
-        </p>
-      )}
     </Panel>
   );
 }
@@ -104,7 +94,7 @@ export default function Home() {
         </div>
         <div className="flex flex-col gap-4">
           <Sessions />
-          <RecentDecisions />
+          <RecentNotes />
         </div>
       </div>
     </div>

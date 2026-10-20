@@ -1,5 +1,5 @@
-import DecisionJournal from '@/components/agents/DecisionJournal';
+import DeskNotes from '@/components/agents/DeskNotes';
 
 export default function JournalPage() {
-  return <DecisionJournal />;
+  return <DeskNotes />;
 }

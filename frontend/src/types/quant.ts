@@ -11,22 +11,14 @@ export type QuantLevels = {
   atr_stop_mult?: number | null;
   win_probability?: number | null;
   expectancy_r?: number | null;
+  side?: 'long' | 'short';
 };
 
 export type QuantSignals = {
   symbol: string;
-  signal: string;
-  action: 'buy' | 'sell' | 'hold' | string;
-  conviction: number;
   composite_score: number;
   levels?: QuantLevels;
   factors?: Record<string, number>;
-  position_sizing?: {
-    kelly_fraction: number;
-    recommended_fraction: number;
-    win_rate: number;
-    payoff_ratio: number;
-  };
   indicators?: {
     rsi_14: number;
     zscore_20d: number;
@@ -43,6 +35,5 @@ export type QuantSignals = {
 
 export type MlInsights = {
   xgboost_probability: number;
-  prophet_7d_forecast: number;
   fear_greed_index: number;
 };

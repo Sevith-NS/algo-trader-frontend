@@ -20,7 +20,7 @@ function load(ids: string, fresh: boolean): Promise<HoldingsResponse[]> {
   return promise;
 }
 
-/** Synced holdings for one or more real accounts, fetched together. */
+/** Live broker holdings for one or more real accounts, fetched together. */
 export function useRealHoldings(accountIds: string[]) {
   const ids = accountIds.join(',');
   const [nonce, setNonce] = useState(0);

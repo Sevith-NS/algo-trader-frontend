@@ -177,7 +177,7 @@ export function SymbolView({ symbol }: { symbol: string }) {
           {tab === 'plan' && (
             quantApi.loading && !quantApi.data ? <LoadingBlock lines={8} label="Loading plan" />
               : quantApi.error ? <ErrorState error={quantApi.error} onRetry={quantApi.reload} />
-              : <PlanDetail quant={quantApi.data} ml={mlApi.data} currency={currency} price={price} />
+              : <PlanDetail quant={quantApi.data} ml={mlApi.data} currency={currency} />
           )}
           {tab === 'desk' && <TradingDeskSection symbol={symbol} currency={currency} />}
           {tab === 'backtest' && <BacktestSection symbol={symbol} currency={currency} />}

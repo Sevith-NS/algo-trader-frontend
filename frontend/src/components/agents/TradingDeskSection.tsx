@@ -3,23 +3,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import {
-  Building2, Play, Square, WifiOff, Brain, CircleDot, Check, Timer, BookOpen, Shuffle,
+  Building2, Play, Square, WifiOff, CircleDot, Check, Timer, BookOpen, Shuffle,
 } from '@/components/ui/icons';
 import type {
-  AnalystEvent, ContextEvent, DebateEvent, DeskEvent, DeskStage, JudgeEvent,
-  RiskEvent, TradePlanEvent, VerdictEvent,
+  AnalystEvent, ContextEvent, DebateEvent, DeskEvent, DeskStage, RulesEvent, SummaryEvent,
 } from '../../types/agents';
 import { streamDesk, DeskRateLimited } from '../../lib/agentsDesk';
 import { usePortfolio } from '../../context/PortfolioContext';
-import { errorMessage } from '../../lib/api';
 import { formatMoney } from '../../lib/format';
 import AnalystCards from './AnalystCards';
 import DebateTranscript from './DebateTranscript';
-import ThesisPanel from './ThesisPanel';
-import TradePlanPanel from './TradePlanPanel';
-import RiskCommittee from './RiskCommittee';
-import DeskVerdict from './DeskVerdict';
-import DecisionJournal from './DecisionJournal';
+import SummaryPanel from './SummaryPanel';
+import RulesPanel from './RulesPanel';
+import DeskNotes from './DeskNotes';
 import { MicroLabel } from './DeskAtoms';
 import { STAGE_LABELS, STAGE_ORDER } from './deskFormat';
 
@@ -29,10 +25,8 @@ interface DeskState {
   context: ContextEvent | null;
   analysts: AnalystEvent[];
   debate: DebateEvent[];
-  judge: JudgeEvent | null;
-  plan: TradePlanEvent | null;
-  risk: RiskEvent[];
-  verdict: VerdictEvent | null;
+  summary: SummaryEvent | null;
+  rules: RulesEvent | null;
   stage: DeskStage | null;
   message: string;
   elapsedMs: number | null;
@@ -42,9 +36,8 @@ interface DeskState {
 }
 
 const EMPTY: DeskState = {
-  context: null, analysts: [], debate: [], judge: null, plan: null,
-  risk: [], verdict: null, stage: null, message: '', elapsedMs: null,
-  failover: null, fallbackCalls: 0,
+  context: null, analysts: [], debate: [], summary: null, rules: null,
+  stage: null, message: '', elapsedMs: null, failover: null, fallbackCalls: 0,
 };
 
 /** The stage rail: which seats have reported, which one is speaking now. */
@@ -69,7 +62,7 @@ function StageRail({ stage, message, running }: {
                 )}
               >
                 {done ? <Check size={10} />
-                  : active ? <CircleDot size={10} className="" />
+                  : active ? <CircleDot size={10} />
                   : <CircleDot size={10} className="opacity-40" />}
                 {STAGE_LABELS[key]}
               </span>
@@ -88,14 +81,11 @@ function StageRail({ stage, message, running }: {
 }
 
 /**
- * The multi-agent trading desk: four analysts, a bull/bear debate, a trader, a
- * three-seat risk committee and a portfolio manager who signs off — streamed
- * turn by turn so the reasoning is watchable rather than a wall of text at the
- * end.
- *
- * Every figure the agents argue over comes from the same engines the Terminal
- * already renders, and the desk's own past calls (scored on alpha) are fed back
- * into each new run. See backend/agents_desk.py.
+ * The research desk: four analysts read a symbol separately, the case for
+ * strength and the case for caution argue it out, a balanced summary explains
+ * the data and how the plan was computed, and "Your rules" works out what your
+ * own risk setting implies. Streamed turn by turn. It explains; it never tells
+ * you what to do. See backend/agents_desk.py.
  */
 export default function TradingDeskSection({
   symbol, currency,
@@ -104,11 +94,11 @@ export default function TradingDeskSection({
   const [rounds, setRounds] = useState(2);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState('');
-  const [journalKey, setJournalKey] = useState(0);
-  const [showJournal, setShowJournal] = useState(false);
+  const [notesKey, setNotesKey] = useState(0);
+  const [showNotes, setShowNotes] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
-  const { balance, positions, placeOrder, account } = usePortfolio();
+  const { balance, positions, account } = usePortfolio();
 
   // A run is tied to the symbol it was opened on — switching tickers has to
   // clear it, or a later event would land in the wrong stock's transcript.
@@ -133,14 +123,10 @@ export default function TradingDeskSection({
           return { ...prev, analysts: [...prev.analysts.filter((a) => a.role !== event.role), event] };
         case 'debate':
           return { ...prev, debate: [...prev.debate, event] };
-        case 'judge':
-          return { ...prev, judge: event };
-        case 'trade_plan':
-          return { ...prev, plan: event };
-        case 'risk':
-          return { ...prev, risk: [...prev.risk.filter((r) => r.seat !== event.seat), event] };
-        case 'verdict':
-          return { ...prev, verdict: event };
+        case 'summary':
+          return { ...prev, summary: event };
+        case 'rules':
+          return { ...prev, rules: event };
         case 'notice':
           return { ...prev, failover: event.message };
         case 'done':
@@ -156,8 +142,8 @@ export default function TradingDeskSection({
     });
 
     if (event.type === 'error') setError(event.message);
-    // The run journals itself server-side; nudge the journal panel to re-read.
-    if (event.type === 'journal') setJournalKey((k) => k + 1);
+    // The run keeps a note server-side; nudge the notes panel to re-read.
+    if (event.type === 'journal') setNotesKey((k) => k + 1);
   }, []);
 
   const run = async () => {
@@ -175,7 +161,7 @@ export default function TradingDeskSection({
       setError(
         e instanceof DeskRateLimited || e instanceof Error
           ? e.message
-          : 'The trading desk could not be reached.',
+          : 'The research desk could not be reached.',
       );
     } finally {
       if (!controller.signal.aborted) setRunning(false);
@@ -188,14 +174,8 @@ export default function TradingDeskSection({
     setRunning(false);
   };
 
-  const { context, analysts, debate, judge, plan, risk, verdict } = state;
+  const { context, analysts, debate, summary, rules } = state;
   const started = Boolean(context) || running;
-  const priorCalls = context?.memory.same_ticker.length ?? 0;
-  // Available from the context event, so the committee's anchor line is drawn
-  // while the seats are still arguing rather than only once the PM reports.
-  const halfKellyPct = context?.quant
-    ? context.quant.position_sizing.recommended_fraction * 100
-    : verdict?.half_kelly_pct ?? null;
 
   return (
     <div className="space-y-5">
@@ -204,17 +184,17 @@ export default function TradingDeskSection({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <h3 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-fg">
-              <Building2 size={15} className="text-fg-2" /> Trading Desk
+              <Building2 size={15} className="text-fg-2" /> Research desk
               <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-caption text-fg-3">
-                analysts · debate · risk · sign-off
+                analysts · debate · summary · your rules
               </span>
             </h3>
             <p className="mt-1.5 max-w-2xl text-xs leading-relaxed text-fg-2">
-              Four specialist analysts read {symbol} separately, a bull and a bear argue it out
-              over {rounds} {rounds === 1 ? 'round' : 'rounds'}, a trader turns the thesis into
-              the quant engine&apos;s solved levels, three risk seats fight over position size,
-              and a portfolio manager signs off or refuses. Every figure comes from this
-              platform&apos;s own engines.
+              Four analysts read {symbol} separately, the case for strength and the case for caution
+              argue it over {rounds} {rounds === 1 ? 'round' : 'rounds'}, and a balanced summary explains
+              the data and how the plan&apos;s levels were computed. &ldquo;Your rules&rdquo; then works out
+              what your own risk setting implies. Every figure comes from this platform&apos;s engines. The
+              desk explains; it never tells you what to do.
             </p>
           </div>
 
@@ -229,9 +209,7 @@ export default function TradingDeskSection({
                     disabled={running}
                     className={clsx(
                       'min-h-8 px-2.5 text-caption font-semibold tabular transition-colors disabled:opacity-50',
-                      rounds === option
-                        ? 'bg-fg text-ink-0'
-                        : 'text-fg-3 hover:text-fg-2',
+                      rounds === option ? 'bg-fg text-ink-0' : 'text-fg-3 hover:text-fg-2',
                     )}
                   >
                     {option}
@@ -252,7 +230,7 @@ export default function TradingDeskSection({
                 onClick={run}
                 className="flex min-h-11 items-center gap-2 rounded-lg border border-fg-2/30 bg-fg-2/5 px-4 text-xs font-semibold text-fg-2 transition-colors hover:bg-fg-2/10"
               >
-                <Play size={13} /> {started ? 'Run again' : `Convene the desk on ${symbol}`}
+                <Play size={13} /> {started ? 'Run again' : `Run the desk on ${symbol}`}
               </button>
             )}
           </div>
@@ -265,13 +243,12 @@ export default function TradingDeskSection({
               <span className="ticker text-fg-2">{context.symbol}</span>
               {context.company !== context.symbol && ` · ${context.company}`}
             </span>
-            <span>
-              engine call{' '}
-              <span className="font-semibold text-fg-2">{context.verdict.long_term.call}</span>
-            </span>
             {context.quant && (
               <span>
-                quant <span className="font-semibold text-fg-2">{context.quant.signal}</span>
+                factor composite{' '}
+                <span className="font-semibold tabular text-fg-2">
+                  {context.quant.composite_score > 0 ? '+' : ''}{context.quant.composite_score.toFixed(2)}
+                </span>
               </span>
             )}
             <span>
@@ -287,12 +264,6 @@ export default function TradingDeskSection({
                 already holding {context.portfolio.existing_position.shares} shares
               </span>
             )}
-            <span className={clsx('flex items-center gap-1', priorCalls > 0 && 'text-fg-2')}>
-              <Brain size={11} />
-              {priorCalls > 0
-                ? `${priorCalls} prior call${priorCalls === 1 ? '' : 's'} on ${symbol} in memory`
-                : 'no prior calls on this name'}
-            </span>
             {state.elapsedMs !== null && (
               <span className="flex items-center gap-1">
                 <Timer size={11} /> {(state.elapsedMs / 1000).toFixed(1)}s
@@ -334,44 +305,22 @@ export default function TradingDeskSection({
       <DebateTranscript
         turns={debate}
         rounds={context?.rounds ?? rounds}
-        pending={running && Boolean(context) && analysts.length === 4 && !judge}
+        pending={running && Boolean(context) && analysts.length === 4 && !summary}
       />
 
-      {judge && <ThesisPanel judge={judge} />}
-      {plan && <TradePlanPanel plan={plan} currency={currency} />}
+      {summary && <SummaryPanel summary={summary} />}
+      {rules && <RulesPanel rules={rules} currency={currency} />}
 
-      <RiskCommittee
-        seats={risk}
-        halfKellyPct={halfKellyPct}
-        pending={running && Boolean(plan) && risk.length < 3}
-      />
-
-      {verdict && (
-        <DeskVerdict
-          verdict={verdict}
-          symbol={symbol}
-          currency={currency}
-          onExecute={async (shares) => {
-            try {
-              await placeOrder(symbol, verdict.action === 'SELL' ? 'sell' : 'buy', shares);
-              return { success: true, message: 'Filled at the live price.' };
-            } catch (err) {
-              return { success: false, message: errorMessage(err) };
-            }
-          }}
-        />
-      )}
-
-      {/* ---- Track record ---- */}
-      {showJournal ? (
-        <DecisionJournal symbol={symbol} refreshKey={journalKey} />
+      {/* ---- Notes ---- */}
+      {showNotes ? (
+        <DeskNotes symbol={symbol} refreshKey={notesKey} />
       ) : (
         <button
-          onClick={() => setShowJournal(true)}
+          onClick={() => setShowNotes(true)}
           className="glass rounded-xl flex w-full items-center justify-center gap-2 p-4 text-xs font-semibold text-fg-2 transition-colors hover:text-fg"
         >
           <BookOpen size={14} className="text-fg-2" />
-          Show the decision journal: every past call, scored on alpha vs the S&amp;P
+          Show desk notes: what each past run explained
         </button>
       )}
     </div>

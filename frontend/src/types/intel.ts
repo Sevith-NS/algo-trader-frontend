@@ -5,18 +5,13 @@
  * check with `'error' in x`.
  */
 
-export type Call = 'BUY' | 'HOLD' | 'AVOID';
 export type Stance = 'bullish' | 'bearish' | 'neutral';
 
 export type Failed = { error: string };
 
-export type HorizonVerdict = { call: Call; score: number; conviction_10: number };
-
-export type Verdict = {
-  long_term: HorizonVerdict;
-  short_term: HorizonVerdict;
-  pillars: Record<'fundamentals' | 'valuation' | 'technicals' | 'quant' | 'news', number>;
-  interesting_price: number | null;
+/** Each pillar normalised to −1…+1, or null when its source is down. Readings, never a call. */
+export type Readings = {
+  pillars: Record<'fundamentals' | 'valuation' | 'technicals' | 'quant' | 'news', number | null>;
 };
 
 export type Technical = {
@@ -86,15 +81,16 @@ export type NewsIntel = {
 
 export type Narrative = Partial<Record<
   'one_liner' | 'business_model' | 'quarterly_results' | 'balance_sheet' | 'competitive_position'
-  | 'management_quality' | 'technical_setup' | 'catalysts' | 'bull_case' | 'bear_case' | 'valuation',
+  | 'management_quality' | 'technical_setup' | 'catalysts' | 'bull_case' | 'bear_case' | 'valuation'
+  | 'what_to_watch',
   unknown
->> & { final_verdict?: { call?: string; horizon?: string; rationale?: unknown } | null };
+>>;
 
 export type DeepAnalysis = {
   symbol: string;
   fundamentals: Fundamentals | Failed;
   technical: Technical | Failed;
-  verdict: Verdict;
+  readings: Readings;
   narrative: Narrative | null;
 };
 
@@ -112,5 +108,5 @@ export type HoldingIntel =
       news_stance: Stance | null;
       news_rating: number | null;
       top_headline: { title: string; link: string | null; sentiment: Stance; source: string | null } | null;
-      verdict: Verdict;
+      readings: Readings;
     };
