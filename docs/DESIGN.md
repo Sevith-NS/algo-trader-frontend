@@ -1,10 +1,23 @@
-# Polaris Design System v3.2 "Glass"
+# Polaris Design System v4 "Liquid Glass"
 
-**Status:** Binding · **Date:** 2026-10-11 (v3.1 same day) · **Supersedes:** `docs/flint-os-v2/DESIGN.md` §6 (visual language) and §15.4 (landing exception)
+**Status:** Binding · **Date:** 2026-10-22 (v4); v3.2 2026-10-11 · **Supersedes:** `docs/flint-os-v2/DESIGN.md` §6 (visual language) and §15.4 (landing exception)
 **Reference:** the "Wealthcore" design on motionsites.ai: monochrome near-black, light-weight Helvetica display with a silver sheen, sharp white and outlined buttons, dark frosted-glass cards floating over a grainy monochrome light field. We take the look, not the copy; its premium prompt was never seen or used.
 **Scope:** every surface: the landing page at `/`, auth, onboarding and the signed-in app. One system, two registers (section 1.2).
 
 Code that disagrees with this file is a bug. Changing a rule here needs an explicit decision recorded in `docs/MEMORY.md`.
+
+## v4 overrides (2026-10-22, owner decision)
+
+Apple-style liquid glass and rounded shapes replace the "sharp controls on soft glass" contrast. Where the v3.2 sections below disagree, this block wins.
+
+| Area | v4 rule |
+|---|---|
+| Radius (§4.2) | `rounded-sm` 10px (inputs, selects, segmented), `rounded`/`md` 8px (chips, badges, tooltips), `lg` 16px (popovers, menus, toasts), `xl` 22px (cards, panels), `2xl` 28px (dialogs, sheets, landing cards), `3xl` 32px. Buttons and `.pill` are capsules (`rounded-full`). |
+| Glass (§2.3) | Fill `rgb(20 20 22 / 0.72)` (`glass`), `0.84` (`glass-2`), `0.80` (`glass-hero`). Sheen is vertical, lit from the top (6% → 0 at 70%). Rim is brightest along the top edge. Shadow adds a specular `inset 0 1px 0 white 14%`, a faint inner glow and a soft drop. Blur 20px phone / 32px `lg`, `saturate(180%)`. Brightest point over the app light field ≈ `#353535`, so `fg-3` stays 4.7:1. |
+| Buttons (§7.1) | `primary` is a silver capsule (`.btn-solid`: white → `#D4D4D4` vertical gradient, top highlight). `secondary` is frosted (`.btn-frost`: white 12% → 4%, blur 16px). Press scales to 0.98. Still no colour fill except `paper` and `danger`. |
+| Gradients (§1.3) | Also allowed on the primary button, the landing nav pills (`.metal`) and the hero badge, all monochrome. Still no hue and no glow. |
+| Landing hero (§9.6 row 2) | One full-height frame: a 3-column header (wordmark · metallic section pills · CTA; burger + full-screen frosted menu under `md`), copy anchored bottom-centre (badge, two masked headline lines with one Instrument Serif italic word in grey, lede, two CTAs) and three plain facts along the bottom edge. No invented counts. Live market cards move to the section right after the hero. Entrance is CSS (`.appear--*`, `--d` delays), visible at rest, off under reduced motion. |
+| Type (§3.1) | Instrument Serif italic (self-hosted by `next/font`) is allowed for the single hero word only. |
 
 ---
 

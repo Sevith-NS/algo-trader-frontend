@@ -1,7 +1,9 @@
 import { Show, SignInButton } from '@clerk/nextjs';
+import { Instrument_Serif } from 'next/font/google';
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { LandingMotion } from '@/components/landing/LandingMotion';
+import { LandingNav } from '@/components/landing/LandingNav';
 import { FxCard, MarketCard, getLandingMarkets, tapeItems, Change } from '@/components/landing/LiveMarkets';
 import { PlanChart } from '@/components/landing/PlanChart';
 import { LEVELS } from '@/components/landing/planData';
@@ -18,6 +20,46 @@ import { buttonClass } from '@/components/ui/Button';
 
 const gutter = 'px-4 md:px-8 xl:px-12';
 const micro = 'text-micro uppercase';
+
+// The hero's one italic word. Self-hosted by next/font; landing only.
+const serif = Instrument_Serif({ subsets: ['latin'], weight: '400', style: 'italic', variable: '--font-serif', display: 'swap' });
+
+const factIcon = 'size-5 shrink-0 min-[1600px]:size-[22px]';
+// Plain facts, no invented counts.
+const HERO_FACTS = [
+  {
+    text: 'NSE, BSE, NYSE and NASDAQ',
+    icon: (
+      <svg aria-hidden="true" viewBox="0 0 24 24" className={factIcon}>
+        <defs>
+          <linearGradient id="hf-a" x1="3" y1="2" x2="14" y2="22" gradientUnits="userSpaceOnUse"><stop stopColor="#fff" stopOpacity="0.38" /><stop offset="1" stopColor="#3a3a3a" stopOpacity="0.62" /></linearGradient>
+          <linearGradient id="hf-b" x1="13" y1="2" x2="24" y2="22" gradientUnits="userSpaceOnUse"><stop stopColor="#3a3a3a" stopOpacity="0.38" /><stop offset="1" stopColor="#fff" stopOpacity="0.62" /></linearGradient>
+        </defs>
+        <rect x="3.4" y="2.6" width="7.2" height="18.8" rx="3.6" fill="url(#hf-a)" />
+        <rect x="13.4" y="2.6" width="7.2" height="18.8" rx="3.6" fill="url(#hf-b)" />
+        <rect x="9.2" y="10.9" width="5.6" height="2.2" rx="1.1" fill="#4a4a4a" />
+      </svg>
+    ),
+  },
+  {
+    text: 'Broker holdings sync read-only',
+    icon: (
+      <svg aria-hidden="true" viewBox="0 0 24 24" className={factIcon}>
+        <rect x="2.4" y="2.4" width="19.2" height="19.2" rx="6.2" fill="#fff" />
+        <path d="M12 7.1v7.4M8.15 12.35L12 16.2l3.85-3.85" fill="none" stroke="#111" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
+    text: 'Paper money never added to real',
+    icon: (
+      <svg aria-hidden="true" viewBox="0 0 24 24" className={factIcon}>
+        <circle cx="9" cy="12" r="6.6" fill="none" stroke="#e8e8e8" strokeWidth="1.6" />
+        <circle cx="15" cy="12" r="6.6" fill="none" stroke="var(--paper)" strokeWidth="1.6" strokeDasharray="2.4 2.2" />
+      </svg>
+    ),
+  },
+];
 
 const TAPE = [
   'NIFTY 50', 'SENSEX', 'BANK NIFTY', 'NIFTY MIDCAP 100', 'S&P 500', 'NASDAQ', 'DOW JONES', 'USD/INR',
@@ -76,72 +118,79 @@ export default async function Landing() {
   const tape = tapeItems(markets, TAPE);
   return (
     <LandingMotion>
-      <div className="relative min-h-[100dvh] overflow-x-clip bg-ink-0">
+      <div className={`relative min-h-[100dvh] overflow-x-clip bg-ink-0 ${serif.variable}`}>
         {/* Film grain over the whole page. Tune it in globals.css (.landing-grain). */}
         <div aria-hidden="true" className="landing-grain" />
 
         <header data-nav className={`fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top,0px)] ${gutter}`}>
           {/* No band, no border: a blur and a dark wash that fade into the page. */}
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[150%] bg-gradient-to-b from-ink-0/90 via-ink-0/55 to-transparent backdrop-blur-md [mask-image:linear-gradient(to_bottom,black_45%,transparent)]" />
-          <div className="mx-auto flex h-16 max-w-[1600px] items-center gap-8 md:h-20">
-            <Link href="/" data-logo aria-label="Polaris, back to top"><Wordmark /></Link>
-            <nav aria-label="Sections" className="hidden items-center gap-8 text-body-sm text-fg-2 md:flex">
-              <a href="#real-paper" data-anchor className="hover:text-fg">Portfolio</a>
-              <a href="#plan" data-anchor className="hover:text-fg">Plans</a>
-              <a href="#desk" data-anchor className="hover:text-fg">AI desk</a>
-              <a href="#trust" data-anchor className="hover:text-fg">Security</a>
-              <a href="#faq" data-anchor className="hover:text-fg">FAQ</a>
-            </nav>
-            <div className="ml-auto flex items-center gap-3">
+          <LandingNav
+            logo={<Link href="/" data-logo aria-label="Polaris, back to top"><Wordmark /></Link>}
+            cta={<>
               <Show when="signed-out">
-                <SignInButton>
-                  <button className={buttonClass('ghost', 'md', 'hidden sm:inline-flex')}>Sign in</button>
-                </SignInButton>
-                <Link href="/sign-up" className={buttonClass('primary', 'md')}>Request access</Link>
+                <Link href="/sign-up" className={buttonClass('primary', 'md', 'shine min-h-10 px-4')}>Request access</Link>
               </Show>
               <Show when="signed-in">
-                <Link href="/home" className={buttonClass('primary', 'md')}>Open Polaris</Link>
+                <Link href="/home" className={buttonClass('primary', 'md', 'shine min-h-10 px-4')}>Open Polaris</Link>
               </Show>
-            </div>
-          </div>
+            </>}
+          />
         </header>
 
         <main>
           {/* ------------------------------------------------------ hero -- */}
-          <section data-hero aria-labelledby="hero-h" className="relative isolate grid min-h-[100dvh] lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-            <div className={`relative flex flex-col items-center justify-center gap-8 pb-16 lg:mt-10 md:mt-36 mt-44 text-center ${gutter}`}>
-              <h1 id="hero-h" data-hero-title
-                  className="text-silver max-w-[16ch] text-[clamp(3rem,6.2vw,6.25rem)] pb-[0.14em] font-normal leading-[0.98] tracking-[-0.04em]">
-                India and US markets. One honest view.
-              </h1>
-              <p data-hero-in className="max-w-xl text-body text-fg-2 md:text-h4 md:font-normal">
-                Sync your Indian broker read-only, follow both markets live, and test every idea on paper with maths you can see. US holdings coming.
-              </p>
-              <div data-hero-in className="flex flex-wrap justify-center gap-4">
-                <Show when="signed-out">
-                  <Link href="/sign-up" className={buttonClass('primary', 'lg')}>Request access</Link>
-                  <SignInButton><button className={buttonClass('secondary', 'lg')}>Sign in</button></SignInButton>
-                </Show>
-                <Show when="signed-in">
-                  <Link href="/home" className={buttonClass('primary', 'lg')}>Open Polaris</Link>
-                </Show>
+          {/* One frame: the copy sits low and centred over the light field,
+              three plain facts run along the bottom edge. */}
+          <section data-hero aria-labelledby="hero-h" className="relative isolate flex min-h-[100dvh] flex-col">
+            <div aria-hidden="true" className="bloom left-1/2 top-[14%] h-[min(900px,140vw)] w-[min(1500px,200vw)] -translate-x-1/2 -translate-y-1/2 [--b:0.5]" />
+            <div className="flex flex-1 items-end justify-center px-5 pb-12 pt-28 md:pb-16 lg:pb-[85px]">
+              <div className="flex w-full max-w-[860px] flex-col items-center text-center min-[1600px]:max-w-[980px] min-[1920px]:max-w-[1120px]">
+                <span className="appear appear--pop mb-5 inline-flex items-center gap-2 hero-badge px-4 py-2 text-[12.5px] tracking-[-0.01em] min-[1600px]:text-[13.5px]"
+                      style={{ '--d': '0.22s' } as CSSProperties}>
+                  <span aria-hidden="true" className="ring-dot !size-4 text-fg" />
+                  India and US · real and paper, kept apart
+                </span>
+                <h1 id="hero-h" className="text-silver flex flex-col items-center text-[36px] font-medium leading-[1.12] tracking-[-0.045em] md:text-[42px] lg:text-[48px] xl:text-[54px] min-[1600px]:text-[64px] min-[1920px]:text-[76px]">
+                  <span className="mask-line"><span className="appear appear--mask block" style={{ '--d': '0.42s' } as CSSProperties}>India and US markets.</span></span>
+                  <span className="mask-line"><span className="appear appear--mask block" style={{ '--d': '0.62s' } as CSSProperties}>One <em className="hero-em">honest</em> view.</span></span>
+                </h1>
+                <p className="appear appear--soft mt-4 max-w-[470px] text-[16.5px] leading-[1.55] tracking-[-0.015em] text-fg-3 md:text-[15.5px] min-[1600px]:max-w-[540px] min-[1600px]:text-[18px]"
+                   style={{ '--d': '0.82s', animationDuration: '1.25s' } as CSSProperties}>
+                  Sync your Indian broker read-only, follow both markets live, and test every idea on paper with maths you can see.
+                </p>
+                <div className="mt-6 flex w-full flex-col items-stretch justify-center gap-2.5 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
+                  <Show when="signed-out">
+                    <Link href="/sign-up" className={buttonClass('primary', 'md', 'shine appear appear--btn px-5')} style={{ '--d': '0.96s' } as CSSProperties}>Request access</Link>
+                    <SignInButton><button className={buttonClass('secondary', 'md', 'shine appear appear--side px-5')} style={{ '--d': '1.10s' } as CSSProperties}>Sign in</button></SignInButton>
+                  </Show>
+                  <Show when="signed-in">
+                    <Link href="/home" className={buttonClass('primary', 'md', 'shine appear appear--btn px-5')} style={{ '--d': '0.96s' } as CSSProperties}>Open Polaris</Link>
+                  </Show>
+                </div>
               </div>
-              <p data-hero-in className="text-caption text-fg-3 mb-20">
-                Broker sync: Zerodha · Markets NSE, BSE, NYSE, NASDAQ · No commissions · Invite only
-              </p>
             </div>
 
-            <div className="relative flex flex-col justify-center gap-4 px-4 pb-16 pt-10 sm:px-10 lg:pt-28 xl:px-16">
-              <div aria-hidden="true" className="bloom left-[40%] top-[40%] h-[min(1000px,100vw)] w-[min(1000px,80vw)] -translate-x-1/2 -translate-y-1/2" />
-              <div data-light-cards className="relative mx-auto flex w-full max-w-[420px] flex-col gap-4">
-                <MarketCard title="India" market={markets?.india ?? null} />
-                <MarketCard title="United States" market={markets?.us ?? null} />
-                <FxCard fx={markets?.fx ?? null} />
-                <p data-hero-card className="text-center">
-                  <span className="pill bg-ink-0/85 text-fg">Live, delayed market data</span>
-                </p>
-              </div>
+            <ul aria-label="At a glance" className="flex flex-col items-center gap-4 px-5 pb-[max(28px,env(safe-area-inset-bottom))] text-[15px] tracking-[-0.015em] text-fg-2 md:flex-row md:justify-between md:gap-6 md:px-12 md:pb-9 md:text-[13.5px] xl:px-[72px] min-[1600px]:px-24 min-[1600px]:text-[15px]">
+              {HERO_FACTS.map((f, i) => (
+                <li key={f.text} className="appear appear--stat inline-flex items-center gap-3.5 md:whitespace-nowrap" style={{ '--d': `${1.12 + i * 0.16}s` } as CSSProperties}>
+                  {f.icon}{f.text}
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          {/* --------------------------------------------- live markets -- */}
+          <section aria-label="Live markets" className={`relative isolate py-16 md:py-24 ${gutter}`}>
+            <div aria-hidden="true" className="bloom left-1/2 top-1/2 h-[min(900px,160vw)] w-[min(1500px,200vw)] -translate-x-1/2 -translate-y-1/2 [--b:0.7]" />
+            <div data-stagger className="mx-auto grid max-w-[1400px] gap-4 md:grid-cols-3">
+              <MarketCard title="India" market={markets?.india ?? null} />
+              <MarketCard title="United States" market={markets?.us ?? null} />
+              <FxCard fx={markets?.fx ?? null} />
             </div>
+            <p className="mt-6 text-center">
+              <span className="pill bg-ink-0/85 text-fg">Live, delayed market data</span>
+            </p>
           </section>
 
           {/* ------------------------------------------------------ tape -- */}
