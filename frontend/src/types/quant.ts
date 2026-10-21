@@ -34,6 +34,5 @@ export type QuantSignals = {
 };
 
 export type MlInsights = {
-  xgboost_probability: number;
   fear_greed_index: number;
 };

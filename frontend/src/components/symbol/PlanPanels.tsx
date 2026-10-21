@@ -145,13 +145,8 @@ export function PlanDetail({ quant, ml, currency }: {
 
       {ml && (
         <section aria-labelledby="ml-h" className="glass rounded-2xl p-5 md:p-6 flex flex-col gap-3">
-          <div className="flex items-baseline gap-3">
-            <h2 id="ml-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />Model forecasts</h2>
-            <span className="pill border-warn/50 bg-warn/10 text-warn">In-sample</span>
-          </div>
-          <p className="text-caption text-fg-3">These models are scored on the same history they learned from, so they overstate their own accuracy. Treat them as context, not a signal.</p>
+          <h2 id="ml-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />Sentiment</h2>
           <dl>
-            <KV label="Next day up (XGBoost)">{formatPct(ml.xgboost_probability * 100, 0).replace('+', '')}</KV>
             <KV label="News sentiment">{ml.fear_greed_index} of 100</KV>
           </dl>
         </section>
