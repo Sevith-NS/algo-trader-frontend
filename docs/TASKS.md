@@ -95,7 +95,17 @@ Each primitive comes with all its states, keyboard support and a short usage com
 ### Brokers and settings
 - [x] **T4.14** Settings → Brokers: list connections with SyncBadge, "Connect Zerodha", "Connect Upstox", Sync now, Disconnect (typed confirm), scopes shown. `[L]` `[BE]` brokers
 - [x] **T4.15** `/settings/brokers/callback`: success, cancelled and error states, then return to Brokers. `[S]` `[BE]`
-- [ ] **T4.16** "Needs reconnect" amber `Banner` on Portfolio and Home when any broker needs attention. `[S]`
+- [x] **T4.15a** Bring-your-own broker keys (2026-10-20). Every broker uses the user's own developer app or read-only token; nothing per broker is on the server (only `BROKER_TOKEN_KEY`). `[L]` `[BE]` brokers
+  - [x] Connect form for every broker: the app's fields, a help link to the broker's developer console, the exact Redirect URL with Copy.
+  - [x] "Keep this connection" picker, like a GitHub token's expiration: this browser session, until today's broker session ends, 7/30/90 days, or a custom date (max 90). Enforced server side inside the sealed cookie.
+  - [x] One-click Reconnect reuses the saved app keys; the row shows when the broker session ends and how long the keys are kept.
+  - [x] Disconnect forgets the token and keys at once and logs out at the broker.
+  - [x] BFF cookies narrowed to `Path=/api/backend; SameSite=Strict`; browser-session cookies when the user picks "this session".
+  - [x] Dhan moved from the partner flow to the individual API-key consent flow (client ID, API key, secret).
+  - [x] Verified locally (2026-10-20): real Zerodha login → callback → connected, holdings and watchlist load, with `SameSite=Strict`. Kite's Redirect URL must be the full callback path, not the site root.
+  - [ ] Same check on the Vercel deploy (set `BROKER_TOKEN_KEY`, `FLINT_API_URL`, and the Vercel origin in `AUTHORIZED_PARTIES`). `[S]`
+  - [ ] Verify each other broker's login once with a real developer app (Upstox, FYERS, Angel One, Dhan). `[M]`
+- [ ] **T4.16** "Needs reconnect" amber `Banner` on Portfolio and Home when any broker needs attention. Reconnect is one click (saved keys). `[S]`
 - [ ] **T4.17** Settings → Preferences: base currency (INR/USD), density, reduced-motion override. Restyle Profile, Security and Data and privacy sections. `[M]`
 
 ### Symbol
