@@ -2,215 +2,432 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Polaris v3.2 "Glass". Tokens mirror tailwind.config.js; see docs/DESIGN.md.
+   Calibrated against the Wealthcore reference: neutral greys, near-opaque
+   glass with a diagonal sheen and a rim light, heavy grain, silver display. */
 :root {
-  /* Core Colors — deep slate with soft neon accents */
-  --bg-primary: #07090F;
-  --bg-secondary: #0D1220;
-  --bg-elevated: #121A2C;
-  --bg-glass: rgba(13, 18, 32, 0.72);
-  --text-primary: #F1F5F9;
-  --text-secondary: #94A3B8;
-  /* Was #64748B, which measured 4.22:1 on --bg-primary and 4.06:1 on the glass
-     panel — under the 4.5:1 floor, and this token carries the small print:
-     footnotes, captions, timestamps, "N of M priced". Raised to the lightest
-     value that still reads a clear step below --text-secondary: 4.98:1 on the
-     page, 4.78:1 on a glass panel. */
-  --text-muted: #72809A;
+  --ink-0: #0B0B0C;
+  --ink-1: #141414;
+  --ink-2: #1C1C1C;
+  --ink-3: #242424;
+  --line: #2A2A2A;
+  --line-strong: #3A3A3A;
+  --control: #7A7A7A;
+  --fg: #F5F5F5;
+  --fg-2: #B5B5B5;
+  --fg-3: #A0A0A0; /* 5.3:1 on the brightest card sheen (#2D2D2D) */
+  --green: #3DD68C;
+  --red: #FF7A75;
+  --amber: #E8B04A;
+  --paper: #86B7FF; /* paper money only */
 
-  /* Brand/Accent Colors */
-  --accent-green: #34D399;
-  --accent-red: #F87171;
-  --accent-blue: #60A5FA;
-  --accent-purple: #A78BFA;
-  --accent-amber: #FBBF24;
-  --accent-cyan: #22D3EE;
+  /* Chart series greys, between fg and control. Indicators use these, never
+     green/red (those mean direction). */
+  --series-2: #C9C9C9;
+  --series-4: #808080;
 
-  /* UI Tokens */
-  --border-subtle: rgba(148, 163, 184, 0.12);
-  --border-strong: rgba(148, 163, 184, 0.24);
-  --border-focus: rgba(52, 211, 153, 0.5);
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  /* Glass. The fill is near-opaque on purpose: the reference reads as glass
+     because of the light behind it and the rim around it, not because the
+     card is see-through. 0.80 keeps the brightest sheen at #2D2D2D over the
+     app's light field (fg-3 stays AA). */
+  --glass-fill: rgb(17 17 17 / 0.80);
+  --glass-fill-2: rgb(22 22 22 / 0.90);
+  --glass-fill-hero: rgb(15 15 15 / 0.88);
+  --glass-sheen: linear-gradient(135deg, rgb(255 255 255 / 0.075) 0%, rgb(255 255 255 / 0.025) 42%, rgb(255 255 255 / 0) 72%);
+  --glass-rim: linear-gradient(135deg, rgb(255 255 255 / 0.34) 0%, rgb(255 255 255 / 0.08) 38%, rgb(255 255 255 / 0.04) 70%, rgb(255 255 255 / 0.14) 100%);
+  --glass-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 24px 48px -24px rgb(0 0 0 / 0.7);
+  --blur: 14px;
 
-  /* Shadows and Effects */
-  --shadow-glow-green: 0 0 24px rgba(52, 211, 153, 0.15);
-  --shadow-glow-red: 0 0 24px rgba(248, 113, 113, 0.15);
-  --shadow-glass: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset, 0 8px 32px rgba(0, 0, 0, 0.35);
-  --blur-glass: blur(16px);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 
-  /* Typography
-     Two faces, one rule: General Sans carries PROSE (headings, descriptions,
-     article copy), JetBrains Mono carries DATA (tickers, prices, percentages,
-     counts, timestamps, labels). Anything a trader reads as a number or an
-     identifier is mono; anything they read as a sentence is General Sans.
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
 
-     Both --font-sans and --font-mono are defined by next/font/local in
-     layout.tsx and set on <html>, so they already carry their own
-     metric-matched fallback chain. Nothing to declare here. */
+  --font-ui: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  color-scheme: dark;
 }
 
-html, body {
+@media (min-width: 1024px) {
+  :root { --blur: 24px; }
+}
+
+html,
+body {
   margin: 0;
   padding: 0;
-  width: 100%;
-  min-height: 100vh;
-  background-color: var(--bg-primary);
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(96, 165, 250, 0.08), transparent),
-    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(167, 139, 250, 0.05), transparent);
-  background-attachment: fixed;
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  /* `clip` rather than `hidden`: both stop the sideways scroll a stray wide
-     table can cause, but `hidden` silently makes this element a scroll
-     container, which breaks `position: sticky` on every descendant (the
-     Navigation bar, the Movers section headers). `clip` does not. */
+  min-height: 100%;
+  background: var(--ink-0);
+  color: var(--fg);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 24px;
+  /* clip, not hidden: hidden would make <body> a scroll container and break
+     position: sticky everywhere below it. */
   overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
 a {
-  text-decoration: none;
   color: inherit;
+  text-decoration: none;
 }
 
 button {
   background: none;
   border: none;
-  cursor: pointer;
-  font-family: inherit;
   color: inherit;
+  cursor: pointer;
+  font: inherit;
 }
 
-/* Slim custom scrollbars */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+h1, h2, h3, h4 {
+  margin: 0;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
 }
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.2);
-  border-radius: 8px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.35);
+
+p {
+  margin: 0;
 }
 
 ::selection {
-  background: rgba(52, 211, 153, 0.25);
+  background: rgb(255 255 255 / 0.22);
 }
 
-/* The caret ships as the browser's, which on a dark surface is a thin black
-   bar that all but disappears in the share-size and search inputs. It is part
-   of the interface; it gets a token like everything else. */
 input,
 textarea,
-[contenteditable] {
-  caret-color: var(--accent-green);
+select {
+  font: inherit;
+  caret-color: var(--fg);
 }
 
-/* Placeholders inherit a browser grey that measures well under 4.5:1 here.
-   Pinned to the muted token, which is now above the floor. */
 ::placeholder {
-  color: var(--text-muted);
-  opacity: 1; /* Firefox dims placeholders by default; the token already is dim. */
+  color: var(--fg-3);
+  opacity: 1;
 }
 
-.glass-panel {
-  background: var(--bg-glass);
-  backdrop-filter: var(--blur-glass);
-  -webkit-backdrop-filter: var(--blur-glass);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-glass);
-  transition: border-color 0.25s ease;
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--control); }
+
+/* One focus treatment everywhere: a 2px white ring with a 2px gap. White,
+   because colour is reserved for meaning. In the base layer so a component
+   that shows focus its own way can override it. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 2px;
+  }
 }
 
-.glass-panel:hover {
-  border-color: var(--border-strong);
-}
+/* ------------------------------------------------------------------ data -- */
 
-/* ==========================================================================
-   Data typography.
-
-   `.tabular` marks a numeric readout, and every numeric readout in this app is
-   mono — so the class carries the family as well as the figures. That is the
-   one lever that keeps numbers consistent across ~14 routes: the alternative
-   was `font-mono` hand-applied at 60-odd call sites, which is exactly how the
-   app drifted into mixed fonts in the first place.
-
-   Apply `.tabular` to the number ITSELF, never to a block of prose containing
-   a number, or the sentence around it turns monospaced too.
-   ========================================================================== */
-.tabular {
-  font-family: var(--font-mono);
+/* Numbers align in columns without a monospace face. */
+.tabular,
+.font-mono {
   font-variant-numeric: tabular-nums;
 }
 
-/* A ticker or instrument code: mono, slightly open, never wrapped mid-symbol. */
 .ticker {
-  font-family: var(--font-mono);
   font-weight: 700;
-  letter-spacing: 0.01em;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Section eyebrows, column headers and metric captions. */
 .label {
-  font-family: var(--font-mono);
-  text-transform: uppercase;
-  letter-spacing: 0.22em;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--fg-3);
 }
 
-/* General Sans is a geometric-leaning grotesque and already sets fairly tight
-   at display sizes, so this pulls in less than the old Raleway did — enough to
-   keep the big headings from reading airy without crowding the counters. */
-h1, h2, h3 {
-  letter-spacing: -0.02em;
+/* ----------------------------------------------------------------- glass -- */
+
+/* In the components layer so utilities on the same element (a border colour,
+   a hover fill, a position) still win, as they do for any Tailwind class. */
+@layer components {
+
+  /* Near-opaque dark glass: diagonal sheen over a translucent fill, a rim
+     light drawn as a masked gradient border (::before), a soft drop, and a
+     faint emboss on the text. Never on table rows or list items; at most two
+     layers deep. */
+  .glass,
+  .glass-hero {
+    position: relative;
+  }
+  /* glass-2 is for overlays, which are always positioned (fixed, absolute or
+     a native <dialog>); setting position here would override the dialog's. */
+  .glass,
+  .glass-2,
+  .glass-hero {
+    background: var(--glass-sheen), var(--g-fill, var(--glass-fill));
+    border: 1px solid transparent;
+    box-shadow: var(--glass-shadow);
+    text-shadow: 0 1px 0 rgb(0 0 0 / 0.35);
+    -webkit-backdrop-filter: blur(var(--blur)) saturate(110%);
+    backdrop-filter: blur(var(--blur)) saturate(110%);
+  }
+  .glass::before,
+  .glass-2::before,
+  .glass-hero::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--g-rim, var(--glass-rim));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .glass-2 { --g-fill: var(--glass-fill-2); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 32px 64px -24px rgb(0 0 0 / 0.8); }
+  .glass-hero { --g-fill: var(--glass-fill-hero); }
+
+  /* Semantic tints: a wash of the colour in the fill and in the rim. They sit
+     on top of a glass class and never replace the text label. */
+  .glass-up    { --tint: 61 214 140; }
+  .glass-down  { --tint: 255 122 117; }
+  .glass-warn  { --tint: 232 176 74; }
+  .glass-paper { --tint: 134 183 255; }
+  .glass-up,
+  .glass-down,
+  .glass-warn,
+  .glass-paper {
+    --g-fill: linear-gradient(rgb(var(--tint) / 0.07), rgb(var(--tint) / 0.07)), var(--glass-fill);
+    --g-rim: linear-gradient(135deg, rgb(var(--tint) / 0.55) 0%, rgb(var(--tint) / 0.14) 40%, rgb(var(--tint) / 0.06) 70%, rgb(var(--tint) / 0.22) 100%);
+  }
+
+  /* A flat inset well inside glass: inputs, nested sections, table frames. */
+  .well {
+    background: rgb(0 0 0 / 0.28);
+    border: 1px solid rgb(255 255 255 / 0.07);
+  }
+
+  /* The reference's ring dot: a status marker that reads at any size. */
+  .ring-dot {
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: rgb(255 255 255 / 0.08);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14);
+  }
+  .ring-dot::after {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: currentColor;
+  }
+
+  /* Square status pill (REBALANCE NEEDED, PAPER, STOP HIT). */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 2px;
+    border: 1px solid rgb(255 255 255 / 0.16);
+    background: rgb(255 255 255 / 0.06);
+    font-size: 11px;
+    line-height: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* Faint dot grid for chart wells, as in the reference's value card. */
+  .dot-grid {
+    background-image: radial-gradient(rgb(255 255 255 / 0.08) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  /* No blur support, or the person asked for less transparency: solid. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass, .glass-hero { --glass-fill: var(--ink-2); --glass-fill-hero: var(--ink-2); }
+    .glass-2 { --glass-fill-2: var(--ink-2); }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .glass, .glass-2, .glass-hero {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      --glass-fill: var(--ink-2);
+      --glass-fill-2: var(--ink-2);
+      --glass-fill-hero: var(--ink-2);
+    }
+  }
 }
 
-/* Shared micro-interaction for cards */
-.hover-lift {
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+/* --------------------------------------------------- light field + grain -- */
+
+/* The page: a vertical ink gradient, a grainy monochrome light behind the
+   glass, and film grain over everything. Fixed pseudo-elements, so there is
+   no JavaScript and no per-frame work. .ambient is the app; the brightest
+   point stays near #5A5A5A so glass text keeps AA. The landing lights itself
+   with .bloom. */
+.ambient {
+  position: relative;
+  isolation: isolate;
 }
-.hover-lift:hover {
-  transform: translateY(-2px);
+.ambient::before,
+.ambient::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+.ambient::before {
+  z-index: -1;
+  background:
+    radial-gradient(38vmax 52vmax at 100% 18%, rgb(150 150 150 / 0.42), rgb(150 150 150 / 0.12) 45%, transparent 72%),
+    radial-gradient(42vmax 30vmax at 0% 100%, rgb(255 255 255 / 0.07), transparent 70%),
+    linear-gradient(180deg, #0B0B0C 0%, #121212 55%, #181818 100%);
+}
+.ambient::after {
+  z-index: 60;
+  opacity: 0.11;
+  mix-blend-mode: overlay;
+  background-image: var(--grain);
 }
 
-/* ==========================================================================
-   Reduced motion — hard requirement (CLAUDE.md).
-   One central kill-switch for all CSS-driven motion: marquees, gradients,
-   shine, meteors, pulses, transitions. Loading spinners are carved out —
-   a frozen spinner reads as "hung", and a slow rotation conveys state
-   without vestibular-trigger motion.
-   JS-driven motion (GSAP, anime.js, R3F, framer springs) is gated in the
-   components themselves via usePrefersReducedMotion / gsap.matchMedia.
-   ========================================================================== */
+/* ------------------------------------------------------- landing grain -- */
+
+/* Film grain over the whole landing page. Two layers, because one blend mode
+   can't do both jobs: "overlay" textures the lit areas and glass but leaves
+   pure black untouched, so a faint "screen" layer adds grain to the dark.
+   Static on purpose (no animated noise).
+
+   CUSTOMISE HERE:
+     --grain-light    strength on lit areas and glass        (0 to 1)
+     --grain-dark     strength on dark areas                  (0 to 0.15; above that it looks dusty)
+     --grain-scale    tile size: smaller = finer grain        (e.g. 120px fine, 300px coarse)
+   The noise pattern itself is --grain in :root (baseFrequency: higher = finer,
+   numOctaves: more = more detail). Override any of these on .landing-grain in
+   page.tsx with Tailwind, e.g. [--grain-dark:0.08]. */
+.landing-grain {
+  --grain-light: 0.16;
+  --grain-dark: 0.06;
+  --grain-scale: 200px;
+  /* No position or z-index here: that would make this element its own group
+     and the layers would blend with nothing (a flat haze over the page). */
+}
+.landing-grain::before,
+.landing-grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background-image: var(--grain);
+  background-size: var(--grain-scale);
+}
+.landing-grain::before {
+  opacity: var(--grain-light);
+  mix-blend-mode: overlay;
+}
+.landing-grain::after {
+  opacity: var(--grain-dark);
+  mix-blend-mode: screen;
+}
+
+/* A free-floating silver bloom: the landing's continuous light. Absolute and
+   behind its section's content; it fades to transparent at every edge, so
+   blooms overlap across sections with no seams. --b sets the strength (0..1);
+   keep text-bearing areas off the bright core (DESIGN.md §2.4). */
+.bloom {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 9999px;
+  /* A Gaussian falloff sampled every 10%: no kinks, so no visible rings or
+     edges where the light fades over a flat dark area. */
+  background: radial-gradient(closest-side,
+    rgb(205 205 205 / calc(var(--b, 1) * 1.000)) 0%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.969)) 10%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.880)) 20%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.749)) 30%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.597)) 40%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.442)) 50%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.301)) 60%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.184)) 70%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.095)) 80%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.035)) 90%,
+    rgb(205 205 205 / calc(var(--b, 1) * 0.000)) 100%);
+}
+
+
+/* ---------------------------------------------------------------- silver -- */
+
+/* Display sizes and the hero figure only. Darkest stop is 7.3:1 on ink-0. */
+.text-silver {
+  background: linear-gradient(180deg, #FFFFFF 0%, #E4E4E4 45%, #A3A3A3 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 2px 6px rgb(0 0 0 / 0.45));
+}
+@media (forced-colors: active) {
+  .text-silver { background: none; color: CanvasText; filter: none; }
+}
+
+/* Skeleton placeholder used while data loads. */
+.skeleton {
+  background: rgb(255 255 255 / 0.06);
+  border-radius: 4px;
+  animation: pulseSoft 1.6s ease-in-out infinite;
+}
+
+/* Sheet (components/ui/Sheet.tsx): slides from its edge. Exit keyframes set
+   only the end state, so a drag-dismissed sheet leaves from where it was let go. */
+.sheet { animation: sheet-in-up var(--dur-slow) var(--ease-standard); }
+.sheet[data-closing] { animation: sheet-out-down 220ms var(--ease-exit) forwards; }
+.sheet::backdrop { animation: sheet-fade-in var(--dur-slow) var(--ease-standard); }
+.sheet[data-closing]::backdrop { animation: sheet-fade-out 220ms var(--ease-exit) forwards; }
+@media (min-width: 1024px) {
+  .sheet { animation-name: sheet-in-left; }
+  .sheet[data-closing] { animation-name: sheet-out-right; }
+}
+@keyframes sheet-in-up { from { transform: translateY(100%); } }
+@keyframes sheet-out-down { to { transform: translateY(100%); } }
+@keyframes sheet-in-left { from { transform: translateX(100%); } }
+@keyframes sheet-out-right { to { transform: translateX(100%); } }
+@keyframes sheet-fade-in { from { opacity: 0; } }
+@keyframes sheet-fade-out { to { opacity: 0; } }
+
+/* Popover, Menu, Tooltip: fade + 4px rise (DESIGN.md §8). */
+.popover { animation: popover-in var(--dur-base) var(--ease-standard); }
+@keyframes popover-in { from { opacity: 0; transform: translateY(4px); } }
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Hard requirement: honour reduced motion everywhere. */
 @media (prefers-reduced-motion: reduce) {
-  *:not(.animate-spin),
-  *:not(.animate-spin)::before,
-  *:not(.animate-spin)::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .animate-spin {
-    animation-duration: 1.8s !important;
-  }
-}
-
-/* Visible keyboard focus (nav buttons previously used focus:outline-none) */
-:focus-visible {
-  outline: 2px solid var(--border-focus);
-  outline-offset: 2px;
 }

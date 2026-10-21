@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from '@/components/ui/icons';
 import type { Freshness } from '../../types/discover';
 
 /**
@@ -25,19 +25,19 @@ export default function FreshnessNote({
   const stale = freshness?.stale === true;
 
   if (!stale) {
-    return <span className={clsx('text-xs text-textMuted', className)}>as of {asOf}</span>;
+    return <span className={clsx('text-xs text-fg-3', className)}>as of {asOf}</span>;
   }
 
   return (
     <span
       className={clsx(
-        'flex items-center gap-1.5 rounded border border-accentAmber/30 bg-accentAmber/10 px-2 py-1 text-xs text-accentAmber',
+        'flex items-center gap-1.5 rounded border border-warn/30 bg-warn/10 px-2 py-1 text-xs text-warn',
         className,
       )}
       title="The upstream feed has not returned a newer bar. Cached data is being served."
     >
       <AlertTriangle size={12} />
-      Data stale — newest bar is {asOf}
+      Stale data: newest bar is {asOf}
       {age != null && <span className="tabular">({age}d old)</span>}
     </span>
   );

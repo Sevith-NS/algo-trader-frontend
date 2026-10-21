@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Polaris: the fixed point the sky turns around. Circumpolar trails orbit a still north star. -->
+  <g fill="none" stroke-linecap="butt">
+    <circle cx="256" cy="256" r="168" stroke="#D6D9DD" stroke-width="10" stroke-dasharray="620 435.6" transform="rotate(-30 256 256)"/>
+    <circle cx="256" cy="256" r="204" stroke="#A9ADB3" stroke-width="7" stroke-dasharray="420 90 380 391.7" transform="rotate(150 256 256)"/>
+    <circle cx="256" cy="256" r="238" stroke="#6F7379" stroke-width="4" stroke-dasharray="260 1235.4" transform="rotate(60 256 256)"/>
+  </g>
+  <path d="M256,116 L267,245 L336,256 L267,267 L256,348 L245,267 L176,256 L245,245 Z" fill="#F2F3F5"/>
+</svg>

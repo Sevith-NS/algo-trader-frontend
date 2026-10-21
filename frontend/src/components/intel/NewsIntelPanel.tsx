@@ -1,117 +1,95 @@
 "use client";
 import { useState } from 'react';
-import { Newspaper, TrendingUp, TrendingDown, Minus, ExternalLink, ChevronDown } from 'lucide-react';
-import clsx from 'clsx';
-import { stanceColor } from './format';
+import { ExternalLink } from '@/components/ui/icons';
+import { Tone } from '@/components/ui/Tone';
+import { timeAgo } from '@/lib/format';
+import type { Failed, NewsArticle, NewsIntel } from '../../types/intel';
+
+const STANCE_WORD = { bullish: 'Positive', bearish: 'Negative', neutral: 'Neutral' } as const;
+const SHOWN = 8;
+
+function Story({ a }: { a: NewsArticle }) {
+  const body = (
+    <>
+      <span className="flex min-w-0 flex-col gap-1">
+        <span className="text-body-sm font-medium text-fg group-hover:underline group-hover:underline-offset-4">
+          {a.title}
+          {a.link && <ExternalLink size={12} aria-hidden="true" className="ml-1.5 inline align-baseline text-fg-3" />}
+        </span>
+        <span className="text-caption text-fg-3">
+          {a.source ?? 'Unknown outlet'}
+          {a.published && <> · <time dateTime={a.published}>{timeAgo(a.published)}</time></>}
+        </span>
+      </span>
+      <Tone score={a.sentiment_score} className="shrink-0 pt-0.5" />
+    </>
+  );
+  return (
+    <li className="border-b border-line">
+      {a.link ? (
+        <a href={a.link} target="_blank" rel="noopener noreferrer" className="group flex items-start justify-between gap-4 py-3">
+          {body}
+          <span className="sr-only">(opens in a new tab)</span>
+        </a>
+      ) : (
+        <div className="flex items-start justify-between gap-4 py-3">{body}</div>
+      )}
+    </li>
+  );
+}
 
 /**
- * Multi-source news intelligence panel: every headline the sweep found across
- * Google News / Bing / Yahoo feeds, each scored, plus the aggregate stance
- * (bullish / bearish / neutral), 0-100 rating and confidence.
+ * News for one symbol: headlines from several outlets, each scored for tone,
+ * plus the recency-weighted overall read (0 to 100) and how much to trust it.
  */
-export default function NewsIntelPanel({ data }: { data: any }) {
+export default function NewsIntelPanel({ data }: { data: NewsIntel | Failed | null | undefined }) {
   const [expanded, setExpanded] = useState(false);
-  if (!data || data.error || !data.articles) return null;
+  if (!data || 'error' in data || !data.articles) return null;
 
-  const color = stanceColor(data.stance);
-  const Icon = data.stance === 'bullish' ? TrendingUp : data.stance === 'bearish' ? TrendingDown : Minus;
-  const shown = expanded ? data.articles : data.articles.slice(0, 6);
+  const { bullish, neutral, bearish } = data.breakdown;
+  const total = Math.max(1, bullish + neutral + bearish);
+  const shown = expanded ? data.articles : data.articles.slice(0, SHOWN);
 
   return (
-    <div className="glass-panel p-5" style={{ borderTop: `2px solid ${color}` }}>
-      <h3 className="mb-3 flex items-center gap-2 border-b border-borderSubtle pb-3 text-sm font-semibold text-textPrimary">
-        <Newspaper size={15} style={{ color }} /> News Intelligence
-        <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wide text-textMuted">
-          {data.distinct_outlets} outlets · {data.article_count} stories
-        </span>
-      </h3>
+    <section aria-labelledby="news-intel-h" className="glass rounded-2xl p-5 md:p-6 flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        <h2 id="news-intel-h" className="flex items-center gap-3 text-micro uppercase text-fg"><span aria-hidden="true" className="ring-dot text-fg" />News tone</h2>
+        <p className="text-body-sm text-fg-2">
+          {data.article_count} stories from {data.distinct_outlets} outlets, newest weighted most.
+        </p>
+      </div>
 
-      {/* Aggregate stance */}
-      <div className="mb-3 flex items-center justify-between rounded-xl border border-borderSubtle bg-white/[0.02] p-3">
-        <div className="flex items-center gap-2">
-          <Icon size={18} style={{ color }} />
-          <div>
-            <div className="text-sm font-bold font-mono uppercase tracking-wide" style={{ color }}>
-              {data.stance}
-            </div>
-            <div className="text-[10px] text-textMuted">
-              confidence: {data.confidence} · recency-weighted
-            </div>
-          </div>
+      <div className="flex flex-wrap items-end gap-x-10 gap-y-4 border-y border-line py-4">
+        <p className="flex items-baseline gap-2">
+          <span className="text-h3 font-bold tabular">{data.rating}</span>
+          <span className="text-body-sm text-fg-2">of 100 · {STANCE_WORD[data.stance]}</span>
+        </p>
+        <p className="text-body-sm text-fg-2">Confidence <span className="font-medium text-fg">{data.confidence}</span></p>
+        <div className="flex min-w-[14rem] flex-1 flex-col gap-1.5">
+          <span aria-hidden="true" className="flex h-1.5 w-full bg-white/[0.06]">
+            <span className="bg-up" style={{ width: `${(bullish / total) * 100}%` }} />
+            <span className="bg-fg-3" style={{ width: `${(neutral / total) * 100}%` }} />
+            <span className="bg-down" style={{ width: `${(bearish / total) * 100}%` }} />
+          </span>
+          <span className="flex justify-between text-caption text-fg-2 tabular">
+            <span>▲ {bullish} positive</span><span>{neutral} neutral</span><span>▼ {bearish} negative</span>
+          </span>
         </div>
-        <div className="text-right">
-          <div className="text-2xl font-bold tabular" style={{ color }}>{data.rating}<span className="text-xs text-textMuted">/100</span></div>
-          <div className="text-[10px] text-textMuted">news rating</div>
-        </div>
       </div>
 
-      {/* Bull / bear split */}
-      <div className="mb-1 flex h-1.5 w-full overflow-hidden rounded-full bg-white/5">
-        {data.article_count > 0 && (
-          <>
-            <div className="h-full bg-accentGreen" style={{ width: `${(data.breakdown.bullish / data.article_count) * 100}%` }} />
-            <div className="h-full bg-accentAmber/60" style={{ width: `${(data.breakdown.neutral / data.article_count) * 100}%` }} />
-            <div className="h-full bg-accentRed" style={{ width: `${(data.breakdown.bearish / data.article_count) * 100}%` }} />
-          </>
-        )}
-      </div>
-      <div className="mb-3 flex justify-between text-[10px] text-textMuted">
-        <span className="text-accentGreen">{data.breakdown.bullish} bullish</span>
-        <span>{data.breakdown.neutral} neutral</span>
-        <span className="text-accentRed">{data.breakdown.bearish} bearish</span>
-      </div>
+      <ul>{shown.map((a, i) => <Story key={`${a.link ?? a.title}-${i}`} a={a} />)}</ul>
 
-      {/* Headlines */}
-      <div className="space-y-2.5">
-        {shown.map((a: any, i: number) => {
-          const body = (
-            <div className="flex items-start gap-2">
-              <span
-                className={clsx(
-                  'mt-0.5 shrink-0 rounded px-1 py-px text-[9px] font-bold uppercase',
-                  a.sentiment === 'bullish' && 'bg-emerald-400/10 text-accentGreen',
-                  a.sentiment === 'bearish' && 'bg-red-400/10 text-accentRed',
-                  a.sentiment === 'neutral' && 'bg-white/5 text-textMuted',
-                )}
-              >
-                {a.sentiment === 'bullish' ? 'BULL' : a.sentiment === 'bearish' ? 'BEAR' : 'NEUT'}
-              </span>
-              <div className="min-w-0">
-                <p className="text-xs leading-snug text-textSecondary transition-colors group-hover:text-textPrimary">
-                  {a.title}
-                  {a.link && <ExternalLink size={10} className="ml-1 inline opacity-0 group-hover:opacity-60" />}
-                </p>
-                <p className="mt-0.5 text-[10px] text-textMuted">
-                  {a.source}{a.age_days !== null && a.age_days !== undefined ? ` · ${a.age_days < 1 ? 'today' : `${Math.round(a.age_days)}d ago`}` : ''}
-                </p>
-              </div>
-            </div>
-          );
-          // Some feeds omit the link — don't render a hover-affordant dead anchor
-          return a.link ? (
-            <a key={i} href={a.link} target="_blank" rel="noopener noreferrer" className="group block">
-              {body}
-            </a>
-          ) : (
-            <div key={i} className="block">{body}</div>
-          );
-        })}
-      </div>
-
-      {data.articles.length > 6 && (
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="mt-3 flex w-full items-center justify-center gap-1 rounded-lg border border-borderSubtle py-1.5 text-[11px] text-textSecondary transition-colors hover:bg-white/[0.03] hover:text-textPrimary"
-        >
-          {expanded ? 'Show less' : `Show all ${data.articles.length} stories`}
-          <ChevronDown size={12} className={clsx('transition-transform', expanded && 'rotate-180')} />
+      {data.articles.length > SHOWN && (
+        <button type="button" onClick={() => setExpanded(!expanded)} aria-expanded={expanded}
+                className="min-h-11 self-start text-body-sm text-fg-2 underline underline-offset-4 hover:text-fg">
+          {expanded ? 'Show fewer stories' : `Show all ${data.articles.length} stories`}
         </button>
       )}
 
-      <p className="mt-3 border-t border-borderSubtle pt-2 text-[10px] leading-relaxed text-textMuted">
-        Sources swept: {data.sources_scanned?.join(' · ')}. Sentiment is headline-level
-        (finance-tuned VADER), recency-weighted with a 3-day decay.
+      <p className="max-w-prose text-caption text-fg-3">
+        Sources: {data.sources_scanned?.join(', ')}. Tone is scored per headline by a finance-tuned sentiment model
+        and weighted toward the last three days. It describes coverage, not where the price will go.
       </p>
-    </div>
+    </section>
   );
 }

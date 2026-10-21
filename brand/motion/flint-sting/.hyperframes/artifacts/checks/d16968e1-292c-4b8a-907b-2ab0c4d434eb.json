@@ -1,0 +1,150 @@
+{
+  "ok": true,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 1,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "overlapping_gsap_tweens",
+        "severity": "warning",
+        "message": "GSAP tweens overlap on \"#sweep\" for opacity between 3.35s and 3.65s.",
+        "selector": "#sweep",
+        "dataAttributes": {},
+        "sourceFile": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\brand\\motion\\flint-sting\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Shorten the earlier tween, move the later tween, or add `overwrite: \"auto\"`."
+      }
+    ],
+    "filesScanned": 1
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "layout": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 1,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "container_overflow",
+        "severity": "warning",
+        "time": 0.278,
+        "selector": "#mark > g:nth-of-type(1)",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": -14.63,
+          "top": 85.38,
+          "right": 897,
+          "bottom": 879,
+          "width": 911.63,
+          "height": 793.62
+        },
+        "containerSelector": "#mark",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1080,
+          "bottom": 1080,
+          "width": 1080,
+          "height": 1080
+        },
+        "overflow": {
+          "left": 14.63
+        },
+        "dataAttributes": {
+          "data-hf-svg-reference-aliases": "[{\"name\":\"mask\",\"localName\":\"mask\",\"namespaceURI\":null,\"before\":\"url(#cut)\",\"after\":\"url(#cut)\"}]"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": -14.63,
+          "y": 85.38,
+          "width": 911.63,
+          "height": 793.62
+        },
+        "firstSeen": 0.278,
+        "lastSeen": 4.722,
+        "occurrences": 8,
+        "heldMs": 2222,
+        "times": [
+          0.278,
+          0.833,
+          1.389,
+          1.944,
+          2.5,
+          3.611,
+          4.167,
+          4.722
+        ]
+      }
+    ],
+    "duration": 5,
+    "samples": [
+      0.278,
+      0.833,
+      1.389,
+      1.944,
+      2.5,
+      3.056,
+      3.611,
+      4.167,
+      4.722
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 1,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": true,
+    "samples": [
+      0.278,
+      1.389,
+      2.5,
+      3.611,
+      4.722
+    ],
+    "checked": 0,
+    "passed": 0
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  }
+}

@@ -107,7 +107,7 @@ export interface ScreenMatch {
   currency: string;
   /** Last ~30 closes, oldest first. */
   spark: number[];
-  /** Keyed by ScreenRunResponse.columns[].key; null renders as "—". */
+  /** Keyed by ScreenRunResponse.columns[].key; null renders as "–". */
   values: Record<string, number | null>;
   /** false when OHLCV confirm data was unavailable (close-only match). */
   volume_confirmed: boolean;

@@ -1,0 +1,51 @@
+'use client';
+
+import clsx from 'clsx';
+import { useEffect, useRef, type ReactNode } from 'react';
+import { X } from './icons';
+
+/**
+ * Modal built on the native <dialog>: the browser traps focus, closes on
+ * Escape, and returns focus to whatever opened it. On phones it docks to the
+ * bottom as a sheet.
+ */
+export function Dialog({ open, onClose, title, children, className }: {
+  open: boolean; onClose: () => void; title: string; children: ReactNode; className?: string;
+}) {
+  const ref = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (open && !el.open) el.showModal();
+    if (!open && el.open) el.close();
+  }, [open]);
+
+  return (
+    <dialog
+      ref={ref}
+      onClose={onClose}
+      onClick={(e) => { if (e.target === ref.current) onClose(); }}
+      aria-labelledby="dialog-title"
+      className={clsx(
+        // overflow-hidden: the body scrolls; the dialog's UA overflow:auto drew 1px scrollbars.
+        'glass-2 m-0 mt-auto w-full max-w-none overflow-hidden rounded-t-2xl p-0 text-fg backdrop:bg-black/60 backdrop:backdrop-blur-sm sm:rounded-2xl',
+        'sm:m-auto sm:w-[min(32rem,calc(100vw-2rem))]',
+        className,
+      )}
+    >
+      {open && (
+        <div className="flex max-h-[85dvh] flex-col">
+          <div className="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-3">
+            <h2 id="dialog-title" className="text-body font-medium">{title}</h2>
+            <button type="button" aria-label="Close" onClick={onClose}
+                    className="grid min-h-11 min-w-11 place-items-center text-fg-2 hover:text-fg">
+              <X />
+            </button>
+          </div>
+          <div className="overflow-y-auto p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))]">{children}</div>
+        </div>
+      )}
+    </dialog>
+  );
+}

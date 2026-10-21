@@ -15,7 +15,7 @@ import type { RefObject } from 'react';
 import type { IChartApi, ISeriesApi, Logical, Time } from 'lightweight-charts';
 import {
   MousePointer2, TrendingUp, MoveUpRight, Minus, Square, Rows3, Eraser, Trash2,
-} from 'lucide-react';
+} from '@/components/ui/icons';
 import clsx from 'clsx';
 import {
   Drawing, DrawingType, HitPart, Projector, Pt, ToolId,
@@ -540,7 +540,7 @@ export function DrawingRail({
       role="toolbar"
       aria-orientation="vertical"
       aria-label="Drawing tools"
-      className="flex w-10 shrink-0 flex-col items-center gap-1 border-r border-borderSubtle bg-black/20 py-2"
+      className="flex w-10 shrink-0 flex-col items-center gap-1 border-r border-line bg-ink-0 py-2"
     >
       {TOOLS.map(t => (
         <button
@@ -553,15 +553,15 @@ export function DrawingRail({
           className={clsx(
             'flex h-8 w-8 items-center justify-center rounded-md transition-colors',
             activeTool === t.id
-              ? 'bg-accentBlue/20 text-accentBlue'
-              : 'text-textMuted hover:bg-white/5 hover:text-textPrimary',
+              ? 'bg-fg-2/20 text-fg-2'
+              : 'text-fg-3 hover:bg-white/[0.06] hover:text-fg',
           )}
         >
           {t.icon}
         </button>
       ))}
 
-      <div className="my-1 h-px w-5 bg-borderSubtle" />
+      <div className="my-1 h-px w-5 bg-line" />
 
       <button
         type="button"
@@ -572,8 +572,8 @@ export function DrawingRail({
         className={clsx(
           'flex h-8 w-8 items-center justify-center rounded-md transition-colors',
           canDelete
-            ? 'text-accentRed hover:bg-accentRed/10'
-            : 'cursor-not-allowed text-textMuted/40',
+            ? 'text-down hover:bg-down/10'
+            : 'cursor-not-allowed text-fg-3/40',
         )}
       >
         <Trash2 size={15} />
@@ -587,7 +587,7 @@ export function DrawingRail({
         title="Clear all drawings"
         aria-label="Clear all drawings"
         onClick={onClearAll}
-        className="flex h-8 w-8 items-center justify-center rounded-md text-textMuted transition-colors hover:bg-white/5 hover:text-accentAmber"
+        className="flex h-8 w-8 items-center justify-center rounded-md text-fg-3 transition-colors hover:bg-white/[0.06] hover:text-warn"
       >
         <Eraser size={15} />
       </button>
@@ -602,7 +602,7 @@ export function DrawingRail({
 export function DrawingHint({ tool }: { tool: ToolId }) {
   if (tool === 'cursor') return null;
   return (
-    <div className="pointer-events-none absolute bottom-10 left-1/2 z-20 -translate-x-1/2 rounded-md border border-accentBlue/30 bg-black/70 px-3 py-1.5 font-mono text-[11px] text-accentBlue">
+    <div className="pointer-events-none absolute bottom-10 left-1/2 z-20 -translate-x-1/2 rounded-md border border-fg-2/30 bg-ink-0 px-3 py-1.5 text-caption text-fg-2">
       {tool === 'hline'
         ? 'Click to place line · Esc to cancel'
         : 'Click start and end points · Esc to cancel'}

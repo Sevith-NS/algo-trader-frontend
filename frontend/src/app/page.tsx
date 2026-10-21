@@ -1,424 +1,399 @@
-'use client';
-
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import { Show, SignInButton } from '@clerk/nextjs';
 import Link from 'next/link';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, TrendingUp, TrendingDown } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { LandingMotion } from '@/components/landing/LandingMotion';
+import { FxCard, MarketCard, getLandingMarkets, tapeItems, Change } from '@/components/landing/LiveMarkets';
+import { PlanChart } from '@/components/landing/PlanChart';
+import { LEVELS } from '@/components/landing/planData';
+import { Wordmark } from '@/components/shell/AppShell';
+import { buttonClass } from '@/components/ui/Button';
 
-import Navigation from '../components/Navigation';
-import { Marquee } from '../components/magicui/Marquee';
-import MaskedText from '../components/motion/MaskedText';
-import WordsReveal from '../components/motion/WordsReveal';
-import CharReveal from '../components/motion/CharReveal';
-import VelocityMarquee from '../components/motion/VelocityMarquee';
-import Magnetic from '../components/motion/Magnetic';
-import usePrefersReducedMotion from '../lib/useReducedMotion';
+/**
+ * Landing page, brand register (docs/DESIGN.md §9.6). Server-rendered in its
+ * finished state; LandingMotion only animates it, so no-JS and reduced-motion
+ * visitors get the complete page. No invented figures: market numbers are
+ * live (LiveMarkets, sourced and timed), and the plan chart is marked illustrative.
+ * Copy describes and explains; it never recommends a trade (SEBI IA/RA rules).
+ */
 
-gsap.registerPlugin(ScrollTrigger);
+const gutter = 'px-4 md:px-8 xl:px-12';
+const micro = 'text-micro uppercase';
 
-const useIsomorphicLayoutEffect =
-  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+const TAPE = [
+  'NIFTY 50', 'SENSEX', 'BANK NIFTY', 'NIFTY MIDCAP 100', 'S&P 500', 'NASDAQ', 'DOW JONES', 'USD/INR',
+  'NSE', 'BSE', 'NYSE', 'NASDAQ GS',
+] as const;
 
-/* -------------------------------- content -------------------------------- */
-
-const MARQUEE_WORDS = ['FLINT', 'EVIDENCE', 'DISCIPLINE', 'RISK'];
-
-const CAPABILITIES = [
-  {
-    index: '01',
-    title: 'Quant Trade Plans',
-    href: '/screener',
-    accent: 'text-accentGreen',
-    hover: 'hover:border-accentGreen/40',
-    desc: 'Five factor families vote on every symbol: mean reversion, momentum, VWAP, order flow, RSI. The output is a plan, not a hunch. Limit entry, ATR stop, 1.5R and 3R targets, half-Kelly size.',
-  },
-  {
-    index: '02',
-    title: 'Movers Across Every Cap',
-    href: '/movers',
-    accent: 'text-accentAmber',
-    hover: 'hover:border-accentAmber/40',
-    desc: 'The whole NSE Total Market scanned by segment. Largecap through microcap, Nifty 50 to Smallcap 250, filtered to the names that actually moved. A 20% day rarely happens in the Nifty 50.',
-  },
-  {
-    index: '03',
-    title: 'Portfolio Risk in Rupees',
-    href: '/portfolio',
-    accent: 'text-accentRed',
-    hover: 'hover:border-accentRed/40',
-    desc: 'VaR and expected shortfall stated in currency, not abstractions. Sharpe, Sortino, drawdown, beta and diversification recomputed as your book moves. Tail risk you can read as money.',
-  },
-  {
-    index: '04',
-    title: 'India-first, Global-aware',
-    href: '/markets',
-    accent: 'text-accentBlue',
-    hover: 'hover:border-accentBlue/40',
-    desc: 'NSE membership and segment data straight from the exchange, beside US equities, crypto and commodities. One desk for both books, no juggling terminals to see the same position twice.',
-  },
+const DESK = [
+  { seat: 'Technical', focus: 'Trend and momentum', body: 'Where price sits against its moving averages and how volume compares, with the bars it read.', src: 'Daily bars · delay shown' },
+  { seat: 'Fundamentals', focus: 'Valuation', body: 'Valuation against the company’s own history, and the margin trend from its filings.', src: 'Quarterly filings' },
+  { seat: 'News', focus: 'Coverage', body: 'What sources report, with single-source claims flagged instead of counted.', src: 'Linked articles · tone scored' },
+  { seat: 'Risk committee', focus: 'Your rules', body: 'Checks the idea against limits you set, like the most one name may take of your book.', src: 'Your rules · your portfolio' },
 ];
 
-const STATS = [
-  { value: 752, decimals: 0, suffix: '', label: 'NSE names scanned daily' },
-  { value: 5, decimals: 0, suffix: '', label: 'Factor votes per signal' },
-  { value: 95, decimals: 0, suffix: '%', label: 'VaR confidence level' },
-  { value: 0.5, decimals: 1, suffix: '×', label: 'Kelly sizing cap' },
+const RISK = [
+  { label: 'One-day VaR, 95%', title: 'A bad day', note: 'About how much your holdings could lose on a bad day, one day in twenty.' },
+  { label: 'Max drawdown', title: 'Deepest fall', note: 'The biggest peak-to-trough drop your holdings took over the period.' },
+  { label: 'Concentration', title: 'Largest position', note: 'Share of the book in one name, checked against the limit you set.' },
 ];
 
-/* ------------------------------ small pieces ----------------------------- */
-
-/** Count-up stat in mono. Renders the final value statically under reduced motion. */
-function CountStat({
-  value,
-  decimals,
-  suffix,
-}: {
-  value: number;
-  decimals: number;
-  suffix: string;
-}) {
-  const ref = useRef<HTMLSpanElement | null>(null);
-  const reducedMotion = usePrefersReducedMotion();
-
-  useIsomorphicLayoutEffect(() => {
-    if (reducedMotion || !ref.current) return;
-    const el = ref.current;
-    const format = (n: number) => `${n.toFixed(decimals)}${suffix}`;
-    const counter = { n: 0 };
-    el.textContent = format(0);
-
-    const ctx = gsap.context(() => {
-      gsap.to(counter, {
-        n: value,
-        duration: 1.6,
-        ease: 'power2.out',
-        scrollTrigger: { trigger: el, start: 'top 88%', once: true },
-        onUpdate: () => {
-          el.textContent = format(counter.n);
-        },
-      });
-    });
-
-    return () => {
-      ctx.revert();
-      // The tween drives textContent directly, so ctx.revert() cannot restore
-      // it — write the final value back explicitly or the stat reads "0".
-      el.textContent = format(value);
-    };
-  }, [reducedMotion, value, decimals, suffix]);
-
+function SectionHead({ kicker, title, body, id }: { kicker: string; title: ReactNode; body?: string; id: string }) {
   return (
-    <span ref={ref} className="tabular">
-      {`${value.toFixed(decimals)}${suffix}`}
-    </span>
-  );
-}
-
-/** One ticker chip in the tape. Prices are static sample data, not a live feed. */
-function TickerChip({ symbol, price, change }: { symbol: string; price: string; change: number }) {
-  const up = change >= 0;
-  return (
-    <div className="mx-2 flex items-center gap-3 rounded-full border border-borderSubtle bg-white/[0.03] px-5 py-2.5 font-mono text-[13px] backdrop-blur-sm">
-      <span className="font-bold text-textPrimary">{symbol}</span>
-      <span className="tabular text-textSecondary">{price}</span>
-      <span
-        className={`flex items-center gap-1 tabular font-semibold ${up ? 'text-accentGreen' : 'text-accentRed'}`}
-      >
-        {up ? <TrendingUp size={13} /> : <TrendingDown size={13} />}
-        {up ? '+' : ''}
-        {change.toFixed(2)}%
-      </span>
+    <div className="flex max-w-3xl flex-col gap-5">
+      <span data-reveal className={`pill w-fit ${micro}`}>{kicker}</span>
+      <h2 id={id} data-split className="text-silver text-[clamp(2.25rem,5vw,4.5rem)] font-normal leading-[1] tracking-[-0.035em]">
+        {title}
+      </h2>
+      {body && <p data-reveal className="max-w-xl text-body text-fg-2 md:text-h4 md:font-normal">{body}</p>}
     </div>
   );
 }
 
-const TICKERS_A = [
-  { symbol: 'AAPL', price: '311.20', change: 1.24 },
-  { symbol: 'NVDA', price: '188.45', change: 3.87 },
-  { symbol: 'TSLA', price: '412.09', change: -2.13 },
-  { symbol: 'MSFT', price: '502.66', change: 0.58 },
-  { symbol: 'AMZN', price: '231.14', change: 1.02 },
-  { symbol: 'META', price: '744.31', change: -0.76 },
+/* ------------------------------------------------- compare and FAQ -- */
+
+// Only claims checked against each company's own pages (Oct 2026). Facts, no adjectives.
+const COMPARE: { row: string; cells: [string, string, string, string] }[] = [
+  { row: 'What it is', cells: ['Read-only tracker and paper desk', 'Model portfolios you buy through your broker', 'Research and screener platform', 'Back office for a Zerodha account'] },
+  { row: 'Who decides what to buy', cells: ['You. Polaris never recommends', 'SEBI-registered basket managers', 'You. Content is informational', 'You'] },
+  { row: 'SEBI status', cells: ['Not registered; a software tool', 'Managers are registered RAs, RIAs or PMS', 'No RA or IA licence', 'Registered stockbroker'] },
+  { row: 'Price', cells: ['Free during the beta', '₹100 or 1.5% per buy, plus any manager fee', 'Free tier; Pro from ₹399 a month', 'Included with the account'] },
 ];
 
-const TICKERS_B = [
-  { symbol: 'BTC-USD', price: '112,480', change: 2.41 },
-  { symbol: 'ETH-USD', price: '4,102', change: -1.18 },
-  { symbol: 'SPY', price: '682.55', change: 0.34 },
-  { symbol: 'QQQ', price: '612.90', change: 0.71 },
-  { symbol: 'GLD', price: '312.77', change: -0.22 },
-  { symbol: 'VIX', price: '14.82', change: -4.05 },
+const FAQ: [string, ReactNode][] = [
+  ['Is this investment advice?', 'No. Polaris is a software tool. It is not registered with SEBI as an Investment Adviser or Research Analyst, and never tells you what to buy or sell. You pick the stock, the method and the risk; Polaris does the arithmetic and shows its working.'],
+  ['Who sets the entry and stop?', 'You do, by choosing the method and your risk per trade. Every formula and every input is on screen, and plans only place paper orders.'],
+  ['Where does the data come from, and how old is it?', 'Market data comes from Yahoo Finance and NSE public pages, and news from Google News. Quotes can be delayed. Every figure shows its source and time.'],
+  ['What can Polaris do with my broker login?', 'Read your holdings and today’s positions. Nothing else: there is no order button on a real account. The access token is encrypted into a cookie in your own browser, sent only to read your holdings, and never stored on our servers. Disconnect any time and it is gone.'],
+  ['How does Polaris make money?', 'It doesn’t yet; it’s free during the beta. We take no commissions from brokers, basket managers or referrals, and no stock is ever featured for pay.'],
+  ['When do US brokers come?', 'US markets are live today. Syncing US broker holdings is planned; until then Polaris says so plainly instead of pretending.'],
+  ['How do I delete my data?', 'Settings → Delete account removes everything Polaris stores, and Settings → Export gives you a copy first.'],
 ];
 
-/** One repeated segment of the marquee strip. */
-function MarqueeSegment() {
+/* ------------------------------------------------------------- page -- */
+
+export default async function Landing() {
+  const markets = await getLandingMarkets();
+  const tape = tapeItems(markets, TAPE);
   return (
-    <div className="flex items-baseline">
-      {MARQUEE_WORDS.map((word, i) => (
-        <React.Fragment key={word}>
-          <span
-            className="px-6 text-[clamp(3.5rem,7vw,7rem)] font-black leading-none tracking-tight md:px-10"
-            style={
-              i % 2 === 1
-                ? { WebkitTextStroke: '1.5px rgba(241,245,249,0.4)', color: 'transparent' }
-                : undefined
-            }
-          >
-            {word}
-          </span>
-          <span className="text-[clamp(2rem,4vw,4rem)] font-light text-textMuted">
-            /
-          </span>
-        </React.Fragment>
-      ))}
-    </div>
-  );
-}
+    <LandingMotion>
+      <div className="relative min-h-[100dvh] overflow-x-clip bg-ink-0">
+        {/* Film grain over the whole page. Tune it in globals.css (.landing-grain). */}
+        <div aria-hidden="true" className="landing-grain" />
 
-/* ---------------------------------- page --------------------------------- */
-
-export default function LandingPage() {
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const reducedMotion = usePrefersReducedMotion();
-
-  useIsomorphicLayoutEffect(() => {
-    if (reducedMotion || !rootRef.current) return;
-
-    // Smooth scrolling is provided app-wide by <SmoothScroll> (Lenis) in the
-    // root layout, which drives NATIVE scroll — so every trigger here reads the
-    // default scroller with no proxy and no scroll container of its own.
-    const ctx = gsap.context(() => {
-      // Hero support copy and CTAs drift in after the headline mask reveal —
-      // sequence follows reading order, so the eye lands on the headline first.
-      gsap.from('[data-hero-fade]', {
-        y: 20,
-        opacity: 0,
-        duration: 0.9,
-        stagger: 0.1,
-        delay: 0.55,
-        ease: 'power3.out',
-      });
-
-      // Capability cards rise once as the grid enters.
-      gsap.from('[data-cap-card]', {
-        y: 48,
-        opacity: 0,
-        duration: 0.9,
-        stagger: 0.09,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: '[data-cap-grid]', start: 'top 80%', once: true },
-      });
-
-      // Stats fade up as one unit; the numbers count themselves.
-      gsap.from('[data-stat]', {
-        y: 28,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.08,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: '[data-stats]', start: 'top 85%', once: true },
-      });
-    }, rootRef);
-
-    return () => ctx.revert();
-  }, [reducedMotion]);
-
-  return (
-    <div ref={rootRef} className="relative">
-      <Navigation />
-
-      {/* ================================ HERO =============================== */}
-      <section className="relative flex min-h-[100dvh] flex-col justify-center px-6 pt-24 md:px-12 lg:px-20">
-        <p
-          data-hero-fade
-          className="mb-8 font-mono text-[11px] uppercase tracking-[0.35em] text-textMuted"
-        >
-          Flint / a personal quant desk
-        </p>
-
-        {/* The two masked lines are separate block spans, so their text nodes
-            butt together and the accessible name came out as "TRADE ONEVIDENCE."
-            Name the heading explicitly and hide the split halves from AT. */}
-        <h1
-          aria-label="Trade on evidence."
-          className="max-w-[13ch] text-[clamp(3.25rem,8.5vw,9rem)] font-black leading-[0.95] tracking-tight text-textPrimary"
-        >
-          <MaskedText as="span" className="block" stagger={0.08} aria-hidden>
-            TRADE ON
-          </MaskedText>
-          <MaskedText
-            as="span"
-            className="block text-accentGreen"
-            delay={0.18}
-            stagger={0.08}
-            aria-hidden
-          >
-            EVIDENCE.
-          </MaskedText>
-        </h1>
-
-        <p
-          data-hero-fade
-          className="mt-8 max-w-xl text-base leading-relaxed text-textSecondary md:text-lg"
-        >
-          Systematic signals, currency-denominated risk and sizing by rule, on paper
-          capital. The only thing at stake is your discipline.
-        </p>
-
-        <div className="mt-12 flex flex-wrap items-center gap-8">
-          <div data-hero-fade>
-            <Magnetic strength={0.25}>
-              <Link
-                href="/screener"
-                className="group inline-flex items-center gap-2.5 rounded-full bg-accentGreen px-8 py-4 text-sm font-bold text-black transition-colors hover:bg-accentGreen/90"
-              >
-                Open the desk
-                <ArrowRight
-                  size={16}
-                  className="transition-transform duration-300 group-hover:translate-x-1"
-                />
-              </Link>
-            </Magnetic>
+        <header data-nav className={`fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top,0px)] ${gutter}`}>
+          {/* No band, no border: a blur and a dark wash that fade into the page. */}
+          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[150%] bg-gradient-to-b from-ink-0/90 via-ink-0/55 to-transparent backdrop-blur-md [mask-image:linear-gradient(to_bottom,black_45%,transparent)]" />
+          <div className="mx-auto flex h-16 max-w-[1600px] items-center gap-8 md:h-20">
+            <Link href="/" data-logo aria-label="Polaris, back to top"><Wordmark /></Link>
+            <nav aria-label="Sections" className="hidden items-center gap-8 text-body-sm text-fg-2 md:flex">
+              <a href="#real-paper" data-anchor className="hover:text-fg">Portfolio</a>
+              <a href="#plan" data-anchor className="hover:text-fg">Plans</a>
+              <a href="#desk" data-anchor className="hover:text-fg">AI desk</a>
+              <a href="#trust" data-anchor className="hover:text-fg">Security</a>
+              <a href="#faq" data-anchor className="hover:text-fg">FAQ</a>
+            </nav>
+            <div className="ml-auto flex items-center gap-3">
+              <Show when="signed-out">
+                <SignInButton>
+                  <button className={buttonClass('ghost', 'md', 'hidden sm:inline-flex')}>Sign in</button>
+                </SignInButton>
+                <Link href="/sign-up" className={buttonClass('primary', 'md')}>Request access</Link>
+              </Show>
+              <Show when="signed-in">
+                <Link href="/home" className={buttonClass('primary', 'md')}>Open Polaris</Link>
+              </Show>
+            </div>
           </div>
-          <Link
-            data-hero-fade
-            href="/movers"
-            className="text-sm font-medium text-textSecondary underline decoration-borderSubtle underline-offset-8 transition-colors hover:text-textPrimary hover:decoration-accentGreen/60"
-          >
-            See today&apos;s movers
-          </Link>
-        </div>
-      </section>
+        </header>
 
-      {/* ========================== VELOCITY MARQUEE ======================== */}
-      <section
-        aria-label="Flint: evidence, discipline, risk"
-        className="border-y border-borderSubtle py-8 md:py-12"
-      >
-        <VelocityMarquee baseSpeed={70} className="select-none">
-          <MarqueeSegment />
-        </VelocityMarquee>
-      </section>
+        <main>
+          {/* ------------------------------------------------------ hero -- */}
+          <section data-hero aria-labelledby="hero-h" className="relative isolate grid min-h-[100dvh] lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+            <div className={`relative flex flex-col items-center justify-center gap-8 pb-16 lg:mt-10 md:mt-36 mt-44 text-center ${gutter}`}>
+              <h1 id="hero-h" data-hero-title
+                  className="text-silver max-w-[16ch] text-[clamp(3rem,6.2vw,6.25rem)] pb-[0.14em] font-normal leading-[0.98] tracking-[-0.04em]">
+                India and US markets. One honest view.
+              </h1>
+              <p data-hero-in className="max-w-xl text-body text-fg-2 md:text-h4 md:font-normal">
+                Sync your Indian broker read-only, follow both markets live, and test every idea on paper with maths you can see. US holdings coming.
+              </p>
+              <div data-hero-in className="flex flex-wrap justify-center gap-4">
+                <Show when="signed-out">
+                  <Link href="/sign-up" className={buttonClass('primary', 'lg')}>Request access</Link>
+                  <SignInButton><button className={buttonClass('secondary', 'lg')}>Sign in</button></SignInButton>
+                </Show>
+                <Show when="signed-in">
+                  <Link href="/home" className={buttonClass('primary', 'lg')}>Open Polaris</Link>
+                </Show>
+              </div>
+              <p data-hero-in className="text-caption text-fg-3 mb-20">
+                Broker sync: Zerodha · Markets NSE, BSE, NYSE, NASDAQ · No commissions · Invite only
+              </p>
+            </div>
 
-      {/* ============================= MANIFESTO ============================ */}
-      <section className="px-6 py-32 md:px-12 md:py-40 lg:px-20">
-        <WordsReveal
-          className="max-w-4xl text-2xl font-medium leading-relaxed tracking-tight text-textPrimary md:text-4xl md:leading-relaxed"
-          text="Every number here is earned. Sourced, timestamped and sized by evidence. Signals are computed, not felt, risk is stated in currency, and discipline beats conviction on every single trade."
-        />
-      </section>
-
-      {/* ================= LIVE TICKER TAPE ================= */}
-      <section className="relative z-10 border-y border-borderSubtle bg-bgPrimary/60 py-4 backdrop-blur-md">
-        <Marquee pauseOnHover className="[--duration:32s] [--gap:0.5rem]">
-          {TICKERS_A.map((t) => <TickerChip key={t.symbol} {...t} />)}
-        </Marquee>
-        <Marquee reverse pauseOnHover className="[--duration:38s] [--gap:0.5rem]">
-          {TICKERS_B.map((t) => <TickerChip key={t.symbol} {...t} />)}
-        </Marquee>
-        {/* edge fades */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-bgPrimary to-transparent" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-bgPrimary to-transparent" />
-      </section>
-
-      {/* ============================ CAPABILITIES ========================== */}
-      <section className="border-t border-borderSubtle px-6 py-32 md:px-12 md:py-40 lg:px-20">
-        <div className="mb-16 md:mb-20">
-          <MaskedText
-            as="h2"
-            className="max-w-3xl text-4xl font-black leading-[1.05] tracking-tight text-textPrimary md:text-6xl"
-            stagger={0.05}
-          >
-            The desk does the arithmetic. You keep the judgment.
-          </MaskedText>
-        </div>
-
-        <div data-cap-grid className="grid grid-cols-1 gap-5 md:grid-cols-2">
-          {CAPABILITIES.map((cap) => (
-            <Link
-              key={cap.index}
-              data-cap-card
-              href={cap.href}
-              className={`glass-panel group flex flex-col justify-between p-8 transition-[transform,border-color,box-shadow] duration-300 motion-safe:hover:-translate-y-1 md:p-10 ${cap.hover}`}
-            >
-              <div>
-                <div className="mb-8 flex items-baseline justify-between">
-                  <span className={`font-mono text-xs ${cap.accent}`}>{cap.index}</span>
-                  <ArrowRight
-                    size={16}
-                    className="text-textMuted transition-[transform,color] duration-300 motion-safe:group-hover:translate-x-1 group-hover:text-textPrimary"
-                  />
-                </div>
-                <CharReveal
-                  as="h3"
-                  className="text-2xl font-bold tracking-tight text-textPrimary md:text-3xl"
-                  stagger={0.02}
-                >
-                  {cap.title}
-                </CharReveal>
-                <p className="mt-4 max-w-md text-sm leading-relaxed text-textSecondary">
-                  {cap.desc}
+            <div className="relative flex flex-col justify-center gap-4 px-4 pb-16 pt-10 sm:px-10 lg:pt-28 xl:px-16">
+              <div aria-hidden="true" className="bloom left-[40%] top-[40%] h-[min(1000px,100vw)] w-[min(1000px,80vw)] -translate-x-1/2 -translate-y-1/2" />
+              <div data-light-cards className="relative mx-auto flex w-full max-w-[420px] flex-col gap-4">
+                <MarketCard title="India" market={markets?.india ?? null} />
+                <MarketCard title="United States" market={markets?.us ?? null} />
+                <FxCard fx={markets?.fx ?? null} />
+                <p data-hero-card className="text-center">
+                  <span className="pill bg-ink-0/85 text-fg">Live, delayed market data</span>
                 </p>
               </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* =========================== NUMBERS STRIP ========================== */}
-      <section
-        data-stats
-        className="border-t border-borderSubtle px-6 py-24 md:px-12 md:py-32 lg:px-20"
-      >
-        <div className="grid grid-cols-2 gap-x-6 gap-y-14 lg:grid-cols-4">
-          {STATS.map((s) => (
-            <div key={s.label} data-stat className="flex flex-col gap-3">
-              <span className="font-mono text-5xl font-bold tracking-tight text-textPrimary md:text-6xl">
-                <CountStat value={s.value} decimals={s.decimals} suffix={s.suffix} />
-              </span>
-              <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-textMuted">
-                {s.label}
-              </span>
             </div>
-          ))}
-        </div>
-      </section>
+          </section>
 
-      {/* ============================= CTA FOOTER =========================== */}
-      <section className="border-t border-borderSubtle px-6 pb-12 pt-32 md:px-12 md:pt-40 lg:px-20">
-        <MaskedText
-          as="h2"
-          className="max-w-5xl text-[clamp(2.75rem,7vw,7rem)] font-black leading-[1.02] tracking-tight text-textPrimary"
-          stagger={0.07}
-        >
-          Start with the evidence.
-        </MaskedText>
+          {/* ------------------------------------------------------ tape -- */}
+          {/* The light carries on through the tape: a bridge between the hero and
+              the next section, its core below the tape so the tape's text only
+              meets its faint edge. */}
+          <div aria-hidden="true" className="relative isolate">
+            <div className="bloom left-[-10%] top-[calc(50%+460px)] h-[min(1500px,200vw)] w-[min(1700px,220vw)] -translate-x-1/2 -translate-y-1/2 [--b:0.65]" />
+            <div className="overflow-hidden py-6 [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
+              <div data-tape className="flex w-max gap-10 whitespace-nowrap">
+                {[...tape, ...tape].map((t, i) => (
+                  <span key={i} className="flex items-center gap-3 text-body-sm">
+                    <span className={`${micro} text-fg-2`}>{t.name}</span>
+                    {t.value !== null && <span className="tabular text-fg">{t.value}</span>}
+                    {t.value !== null && <Change pct={t.pct} />}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
 
-        <div className="mt-12">
-          <Magnetic strength={0.25}>
-            <Link
-              href="/screener"
-              className="group inline-flex items-center gap-2.5 rounded-full bg-accentGreen px-9 py-4 text-sm font-bold text-black transition-colors hover:bg-accentGreen/90"
-            >
-              Open the desk
-              <ArrowRight
-                size={16}
-                className="transition-transform duration-300 group-hover:translate-x-1"
-              />
-            </Link>
-          </Magnetic>
-        </div>
+          {/* -------------------------------------- pinned 1: real/paper -- */}
+          <section id="real-paper" data-pin-rp aria-labelledby="rp-h" className={`relative isolate py-24 md:py-32 ${gutter}`}>
+            <div className="mx-auto grid max-w-[1400px] items-center gap-12 lg:min-h-[80dvh] lg:grid-cols-2">
+              <SectionHead id="rp-h" kicker="Two books, one view" title="Real and paper, never mixed."
+                           body="Your broker holdings sync read-only and stay exactly as they are. Ideas live in paper books with their own totals, always marked in blue." />
+              <div className="relative isolate">
+                <div aria-hidden="true" className="bloom left-[188%] top-[38%] h-[min(1300px,180vw)] w-[min(1300px,180vw)] -translate-x-1/2 -translate-y-1/2" />
+                <div className="relative flex flex-col gap-4">
+                  <PortfolioFace mode="real" />
+                  <PortfolioFace mode="paper" />
+                </div>
+              </div>
+            </div>
+          </section>
 
-        <footer className="mt-32 flex flex-col gap-3 border-t border-borderSubtle pt-8 font-mono text-[11px] text-textMuted md:flex-row md:items-center md:justify-between">
-          <span>Flint</span>
-          <span>All trading is paper. Signals are educational, not advice.</span>
-          <Link href="/movers" className="transition-colors hover:text-textSecondary">
-            /movers
-          </Link>
+          {/* ------------------------------------------ pinned 2: plan -- */}
+          <section id="plan" data-plan aria-labelledby="plan-h" className={`relative isolate py-24 md:py-32 ${gutter}`}>
+            <div className="mx-auto flex max-w-[1400px] flex-col gap-12 lg:min-h-[90dvh] lg:justify-center">
+              <SectionHead id="plan-h" kicker="From symbol to plan" title="The plan comes before the button."
+                           body="Entry, stop, two targets and a size that risks exactly what you chose. Shown before any paper order, every time." />
+              <div className="relative isolate grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+                <div aria-hidden="true" className="bloom left-[62%] top-[55%] h-[min(1200px,170vw)] w-[min(1900px,200vw)] -translate-x-1/2 -translate-y-1/2 [--b:0.85]" />
+                <div className="glass rounded-2xl p-4 md:p-6">
+                  <p className="mb-4 flex items-center justify-between">
+                    <span className={`${micro} text-fg`}>Example · Daily candles</span>
+                    <span className="text-caption text-fg-3">Illustrative, not market data</span>
+                  </p>
+                  <PlanChart />
+                </div>
+                <div className="glass flex flex-col rounded-2xl p-6">
+                  <p className="flex items-center justify-between"><span className={`${micro} text-fg`}>Plan</span><span className="pill text-paper">Paper</span></p>
+                  <dl className="mt-4 flex flex-col">
+                    {[...LEVELS].reverse().map((l) => (
+                      <div key={l.key} data-ticket-row className="flex items-baseline justify-between border-t border-white/[0.07] py-3">
+                        <dt className="text-body-sm text-fg-2">{l.label}</dt>
+                        <dd className={`text-right ${l.key === 'stop' ? 'text-down' : 'text-fg'}`}>
+                          {l.rule}<span className="ml-2 text-caption text-fg-3">{l.note}</span>
+                        </dd>
+                      </div>
+                    ))}
+                    <div data-ticket-row className="flex items-baseline justify-between border-t border-white/[0.07] py-3">
+                      <dt className="text-body-sm text-fg-2">Size</dt>
+                      <dd className="text-right">Risk ÷ (entry − stop)<span className="ml-2 text-caption text-fg-3">you pick the risk</span></dd>
+                    </div>
+                  </dl>
+                  <p className="mt-auto pt-4 text-caption text-fg-3">Prices fill in from the live quote when you open a symbol. You set every rule.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ----------------------------------------------------- desk -- */}
+          <section id="desk" aria-labelledby="desk-h" className={`relative isolate py-24 md:py-32 ${gutter}`}>
+            <div className="mx-auto flex max-w-[1400px] flex-col gap-12">
+              <SectionHead id="desk-h" kicker="AI desk" title="An AI desk that shows its work."
+                           body="Four seats explain what they see, with their sources on the table. They describe and never tell you to buy or sell. When a model is down, the card says so instead of guessing." />
+              <div className="relative isolate">
+                <div aria-hidden="true" className="bloom left-1/2 top-1/2 h-[min(700px,150vw)] w-[min(1400px,170vw)] -translate-x-1/2 -translate-y-1/2 [--b:0.6]" />
+              <div data-stagger className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                {DESK.map((d, i) => (
+                  <article key={d.seat} className={`glass flex flex-col gap-4 rounded-2xl p-6 ${i === 3 ? 'glass-warn' : ''}`}>
+                    <p className="flex items-center gap-3"><span aria-hidden="true" className="ring-dot text-fg" /><span className={`${micro} text-fg`}>{d.seat}</span></p>
+                    <p className="text-h4 font-medium">{d.focus}</p>
+                    <p className="text-body-sm text-fg-2">{d.body}</p>
+                    <p className="mt-auto border-t border-white/[0.07] pt-3 text-caption text-fg-3">{d.src}</p>
+                  </article>
+                ))}
+              </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ----------------------------------------------------- risk -- */}
+          <section aria-labelledby="risk-h" className={`relative isolate py-24 md:py-32 ${gutter}`}>
+            <div className="mx-auto flex max-w-[1400px] flex-col gap-12">
+              <SectionHead id="risk-h" kicker="Risk" title="Risk you can read." body="Each number comes with one plain sentence about what it means." />
+              <div className="relative isolate">
+                <div aria-hidden="true" className="bloom left-1/2 top-1/2 h-[min(600px,140vw)] w-[min(1200px,170vw)] -translate-x-1/2 -translate-y-1/2 [--b:0.55]" />
+              <dl data-stagger className="grid gap-4 md:grid-cols-3">
+                {RISK.map((r) => (
+                  <div key={r.label} className="glass flex flex-col gap-3 rounded-2xl p-6">
+                    <dt className={`${micro} text-fg-3`}>{r.label}</dt>
+                    <dd className="text-silver text-[clamp(2rem,3.5vw,3rem)] font-normal leading-none tracking-[-0.03em]">{r.title}</dd>
+                    <dd className="text-body-sm text-fg-2">{r.note}</dd>
+                  </div>
+                ))}
+              </dl>
+              </div>
+            </div>
+          </section>
+
+          {/* ---------------------------------------------------- trust -- */}
+          <section id="trust" aria-labelledby="trust-h" className={`py-24 md:py-32 ${gutter}`}>
+            <div className="mx-auto grid max-w-[1400px] gap-12 lg:grid-cols-2">
+              <SectionHead id="trust-h" kicker="Security" title="Built to be honest." />
+              <ul data-stagger className="flex flex-col">
+                {[
+                  ['Read-only broker access', 'Polaris can see your holdings. It can never place an order on a real account.'],
+                  ['Your broker token stays with you', 'It is encrypted into a cookie in your own browser and only used to read. Nothing about your broker account is stored on our servers.'],
+                  ['No commissions, no featured stocks', 'We take nothing from brokers, basket managers or referrals, and never promote a stock for pay.'],
+                  ['Your login, protected', 'Sign-in by Clerk with two-step verification. Polaris never stores a password.'],
+                  ['Paper is always labelled', 'Simulated money is marked in blue on every screen and never added to real totals. Every paper trade stays on record, losers included.'],
+                  ['Your data, your call', 'Export everything or delete your account from Settings at any time.'],
+                  ['Every number shows its source', 'Each figure says where it came from and how old it is. NSE and US quotes can be delayed.'],
+                  ['Information, not advice', 'Polaris is not registered with SEBI as an Investment Adviser or Research Analyst, or with the SEC or FINRA. Nothing here is a recommendation to buy or sell.'],
+                ].map(([t, b]) => (
+                  <li key={t} className="flex gap-4 border-t border-white/10 py-6">
+                    <span aria-hidden="true" className="ring-dot mt-0.5 shrink-0 text-fg" />
+                    <span><span className="block text-h4 font-medium">{t}</span><span className="mt-1 block text-body-sm text-fg-2">{b}</span></span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+
+          {/* -------------------------------------------------- compare -- */}
+          <section id="compare" aria-labelledby="compare-h" className={`py-24 md:py-32 ${gutter}`}>
+            <div className="mx-auto flex max-w-[1400px] flex-col gap-12">
+              <SectionHead id="compare-h" kicker="Compared" title="Where Polaris fits."
+                           body="Polaris doesn't replace a broker or a basket. It shows what you own across markets and lets you test ideas first." />
+              <div data-reveal className="glass overflow-x-auto rounded-2xl">
+                <table className="w-full min-w-[760px] text-left text-body-sm">
+                  <caption className="sr-only">Polaris compared with smallcase, Tickertape and Zerodha Console</caption>
+                  <thead>
+                    <tr className="text-caption text-fg-3">
+                      <th scope="col" className="p-4 font-normal"><span className="sr-only">Feature</span></th>
+                      {['Polaris', 'smallcase', 'Tickertape', 'Zerodha Console'].map((h, i) => (
+                        <th key={h} scope="col" className={`p-4 font-normal ${micro} ${i === 0 ? 'text-fg' : ''}`}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {COMPARE.map(({ row, cells }) => (
+                      <tr key={row} className="border-t border-white/[0.07] align-top">
+                        <th scope="row" className="p-4 font-normal text-fg-2">{row}</th>
+                        {cells.map((c, i) => <td key={i} className={`p-4 ${i === 0 ? 'text-fg' : 'text-fg-2'}`}>{c}</td>)}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <p className="border-t border-white/[0.07] p-4 text-caption text-fg-3">
+                  From each company&apos;s public pages, October 2026. Something changed? Tell us and we&apos;ll correct it.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* ------------------------------------------------------ faq -- */}
+          <section id="faq" aria-labelledby="faq-h" className={`py-24 md:py-32 ${gutter}`}>
+            <div className="mx-auto grid max-w-[1400px] gap-12 lg:grid-cols-2">
+              <SectionHead id="faq-h" kicker="FAQ" title="Straight answers." />
+              <div data-stagger className="flex flex-col">
+                {FAQ.map(([q, a]) => (
+                  <details key={q} className="group border-t border-white/10 py-5">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-h4 font-medium">
+                      {q}
+                      <span aria-hidden="true" className="text-fg-3 transition-transform group-open:rotate-45">+</span>
+                    </summary>
+                    <p className="mt-3 max-w-xl text-body-sm text-fg-2">{a}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* ---------------------------------------------------- close -- */}
+          <section aria-labelledby="close-h" className="relative isolate">
+            <div aria-hidden="true" className="bloom left-1/2 top-1/2 h-[min(1000px,180vw)] w-[min(1400px,190vw)] -translate-x-1/2 -translate-y-1/2" />
+            <div className={`relative z-10 mx-auto flex max-w-[1400px] justify-center py-28 md:py-40 ${gutter}`}>
+              <div data-reveal className="glass-hero flex w-full max-w-3xl flex-col items-center gap-8 rounded-[28px] px-6 py-16 text-center md:px-16">
+                <span className={`pill ${micro} text-fg`}>Invite only</span>
+                <h2 id="close-h" data-split className="text-silver max-w-[14ch] text-[clamp(2.5rem,6vw,5rem)] font-normal leading-[1] tracking-[-0.04em]">
+                  Know what you own.
+                </h2>
+                <div className="flex flex-wrap justify-center gap-4">
+                  <Show when="signed-out">
+                    <Link href="/sign-up" className={buttonClass('primary', 'lg')}>Request access</Link>
+                  </Show>
+                  <Show when="signed-in">
+                    <Link href="/home" className={buttonClass('primary', 'lg')}>Open Polaris</Link>
+                  </Show>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <div aria-hidden="true" className="mx-auto h-px max-w-[1400px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+        <footer className={`flex flex-wrap items-center justify-between gap-4 py-8 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] text-caption text-fg-3 ${gutter}`}>
+          <span className="max-w-3xl">
+            Paper trading is simulated. Analytics are for information only, not investment advice or a
+            recommendation. Polaris is not a SEBI-registered Investment Adviser or Research Analyst, nor a US broker-dealer
+            or investment adviser. Quotes can be delayed. Investments in securities are subject to market risks.
+          </span>
+          <span className="flex gap-6">
+            <Link href="/legal/privacy" className="py-3 hover:text-fg">Privacy</Link>
+            <Link href="/legal/terms" className="py-3 hover:text-fg">Terms</Link>
+            <span className="py-3">© 2026 Polaris</span>
+          </span>
         </footer>
-      </section>
+      </div>
+    </LandingMotion>
+  );
+}
 
+/** One portfolio card in two states; the pinned scroll crossfades real into paper. */
+function PortfolioFace({ mode }: { mode: 'real' | 'paper' }) {
+  const paper = mode === 'paper';
+  const rows = paper
+    ? [['Orders', 'Filled at the live quote, simulated'], ['Cash and P&L', 'The book’s own, from its fills'], ['Plans', 'Entry, stop and size before every order']]
+    : [['Holdings', 'Live from your broker on every view'], ['Currency', 'INR and USD side by side'], ['Orders', 'None. Real accounts are read-only']];
+  return (
+    <div data-face={mode} aria-label={paper ? 'Paper book, simulated' : 'Real holdings, synced read-only'}
+         className={`glass-hero rounded-2xl p-6 ${paper ? 'glass-paper' : ''}`}>
+      {paper && <span aria-hidden="true" className="absolute inset-x-6 top-0 h-0.5 rounded-full bg-paper" />}
+      <p className="flex items-center justify-between">
+        <span className={`pill ${paper ? 'text-paper' : 'text-fg'}`}>{paper ? 'Paper' : 'Real'}</span>
+        <span className="text-caption text-fg-2">{paper ? 'Swing book · simulated' : 'Zerodha · read-only'}</span>
+      </p>
+      <p className="mt-5 text-[clamp(1.75rem,3vw,2.5rem)] font-medium leading-none tracking-[-0.03em]">
+        {paper ? 'Your paper book' : 'Your broker holdings'}
+      </p>
+      <dl className="mt-6 text-body-sm">
+        {rows.map(([t, d]) => (
+          <div key={t} className="flex justify-between gap-4 border-t border-white/[0.07] py-3">
+            <dt className="font-bold">{t}</dt>
+            <dd className="text-right text-fg-2">{d}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="mt-4 text-caption text-fg-3">{paper ? 'Never added to your real net worth.' : 'Read-only. No order buttons on real accounts.'}</p>
     </div>
   );
 }

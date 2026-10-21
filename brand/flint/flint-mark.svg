@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Flint: a knapped stone split open; the fracture is a rising price line. -->
+  <defs>
+    <mask id="cut" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+      <rect width="512" height="512" fill="#fff"/>
+      <polyline points="40,352 210,292 262,328 472,180" fill="none" stroke="#000" stroke-width="18" stroke-linejoin="miter" stroke-miterlimit="10"/>
+    </mask>
+  </defs>
+  <g mask="url(#cut)" stroke-width="0.8" stroke-linejoin="round">
+    <polygon points="84,262 146,146 288,92 300,236 236,312" fill="#C4C7CC" stroke="#C4C7CC"/>
+    <polygon points="288,92 414,140 446,272 300,236" fill="#EDEEF0" stroke="#EDEEF0"/>
+    <polygon points="300,236 446,272 380,392 252,320" fill="#D9DCDF" stroke="#D9DCDF"/>
+    <polygon points="84,262 236,312 300,236 252,320 210,428 112,372" fill="#8E9298" stroke="#8E9298"/>
+    <polygon points="252,320 380,392 210,428" fill="#62666C" stroke="#62666C"/>
+  </g>
+</svg>

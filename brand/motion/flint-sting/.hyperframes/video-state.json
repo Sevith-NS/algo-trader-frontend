@@ -1,0 +1,189 @@
+{
+  "version": 1,
+  "historyId": "d7b00eef-d939-43b7-97ce-0cd7ff412ccb",
+  "currentRevision": null,
+  "pendingChanges": false,
+  "files": {
+    "AGENTS.md": {
+      "hash": "1d4f0c8ca2507b94fd7c9df709fff01416adbd51a0f922b9d6ed2f40129147d5",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\d7b00eef-d939-43b7-97ce-0cd7ff412ccb\\blobs\\1d\\1d4f0c8ca2507b94fd7c9df709fff01416adbd51a0f922b9d6ed2f40129147d5"
+    },
+    "CLAUDE.md": {
+      "hash": "1d4f0c8ca2507b94fd7c9df709fff01416adbd51a0f922b9d6ed2f40129147d5",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\d7b00eef-d939-43b7-97ce-0cd7ff412ccb\\blobs\\1d\\1d4f0c8ca2507b94fd7c9df709fff01416adbd51a0f922b9d6ed2f40129147d5"
+    },
+    "hyperframes.json": {
+      "hash": "e5da816b77f863aa4798d974bc68d65805329ca4d39ebcf353967c5b47e677a6",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\d7b00eef-d939-43b7-97ce-0cd7ff412ccb\\blobs\\e5\\e5da816b77f863aa4798d974bc68d65805329ca4d39ebcf353967c5b47e677a6"
+    },
+    "index.html": {
+      "hash": "37b1f2a0a7cd078633a668fd70bd87b77eec5ed1be95d41ef4a1156eb49c7c12",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\d7b00eef-d939-43b7-97ce-0cd7ff412ccb\\blobs\\37\\37b1f2a0a7cd078633a668fd70bd87b77eec5ed1be95d41ef4a1156eb49c7c12"
+    },
+    "meta.json": {
+      "hash": "0532025e36df5ba7579e25edf16e0af47692a831816d38132c61df2cb6bc0211",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\d7b00eef-d939-43b7-97ce-0cd7ff412ccb\\blobs\\05\\0532025e36df5ba7579e25edf16e0af47692a831816d38132c61df2cb6bc0211"
+    },
+    "package.json": {
+      "hash": "cde3ffd4dbd53d4ed1645ef971ec387ab7642f95cf20158349efd62c6e7ed0d5",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\d7b00eef-d939-43b7-97ce-0cd7ff412ccb\\blobs\\cd\\cde3ffd4dbd53d4ed1645ef971ec387ab7642f95cf20158349efd62c6e7ed0d5"
+    }
+  },
+  "revisions": {},
+  "checks": {
+    "latest": {
+      "revision": null,
+      "id": "d16968e1-292c-4b8a-907b-2ab0c4d434eb"
+    },
+    "revisions": {},
+    "unversioned": [
+      {
+        "id": "d16968e1-292c-4b8a-907b-2ab0c4d434eb",
+        "scope": "project",
+        "report": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\brand\\motion\\flint-sting\\.hyperframes\\artifacts\\checks\\d16968e1-292c-4b8a-907b-2ab0c4d434eb.json",
+        "metadata": {
+          "ok": true,
+          "browserSkipped": false,
+          "options": {
+            "samples": 9,
+            "atTransitions": false,
+            "maxIssues": 80,
+            "collapseStatic": true,
+            "tolerance": 2,
+            "timeout": 3000,
+            "contrast": true,
+            "strict": false,
+            "snapshots": false,
+            "browserGpuMode": "auto"
+          }
+        },
+        "createdAt": 1792046896045,
+        "contentHash": "0ba6c1d4b657c4768ede13d7ab4a073f60723170b23fa92476ade05ef7ef90e2",
+        "revision": null,
+        "inputFingerprint": "e7afcedb128a47926570b9d633095a929d6d122bb4d63126dc89f77d6c090aef",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  },
+  "snapshots": {
+    "latest": {
+      "revision": null,
+      "id": "db033efb-8f02-4504-b529-e10c5709b18b-4"
+    },
+    "revisions": {},
+    "unversioned": [
+      {
+        "scope": "full",
+        "id": "db033efb-8f02-4504-b529-e10c5709b18b-0",
+        "image": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\brand\\motion\\flint-sting\\.hyperframes\\artifacts\\snapshots\\6b312ee1-6f53-4072-86ca-6b9ef8413d85\\frame-00-at-0.5s.png",
+        "time": 0.5,
+        "metadata": {
+          "width": 1080,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1792046928887,
+        "contentHash": "f300dfce196448cc2ba901e644415553688969f9f3f3fec8a293756f54e8f3a1",
+        "revision": null,
+        "inputFingerprint": "e7afcedb128a47926570b9d633095a929d6d122bb4d63126dc89f77d6c090aef",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "db033efb-8f02-4504-b529-e10c5709b18b-1",
+        "image": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\brand\\motion\\flint-sting\\.hyperframes\\artifacts\\snapshots\\6b312ee1-6f53-4072-86ca-6b9ef8413d85\\frame-01-at-1.2s.png",
+        "time": 1.2,
+        "metadata": {
+          "width": 1080,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1792046928887,
+        "contentHash": "ae0aac9cfc5891fd6d47291ab8605d79822cc0015fa1387167cd803e1b7b5121",
+        "revision": null,
+        "inputFingerprint": "e7afcedb128a47926570b9d633095a929d6d122bb4d63126dc89f77d6c090aef",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "db033efb-8f02-4504-b529-e10c5709b18b-2",
+        "image": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\brand\\motion\\flint-sting\\.hyperframes\\artifacts\\snapshots\\6b312ee1-6f53-4072-86ca-6b9ef8413d85\\frame-02-at-2s.png",
+        "time": 2,
+        "metadata": {
+          "width": 1080,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1792046928888,
+        "contentHash": "a22940039a8c26a904985f5f0ebcf61aa5c38586b841bb2f22a1edbc7f591e60",
+        "revision": null,
+        "inputFingerprint": "e7afcedb128a47926570b9d633095a929d6d122bb4d63126dc89f77d6c090aef",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "db033efb-8f02-4504-b529-e10c5709b18b-3",
+        "image": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\brand\\motion\\flint-sting\\.hyperframes\\artifacts\\snapshots\\6b312ee1-6f53-4072-86ca-6b9ef8413d85\\frame-03-at-2.9s.png",
+        "time": 2.9,
+        "metadata": {
+          "width": 1080,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1792046928888,
+        "contentHash": "34ce2cbbd7470f2a439327ebacb9d9d70e7af50fad6bb7a003622ea7c9e7bd9d",
+        "revision": null,
+        "inputFingerprint": "e7afcedb128a47926570b9d633095a929d6d122bb4d63126dc89f77d6c090aef",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "db033efb-8f02-4504-b529-e10c5709b18b-4",
+        "image": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\brand\\motion\\flint-sting\\.hyperframes\\artifacts\\snapshots\\6b312ee1-6f53-4072-86ca-6b9ef8413d85\\frame-04-at-4.8s.png",
+        "time": 4.8,
+        "metadata": {
+          "width": 1080,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1792046928888,
+        "contentHash": "ae3b920329c0f3775e0e21d7efcfda6810082f922a845412a6e8d92e23940044",
+        "revision": null,
+        "inputFingerprint": "e7afcedb128a47926570b9d633095a929d6d122bb4d63126dc89f77d6c090aef",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  },
+  "renders": {
+    "latest": {
+      "id": "49f0a759-ada4-4940-bd5e-245a0a9c8b64",
+      "completedAt": 1792046999997,
+      "output": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\brand\\flint\\flint-sting.mp4",
+      "status": "completed",
+      "revision": null
+    },
+    "retainedRevisions": []
+  },
+  "pendingArtifactCleanup": []
+}

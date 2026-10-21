@@ -2,14 +2,16 @@
  * Chart drawing primitives — geometry, hit-testing, canvas rendering, storage.
  *
  * Everything here is pure and DOM-free apart from the 2D context it paints
- * into, so the React layer (`ChartDrawings.tsx`) only has to own state and
- * pointer plumbing.
+ * into (and the colour tokens it resolves when painting), so the React
+ * layer (`ChartDrawings.tsx`) only has to own state and pointer plumbing.
  *
  * Drawings are stored in (time, price) space — never pixels — which is what
  * lets them survive pan, zoom, resize, a timeframe switch and a reload. The
  * pixel projection is supplied per frame by a `Projector`.
  */
 import type { Time } from 'lightweight-charts';
+import { cssVar } from './theme';
+import { readStorage, removeStorage, writeStorage } from './browser';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -51,22 +53,23 @@ export const POINT_COUNT: Record<DrawingType, 1 | 2> = {
   hline: 1, trend: 2, ray: 2, rect: 2, fib: 2,
 };
 
-export const DRAW_COLORS: Record<DrawingType, string> = {
-  trend: '#60A5FA',  // accentBlue
-  ray: '#60A5FA',
-  hline: '#FBBF24',  // accentAmber
-  rect: '#60A5FA',
-  fib: '#94A3B8',    // textSecondary
+/** Colour tokens (globals.css), resolved with cssVar when drawn. */
+export const DRAW_COLORS: Record<DrawingType, `--${string}`> = {
+  trend: '--fg',
+  ray: '--fg',
+  hline: '--series-2',
+  rect: '--fg-2',
+  fib: '--fg-2',
 };
 
-export const FIB_LEVELS: { r: number; color: string }[] = [
-  { r: 0, color: '#94A3B8' },
-  { r: 0.236, color: '#F87171' },
-  { r: 0.382, color: '#FBBF24' },
-  { r: 0.5, color: '#34D399' },
-  { r: 0.618, color: '#22D3EE' },
-  { r: 0.786, color: '#A78BFA' },
-  { r: 1, color: '#94A3B8' },
+export const FIB_LEVELS: { r: number; color: `--${string}` }[] = [
+  { r: 0, color: '--fg-2' },
+  { r: 0.236, color: '--series-4' },
+  { r: 0.382, color: '--fg-2' },
+  { r: 0.5, color: '--fg' },
+  { r: 0.618, color: '--series-2' },
+  { r: 0.786, color: '--series-4' },
+  { r: 1, color: '--fg-2' },
 ];
 
 /** Pointer slop, in CSS px, for grabbing a line. Endpoints get a little more. */
@@ -259,9 +262,10 @@ export function sanitizeDrawings(raw: unknown): Drawing[] {
   return out;
 }
 
+/** Drawings belong to the signed-in user (see lib/browser for the namespacing). */
 export function loadDrawings(key: string): Drawing[] {
   try {
-    const raw = window.localStorage.getItem(key);
+    const raw = readStorage(key);
     return raw ? sanitizeDrawings(JSON.parse(raw)) : [];
   } catch {
     return [];
@@ -269,10 +273,8 @@ export function loadDrawings(key: string): Drawing[] {
 }
 
 export function saveDrawings(key: string, list: Drawing[]): void {
-  try {
-    if (list.length === 0) window.localStorage.removeItem(key);
-    else window.localStorage.setItem(key, JSON.stringify(list));
-  } catch { /* storage blocked or full — drawings just won't survive reload */ }
+  if (list.length === 0) removeStorage(key);
+  else writeStorage(key, JSON.stringify(list));
 }
 
 // ---------------------------------------------------------------------------
@@ -350,8 +352,8 @@ export interface RenderState {
 function drawHandle(ctx: CanvasRenderingContext2D, x: number, y: number) {
   ctx.save();
   ctx.setLineDash([]);
-  ctx.fillStyle = '#0D1220';   // bgSecondary
-  ctx.strokeStyle = '#F1F5F9'; // textPrimary
+  ctx.fillStyle = cssVar('--ink-2');
+  ctx.strokeStyle = cssVar('--fg');
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.arc(x, y, HANDLE_R, 0, Math.PI * 2);
@@ -373,7 +375,7 @@ export function renderDrawing(
   state: RenderState = {},
 ): void {
   const { selected = false, hovered = false, preview = false } = state;
-  const color = DRAW_COLORS[d.type];
+  const color = cssVar(DRAW_COLORS[d.type]);
 
   ctx.save();
   ctx.globalAlpha = preview ? 0.7 : 1;
@@ -420,8 +422,9 @@ export function renderDrawing(
       const y = proj.priceToY(price);
       if (y == null) continue;
       const isBound = lvl.r === 0 || lvl.r === 1;
-      ctx.strokeStyle = lvl.color;
-      ctx.fillStyle = lvl.color;
+      const lvlColor = cssVar(lvl.color);
+      ctx.strokeStyle = lvlColor;
+      ctx.fillStyle = lvlColor;
       ctx.globalAlpha = preview ? 0.5 : 0.85;
       ctx.setLineDash(isBound ? [] : [4, 3]);
       ctx.beginPath();

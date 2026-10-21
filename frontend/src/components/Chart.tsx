@@ -1,12 +1,14 @@
 "use client";
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { CreatePriceLineOptions } from 'lightweight-charts';
 import {
   createChart, ColorType, IChartApi, ISeriesApi, IPriceLine, LineStyle,
   CandlestickSeries, LineSeries, HistogramSeries, LineSeriesPartialOptions, Time,
 } from 'lightweight-charts';
 import { ema, bollinger, macd, rsi } from '../lib/indicators';
+import { readStorage, useBrowserValue, writeStorage } from '../lib/browser';
+import { cssVar, tint } from '../lib/theme';
 import { CHART_INTERACTION_FREE, DrawingHint, DrawingRail, useChartDrawings } from './ChartDrawings';
-import { migrateLegacyStorageKeys } from '../lib/legacyStorage';
 
 // ---------------------------------------------------------------------------
 // Indicator configuration
@@ -41,17 +43,18 @@ const clampPeriod = (v: number) =>
   Math.min(PERIOD_MAX, Math.max(PERIOD_MIN, Math.round(v)));
 const clampMult = (v: number) => Math.min(MULT_MAX, Math.max(MULT_MIN, v));
 
-// One accent per indicator so the toolbar chip, its overlay, and its pane all
-// read as the same object (colors from tailwind.config.js accents).
+// Indicators are drawn in white and greys, never in green or red: in Polaris
+// those two colours mean direction and nothing else. Lines are told apart by
+// weight and dash, and each toolbar chip carries its line's swatch.
 const CHIP_META: { key: IndicatorKey; label: string; color: string }[] = [
-  { key: 'ema', label: 'EMA', color: '#FBBF24' },      // accentAmber
-  { key: 'ribbon', label: 'EMA Ribbon', color: '#34D399' }, // accentGreen
-  { key: 'bb', label: 'Bollinger', color: '#22D3EE' },  // accentCyan
-  { key: 'macd', label: 'MACD', color: '#60A5FA' },     // accentBlue
-  { key: 'rsi', label: 'RSI', color: '#A78BFA' },       // accentPurple
+  { key: 'ema', label: 'EMA', color: 'var(--fg)' },
+  { key: 'ribbon', label: 'EMA Ribbon', color: 'var(--series-2)' },
+  { key: 'bb', label: 'Bollinger', color: 'var(--fg-2)' },
+  { key: 'macd', label: 'MACD', color: 'var(--fg)' },
+  { key: 'rsi', label: 'RSI', color: 'var(--fg)' },
 ];
 
-const RIBBON_COLORS = ['#34D399', '#60A5FA', '#A78BFA', '#F87171'];
+const RIBBON_TOKENS = ['--fg', '--series-2', '--fg-2', '--series-4'] as const;
 
 // ---------------------------------------------------------------------------
 // Wheel-to-zoom (TradingView behaviour)
@@ -75,10 +78,8 @@ function wheelPixels(delta: number, mode: number): number {
   return delta;                        // DOM_DELTA_PIXEL
 }
 
-function loadStoredConfig(): IndicatorConfig {
+function parseStoredConfig(raw: string | null): IndicatorConfig {
   try {
-    migrateLegacyStorageKeys();
-    const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_CONFIG;
     const p = JSON.parse(raw);
     // Deep-merge over defaults so a stale or hand-edited payload can never
@@ -146,7 +147,7 @@ function ParamInput({ label, value, min, max, step, onCommit }: {
   };
   return (
     <label className="flex items-center justify-between gap-3 py-1">
-      <span className="text-[11px] text-textSecondary">{label}</span>
+      <span className="text-caption text-fg-2">{label}</span>
       <input
         type="number"
         defaultValue={value}
@@ -155,7 +156,7 @@ function ParamInput({ label, value, min, max, step, onCommit }: {
         step={step ?? 1}
         onBlur={(e) => commit(e.currentTarget)}
         onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-        className="w-20 rounded border border-borderSubtle bg-black/30 px-2 py-1 text-right text-xs tabular text-textPrimary focus:border-white/30"
+        className="w-20 rounded border border-white/15 bg-black/30 px-2 py-1 text-right text-xs tabular text-fg focus:border-line-strong"
       />
     </label>
   );
@@ -198,7 +199,9 @@ interface ChartProps {
     borderDownColor?: string;
     wickUpColor?: string;
     wickDownColor?: string;
-    priceLines?: any[];
+    /** Lines without a price yet (a level still loading) are skipped. A colour
+     *  given as a token name (`--red`) is resolved from globals.css. */
+    priceLines?: (Omit<CreatePriceLineOptions, 'price'> & { price: number | null })[];
   };
 }
 
@@ -212,31 +215,17 @@ export default function Chart({
   const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const priceLineRefs = useRef<IPriceLine[]>([]);
 
-  const [config, setConfig] = useState<IndicatorConfig>(DEFAULT_CONFIG);
+  // Saved indicators are read from storage as a browser-only value (defaults
+  // on the server and first render, so the HTML matches); an edit wins after.
+  const storedConfig = useBrowserValue(() => readStorage(STORAGE_KEY), null);
+  const [editedConfig, setEditedConfig] = useState<IndicatorConfig | null>(null);
+  const config = useMemo(() => editedConfig ?? parseStoredConfig(storedConfig), [editedConfig, storedConfig]);
+  const [openPopover, setOpenPopover] = useState<IndicatorKey | null>(null);
   // Bumped after every chart rebuild so the price-line effect re-applies its
   // lines to the FRESH candlestick series — without this, quant levels
   // (ENTRY/STOP/T1/T2) vanish on any indicator toggle/param edit because the
   // rebuild replaces the series but [colors.priceLines, data] never changed.
   const [rebuildEpoch, setRebuildEpoch] = useState(0);
-  // Rehydration happens in an effect (not a lazy initializer) so the server
-  // and first client render agree — reading localStorage during render would
-  // make the chip styling mismatch the SSR HTML.
-  const [hydrated, setHydrated] = useState(false);
-  const [openPopover, setOpenPopover] = useState<IndicatorKey | null>(null);
-
-  useEffect(() => {
-    setConfig(loadStoredConfig());
-    setHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    // Guard on hydrated so the pre-rehydration default state can't clobber
-    // what the user previously saved.
-    if (!hydrated) return;
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-    } catch { /* storage full or blocked — config just won't persist */ }
-  }, [config, hydrated]);
 
   // Close the open popover on outside click / Escape. Clicks inside the open
   // chip group (its popover, its settings button) are left alone so the
@@ -258,8 +247,11 @@ export default function Chart({
     };
   }, [openPopover]);
 
-  const setIndicator = <K extends IndicatorKey>(key: K, patch: Partial<IndicatorConfig[K]>) =>
-    setConfig(prev => ({ ...prev, [key]: { ...prev[key], ...patch } }));
+  const setIndicator = <K extends IndicatorKey>(key: K, patch: Partial<IndicatorConfig[K]>) => {
+    const next = { ...config, [key]: { ...config[key], ...patch } };
+    setEditedConfig(next);
+    writeStorage(STORAGE_KEY, JSON.stringify(next));
+  };
 
   // The drawing layer reads chartRef/seriesRef per frame rather than holding
   // them, so it rides out the chart rebuilds that indicator edits trigger;
@@ -277,22 +269,29 @@ export default function Chart({
 
   const {
     backgroundColor = 'transparent',
-    textColor = '#94A3B8',
-    upColor = '#00FF88',
-    downColor = '#FF3366',
-    borderUpColor = '#00FF88',
-    borderDownColor = '#FF3366',
-    wickUpColor = '#00FF88',
-    wickDownColor = '#FF3366',
+    textColor,
+    upColor,
+    downColor,
+    borderUpColor,
+    borderDownColor,
+    wickUpColor,
+    wickDownColor,
   } = colors;
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
+    const fg = cssVar('--fg');
+    const fg3 = cssVar('--fg-3');
+    const up = cssVar('--green');
+    const down = cssVar('--red');
+
     const chart = createChart(chartContainerRef.current, {
       layout: {
         background: { type: ColorType.Solid, color: backgroundColor },
-        textColor,
+        textColor: textColor ?? fg3,
+        fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+        fontSize: 11,
       },
       // autoSize: the chart runs its own ResizeObserver on the container, so
       // it tracks react-grid-layout widget resizes, not just window resizes.
@@ -301,14 +300,14 @@ export default function Chart({
       autoSize: true,
       height,
       grid: {
-        vertLines: { color: 'rgba(255, 255, 255, 0.05)' },
-        horzLines: { color: 'rgba(255, 255, 255, 0.05)' },
+        vertLines: { visible: false },
+        horzLines: { color: cssVar('--ink-2') },
       },
       timeScale: {
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderColor: cssVar('--line'),
       },
       rightPriceScale: {
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderColor: cssVar('--line'),
       },
       // Wheel zoom is driven by our own handler on the wrapper (see the wheel
       // effect below) rather than by the library. The library binds its
@@ -320,11 +319,11 @@ export default function Chart({
 
     // Candles live in pane 0 (v5: addSeries(definition, options, paneIndex)).
     const candleSeries = chart.addSeries(CandlestickSeries, {
-      upColor,
-      downColor,
+      upColor: upColor ?? up,
+      downColor: downColor ?? down,
       borderVisible: false,
-      wickUpColor,
-      wickDownColor,
+      wickUpColor: wickUpColor ?? up,
+      wickDownColor: wickDownColor ?? down,
     });
     candleSeries.setData(data);
 
@@ -359,21 +358,21 @@ export default function Chart({
     // ---- Pane 0 overlays ----
     if (config.ema.on) {
       addOverlayLine(toLineData(ema(closes, config.ema.period)), {
-        color: '#FBBF24', lineWidth: 2, title: `EMA ${config.ema.period}`,
+        color: fg, lineWidth: 2, title: `EMA ${config.ema.period}`,
       });
     }
 
     if (config.ribbon.on) {
       config.ribbon.periods.forEach((period, i) => {
         addOverlayLine(toLineData(ema(closes, period)), {
-          color: RIBBON_COLORS[i], lineWidth: 1, title: `EMA ${period}`,
+          color: cssVar(RIBBON_TOKENS[i]), lineWidth: 1, title: `EMA ${period}`,
         });
       });
     }
 
     if (config.bb.on) {
       const bands = bollinger(closes, config.bb.period, config.bb.mult);
-      const bbColor = 'rgba(34, 211, 238, 0.6)'; // accentCyan @ 60%
+      const bbColor = 'rgba(164, 172, 168, 0.7)'; // fg-2 @ 70%
       addOverlayLine(toLineData(bands.upper), { color: bbColor, lineWidth: 1 });
       addOverlayLine(toLineData(bands.middle), { color: bbColor, lineWidth: 1, lineStyle: LineStyle.Dashed });
       addOverlayLine(toLineData(bands.lower), { color: bbColor, lineWidth: 1 });
@@ -389,14 +388,14 @@ export default function Chart({
       const rsiPoints = toLineData(rsi(closes, config.rsi.period));
       if (rsiPoints.length > 0) {
         const rsiSeries = addOverlayLine(rsiPoints, {
-          color: '#A78BFA', lineWidth: 2, title: `RSI ${config.rsi.period}`,
+          color: fg, lineWidth: 2, title: `RSI ${config.rsi.period}`,
           lastValueVisible: true,
         }, nextPane++);
         // Overbought/oversold guides drawn as price lines on the RSI series.
         for (const level of [30, 70]) {
           rsiSeries.createPriceLine({
             price: level,
-            color: 'rgba(167, 139, 250, 0.45)',
+            color: 'rgba(132, 140, 136, 0.6)',
             lineWidth: 1,
             lineStyle: LineStyle.Dashed,
             axisLabelVisible: false,
@@ -423,13 +422,13 @@ export default function Chart({
             histData.push({
               time: data[i].time,
               value: v,
-              color: v >= 0 ? 'rgba(52, 211, 153, 0.55)' : 'rgba(248, 113, 113, 0.55)',
+              color: v >= 0 ? 'rgba(47, 191, 113, 0.55)' : 'rgba(229, 72, 77, 0.55)',
             });
           }
         });
         histSeries.setData(histData);
-        addOverlayLine(macdPoints, { color: '#60A5FA', lineWidth: 2, title: 'MACD', lastValueVisible: true }, macdPane);
-        addOverlayLine(toLineData(result.signal), { color: '#FBBF24', lineWidth: 1, title: 'Signal' }, macdPane);
+        addOverlayLine(macdPoints, { color: fg, lineWidth: 2, title: 'MACD', lastValueVisible: true }, macdPane);
+        addOverlayLine(toLineData(result.signal), { color: fg3, lineWidth: 1, title: 'Signal' }, macdPane);
       }
     }
 
@@ -474,7 +473,6 @@ export default function Chart({
     // resetting the user's pan/zoom while they typed in the trade form.
     // `config` IS included: a toggle/param change rebuilds the chart, which is
     // the accepted behavior (same as the old SMA button).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, visibleBars, height, backgroundColor, textColor, upColor, downColor, borderUpColor, borderDownColor, wickUpColor, wickDownColor, config]);
 
   // ---- Wheel: zoom the chart, never the page ----------------------------
@@ -552,8 +550,10 @@ export default function Chart({
       try { series.removePriceLine(line); } catch { /* series torn down */ }
     });
     priceLineRefs.current = (colors.priceLines ?? [])
-      .filter(line => line && line.price !== null && line.price !== undefined)
-      .map(line => series.createPriceLine(line));
+      .filter((line): line is CreatePriceLineOptions => line?.price != null)
+      .map(line => series.createPriceLine(
+        line.color?.startsWith('--') ? { ...line, color: cssVar(line.color as `--${string}`) } : line,
+      ));
   }, [colors.priceLines, data, rebuildEpoch]);
 
   return (
@@ -570,24 +570,24 @@ export default function Chart({
                   if (active && openPopover === key) setOpenPopover(null);
                 }}
                 className={`rounded border px-2 py-1 text-xs transition-colors ${
-                  active ? '' : 'border-borderSubtle bg-black/40 text-textSecondary hover:text-textPrimary'
+                  active ? '' : 'border-line bg-ink-0 text-fg-2 hover:text-fg'
                 }`}
-                style={active ? { borderColor: color, backgroundColor: `${color}1a`, color } : undefined}
+                style={active ? { borderColor: color, backgroundColor: tint(color, 10), color } : undefined}
               >
                 {label}
               </button>
               {active && (
                 <button
                   onClick={() => setOpenPopover(openPopover === key ? null : key)}
-                  className="rounded border border-borderSubtle bg-black/40 px-1.5 py-1 text-[10px] tabular text-textMuted transition-colors hover:text-textPrimary"
+                  className="rounded border border-white/15 bg-black/30 px-1.5 py-1 text-caption tabular text-fg-3 transition-colors hover:text-fg"
                   title={`${label} settings`}
                 >
                   {chipSummary(key, config)}
                 </button>
               )}
               {openPopover === key && (
-                <div className="glass-panel absolute left-0 top-full z-20 mt-2 w-52 p-3">
-                  <div className="mb-1 text-[11px] font-semibold font-mono uppercase tracking-wider text-textMuted">
+                <div className="glass-2 rounded-lg absolute left-0 top-full z-20 mt-2 w-52 p-3">
+                  <div className="mb-1 text-caption font-semibold text-fg-3">
                     {label}
                   </div>
                   {key === 'ema' && (

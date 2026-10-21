@@ -8,6 +8,8 @@ product
 
 web
 
+> **Updated 2026-10-11:** Polaris is now a personal portfolio manager for India + US with read-only broker-synced real holdings alongside paper portfolios. See `docs/PRD.md` Part III. Where this file says "all trading is paper", read it as "all *trading* is paper; real holdings are read-only".
+
 ## Users
 
 A single quant-minded self-directed trader — the person who built and runs it. The context is research and paper trading: sitting with a chart open, deciding whether and how large to take a position, and wanting the discipline of explicit rules rather than gut feel. The job to be done is to turn a symbol into a defensible decision — is there an edge, where's the entry, where's the stop, how big should the position be, and what's the portfolio-level risk of adding it.
@@ -16,7 +18,7 @@ The product register is the default, but the surface is split: the app itself (s
 
 ## Product Purpose
 
-Flint is a personal quant desk: a stock screener and paper-trading platform that unifies the analysis a disciplined trader would otherwise assemble from many tools. It produces a systematic multi-factor trade plan (limit entry, ATR/swing stop, 1.5R/3R targets, factor-vote breakdown, half-Kelly sizing), portfolio risk analytics (VaR/CVaR in dollars, Sharpe, Sortino, max drawdown, beta, diversification, Markowitz optimization), sentiment-scored global news, ML forecasts (XGBoost direction, Prophet), and a portfolio-aware AI assistant grounded in live signals. Success is measured in decision quality: better-sized positions, clearer risk, and trades taken on rules rather than emotion.
+Polaris is a personal quant desk: a stock screener and paper-trading platform that unifies the analysis a disciplined trader would otherwise assemble from many tools. It produces a systematic multi-factor trade plan (limit entry, ATR/swing stop, 1.5R/3R targets, factor-vote breakdown, half-Kelly sizing), portfolio risk analytics (VaR/CVaR in dollars, Sharpe, Sortino, max drawdown, beta, diversification, Markowitz optimization), sentiment-scored global news, ML forecasts (XGBoost direction, Prophet), and a portfolio-aware AI assistant grounded in live signals. Success is measured in decision quality: better-sized positions, clearer risk, and trades taken on rules rather than emotion.
 
 ## Positioning
 

@@ -2,7 +2,7 @@
 
 export const fmtPrice = (val: number | null | undefined, currency = 'USD') =>
   val === null || val === undefined
-    ? '—'
+    ? '–'
     : new Intl.NumberFormat(currency === 'INR' ? 'en-IN' : 'en-US', {
         style: 'currency',
         currency,
@@ -10,7 +10,7 @@ export const fmtPrice = (val: number | null | undefined, currency = 'USD') =>
 
 /** Large statement figures: ₹ Cr / L Cr for INR, $B/$M elsewhere. */
 export const fmtBig = (val: number | null | undefined, currency = 'USD') => {
-  if (val === null || val === undefined) return '—';
+  if (val === null || val === undefined) return '–';
   const abs = Math.abs(val);
   if (currency === 'INR') {
     if (abs >= 1e12) return `₹${(val / 1e12).toFixed(2)} L Cr`;
@@ -23,18 +23,15 @@ export const fmtBig = (val: number | null | undefined, currency = 'USD') => {
   return `$${Math.round(val).toLocaleString('en-US')}`;
 };
 
-export const stanceColor = (stance: string | undefined) =>
-  stance === 'bullish' ? '#34D399' : stance === 'bearish' ? '#F87171' : '#FBBF24';
-
-export const callColor = (call: string | undefined) =>
-  call === 'BUY' ? '#34D399' : call === 'AVOID' ? '#F87171' : '#FBBF24';
+export const stanceColor = (stance: string | null | undefined) =>
+  stance === 'bullish' ? 'var(--green)' : stance === 'bearish' ? 'var(--red)' : 'var(--fg-2)';
 
 export const gradeColor = (grade: string | undefined) => {
-  if (!grade) return '#64748B';
-  if (grade.startsWith('A')) return '#34D399';
-  if (grade === 'B') return '#60A5FA';
-  if (grade === 'C') return '#FBBF24';
-  return '#F87171';
+  if (!grade) return 'var(--fg-3)';
+  if (grade.startsWith('A')) return 'var(--green)';
+  if (grade === 'B') return 'var(--fg-2)';
+  if (grade === 'C') return 'var(--fg-2)';
+  return 'var(--red)';
 };
 
 export const PHASE_LABELS: Record<string, string> = {
@@ -45,9 +42,9 @@ export const PHASE_LABELS: Record<string, string> = {
   transition: 'Transition · no regime',
 };
 
-export const phaseColor = (phase: string | undefined) =>
-  phase === 'markup' ? '#34D399'
-  : phase === 'markdown' ? '#F87171'
-  : phase === 'accumulation' ? '#22D3EE'
-  : phase === 'distribution' ? '#FBBF24'
-  : '#94A3B8';
+export const phaseColor = (phase: string | null | undefined) =>
+  phase === 'markup' ? 'var(--green)'
+  : phase === 'markdown' ? 'var(--red)'
+  : phase === 'accumulation' ? 'var(--fg-2)'
+  : phase === 'distribution' ? 'var(--fg-2)'
+  : 'var(--fg-2)';
