@@ -220,7 +220,7 @@ export default async function Landing() {
           </div>
 
           {/* -------------------------------------- pinned 1: real/paper -- */}
-          <section id="real-paper" data-pin-rp aria-labelledby="rp-h" className={`relative isolate py-24 md:py-32 ${gutter}`}>
+          <section id="real-paper" data-pin-rp aria-labelledby="rp-h" className={`relative isolate py-24 md:py-16 ${gutter}`}>
             <div className="mx-auto grid max-w-[1400px] items-center gap-12 lg:min-h-[80dvh] lg:grid-cols-2">
               <SectionHead id="rp-h" kicker="Two books, one view" title="Real and paper, never mixed."
                            body="Your broker holdings sync read-only and stay exactly as they are. Ideas live in paper books with their own totals, always marked in blue." />
@@ -234,7 +234,7 @@ export default async function Landing() {
           </section>
 
           {/* ------------------------------------------ pinned 2: plan -- */}
-          <section id="plan" data-plan aria-labelledby="plan-h" className={`relative isolate py-24 md:py-32 ${gutter}`}>
+          <section id="plan" data-plan aria-labelledby="plan-h" className={`relative isolate py-8 ${gutter}`}>
             <div className="mx-auto flex max-w-[1400px] flex-col gap-12 lg:min-h-[90dvh] lg:justify-center">
               <SectionHead id="plan-h" kicker="From symbol to plan" title="The plan comes before the button."
                            body="Entry, stop, two targets and a size that risks exactly what you chose. Shown before any paper order, every time." />
@@ -269,7 +269,7 @@ export default async function Landing() {
           </section>
 
           {/* ----------------------------------------------------- desk -- */}
-          <section id="desk" aria-labelledby="desk-h" className={`relative isolate py-24 md:py-32 ${gutter}`}>
+          <section id="desk" aria-labelledby="desk-h" className={`relative isolate py-12 md:py-8 ${gutter}`}>
             <div className="mx-auto flex max-w-[1400px] flex-col gap-12">
               <SectionHead id="desk-h" kicker="AI desk" title="An AI desk that shows its work."
                            body="Four seats explain what they see, with their sources on the table. They describe and never tell you to buy or sell. When a model is down, the card says so instead of guessing." />
@@ -289,7 +289,7 @@ export default async function Landing() {
           </section>
 
           {/* ----------------------------------------------------- risk -- */}
-          <section aria-labelledby="risk-h" className={`relative isolate py-24 md:py-32 ${gutter}`}>
+          <section aria-labelledby="risk-h" className={`relative isolate py-12 md:py-8 ${gutter}`}>
             <div className="mx-auto flex max-w-[1400px] flex-col gap-12">
               <SectionHead id="risk-h" kicker="Risk" title="Risk you can read." body="Each number comes with one plain sentence about what it means." />
               <div className="relative isolate">
@@ -307,7 +307,7 @@ export default async function Landing() {
           </section>
 
           {/* ---------------------------------------------------- trust -- */}
-          <section id="trust" aria-labelledby="trust-h" className={`py-24 md:py-32 ${gutter}`}>
+          <section id="trust" aria-labelledby="trust-h" className={`py-12 md:py-8 ${gutter}`}>
             <div className="mx-auto grid max-w-[1400px] gap-12 lg:grid-cols-2">
               <SectionHead id="trust-h" kicker="Security" title="Built to be honest." />
               <ul data-stagger className="flex flex-col">
@@ -331,7 +331,7 @@ export default async function Landing() {
           </section>
 
           {/* -------------------------------------------------- compare -- */}
-          <section id="compare" aria-labelledby="compare-h" className={`py-24 md:py-32 ${gutter}`}>
+          <section id="compare" aria-labelledby="compare-h" className={`py-12 md:py-8 ${gutter}`}>
             <div className="mx-auto flex max-w-[1400px] flex-col gap-12">
               <SectionHead id="compare-h" kicker="Compared" title="Where Polaris fits."
                            body="Polaris doesn't replace a broker or a basket. It shows what you own across markets and lets you test ideas first." />
@@ -363,7 +363,7 @@ export default async function Landing() {
           </section>
 
           {/* ------------------------------------------------------ faq -- */}
-          <section id="faq" aria-labelledby="faq-h" className={`py-24 md:py-32 ${gutter}`}>
+          <section id="faq" aria-labelledby="faq-h" className={`py-12 md:py-8 ${gutter}`}>
             <div className="mx-auto grid max-w-[1400px] gap-12 lg:grid-cols-2">
               <SectionHead id="faq-h" kicker="FAQ" title="Straight answers." />
               <div data-stagger className="flex flex-col">
