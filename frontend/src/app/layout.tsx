@@ -37,7 +37,7 @@ const clerkAppearance = {
     colorWarning: '#E8B04A',
     colorRing: '#F5F5F5',
     colorShadow: 'transparent',
-    borderRadius: '2px',
+    borderRadius: '10px',
     fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
   },
 };

@@ -48,7 +48,7 @@ export function Change({ pct, className = '' }: { pct: number | null; className?
 
 function Unavailable({ title }: { title: string }) {
   return (
-    <div data-hero-card className="glass-hero w-full rounded-2xl p-6">
+    <div className="glass-hero w-full rounded-2xl p-6">
       <p className={`${micro} text-fg`}>{title}</p>
       <p className="mt-4 text-body-sm text-fg-2">Market data is unavailable right now. Nothing is shown in its place.</p>
     </div>
@@ -61,7 +61,7 @@ export function MarketCard({ market, title, limit = 3 }: { market: Market | null
   const b = market.breadth;
   const total = b ? b.advancing + b.declining + b.unchanged : 0;
   return (
-    <section data-hero-card aria-label={`${title} markets`} className="glass-hero w-full rounded-2xl p-6">
+    <section aria-label={`${title} markets`} className="glass-hero w-full rounded-2xl p-6">
       <p className="flex items-center justify-between">
         <span className={`${micro} text-fg`}>{title}</span>
         <span className="pill text-caption text-fg-2">{market.session === 'open' ? 'Open' : 'Closed'}</span>
@@ -96,7 +96,7 @@ export function MarketCard({ market, title, limit = 3 }: { market: Market | null
 export function FxCard({ fx }: { fx: Fx | null }) {
   if (!fx) return <Unavailable title="USD / INR" />;
   return (
-    <section data-hero-card aria-label="US dollar in rupees" className="glass-hero w-full rounded-2xl p-6">
+    <section aria-label="US dollar in rupees" className="glass-hero w-full rounded-2xl p-6">
       <p className="flex items-center justify-between">
         <span className={`${micro} text-fg`}>USD / INR</span>
         <span className="text-caption text-fg-2">Rupees per dollar</span>

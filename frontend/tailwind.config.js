@@ -1,9 +1,9 @@
 /**
- * Polaris v3.2 "Glass" tokens. Source of truth: docs/DESIGN.md.
+ * Polaris v4 "Liquid Glass" tokens. Source of truth: docs/DESIGN.md.
  *
  * Dark only. Colour carries meaning only: green gains, red losses and
  * destructive actions, amber stale or delayed data, blue paper (simulated)
- * money. Controls are sharp (2px); glass surfaces are soft (12/16/20px). Only
+ * money. Everything is rounded (controls 10px, glass 16/22/28px). Only
  * overlays cast a shadow. Glass itself lives in globals.css (glass-* classes).
  */
 const ink0 = "#0B0B0C";
@@ -28,10 +28,11 @@ module.exports = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    // Replace, not extend: only these radii exist. Controls sharp, glass soft.
+    // Replace, not extend: only these radii exist. v4: Apple-style continuous
+    // rounding; controls 10, chips 8, glass 16/22/28, buttons are capsules.
     borderRadius: {
-      none: "0", sm: "2px", DEFAULT: "4px", md: "4px", lg: "12px",
-      xl: "16px", "2xl": "20px", "3xl": "20px", full: "9999px",
+      none: "0", sm: "10px", DEFAULT: "8px", md: "8px", lg: "16px",
+      xl: "22px", "2xl": "28px", "3xl": "32px", full: "9999px",
     },
     // Only overlays cast a shadow. Everything else maps to none.
     boxShadow: {

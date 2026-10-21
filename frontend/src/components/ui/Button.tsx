@@ -7,14 +7,14 @@ type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'paper';
 type Size = 'md' | 'sm' | 'lg';
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-sm border font-medium whitespace-nowrap ' +
-  'transition-[background-color,border-color,color,transform] duration-fast ease-standard active:translate-y-px ' +
+  'inline-flex items-center justify-center gap-2 rounded-full border font-medium tracking-[-0.01em] whitespace-nowrap ' +
+  'transition-[background-color,border-color,color,box-shadow,transform] duration-fast ease-standard active:scale-[0.98] ' +
   'disabled:cursor-not-allowed disabled:opacity-50';
 
 const variants: Record<Variant, string> = {
   // White is the action; colour is reserved for meaning (docs/DESIGN.md §7.1).
-  primary: 'border-transparent bg-fg text-ink-0 hover:bg-white',
-  secondary: 'border-white/30 bg-black/30 text-fg backdrop-blur hover:border-white/40 hover:bg-white/[0.06]',
+  primary: 'btn-solid border-white text-ink-0',
+  secondary: 'btn-frost border-white/25 text-fg hover:border-white/50',
   danger: 'border-down/60 bg-transparent text-down hover:bg-down/10',
   ghost: 'border-transparent bg-transparent text-fg-2 hover:bg-white/[0.06] hover:text-fg',
   // Placing paper (simulated) orders only.
