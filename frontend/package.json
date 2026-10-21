@@ -18,8 +18,7 @@
     "locomotive-scroll": "^5.0.1",
     "next": "^16.4.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "tailwind-merge": "^3.5.0"
+    "react-dom": "19.2.3"
   },
   "devDependencies": {
     "@types/node": "^20.19.37",

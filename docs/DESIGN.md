@@ -274,7 +274,7 @@ Anything not on this list needs a decision in `MEMORY.md`. There are no page tra
 
 ### 6.4 Reduced motion (hard requirement)
 
-`prefers-reduced-motion: reduce` (or the in-app setting via `useReducedMotion()`):
+`prefers-reduced-motion: reduce`:
 - Locomotive is never instantiated, so native scrolling is used.
 - GSAP timelines are skipped and every element renders in its final state.
 - Count-ups show the final value. Price ticks become a static colour for 1s. Skeletons stop pulsing.
