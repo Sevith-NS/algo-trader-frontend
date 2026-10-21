@@ -37,6 +37,13 @@ export function LandingMotion({ children }: { children: React.ReactNode }) {
           if (motion) v.play().catch(() => {}); // autoplay can be refused; the poster stays
           else v.pause();
         });
+        // Not motion, just brightness tied to scroll, so it runs for everyone:
+        // past the hero the video dims to 72% black and section text stays AA.
+        gsap.to(q('[data-video-dim]'), {
+          opacity: 0.72,
+          ease: 'none',
+          scrollTrigger: { trigger: q('[data-hero]')[0], start: 'center top', end: 'bottom top', scrub: true },
+        });
         if (!motion) return;
         const pinning = desktop && tall;
 

@@ -468,7 +468,7 @@ select {
 /* Darkens only the area behind the hero copy, so text stays AA when the
    video's bright band passes behind it. The rest of the video is untouched. */
 .hero-scrim {
-  background: radial-gradient(ellipse 60% 42% at 50% 72%, rgb(0 0 0 / 0.62), rgb(0 0 0 / 0.35) 55%, transparent 100%);
+  background: radial-gradient(ellipse 62% 30% at 50% 68%, rgb(0 0 0 / 0.62), rgb(0 0 0 / 0.35) 55%, transparent 100%);
 }
 
 /* Hero headline: the italic serif word, in grey. */

@@ -118,7 +118,16 @@ export default async function Landing() {
   const tape = tapeItems(markets, TAPE);
   return (
     <LandingMotion>
-      <div className={`relative min-h-[100dvh] overflow-x-clip bg-ink-0 ${serif.variable}`}>
+      <div className={`relative isolate min-h-[100dvh] overflow-x-clip bg-ink-0 ${serif.variable}`}>
+        {/* The landing's background: one full-strength loop pinned behind
+            every section. LandingMotion plays it only when motion is allowed
+            (otherwise the first frame stays) and fades in the dim layer as
+            the hero scrolls away, so later text stays AA over the bright band. */}
+        <video data-hero-video aria-hidden="true" muted loop playsInline preload="auto" poster="/hero/poster.jpg"
+               className="pointer-events-none fixed inset-0 -z-20 size-full object-cover">
+          <source src="/hero/hero.mp4" type="video/mp4" />
+        </video>
+        <div data-video-dim aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 bg-ink-0 opacity-0" />
         {/* Film grain over the whole page. Tune it in globals.css (.landing-grain). */}
         <div aria-hidden="true" className="landing-grain" />
 
@@ -143,12 +152,6 @@ export default async function Landing() {
           {/* One frame: the copy sits low and centred over the light field,
               three plain facts run along the bottom edge. */}
           <section data-hero aria-labelledby="hero-h" className="relative isolate flex min-h-[100dvh] flex-col">
-            {/* Full-strength background loop; LandingMotion plays it only when
-                motion is allowed, otherwise the first frame stays as a still. */}
-            <video data-hero-video aria-hidden="true" muted loop playsInline preload="auto" poster="/hero/poster.jpg"
-                   className="absolute inset-0 -z-10 size-full object-cover [mask-image:linear-gradient(to_bottom,black_78%,transparent)]">
-              <source src="/hero/hero.mp4" type="video/mp4" />
-            </video>
             <div aria-hidden="true" className="hero-scrim absolute inset-0 -z-10" />
             <div className="flex flex-1 items-end justify-center px-5 pb-12 pt-28 md:pb-16 lg:pb-[85px]">
               <div className="flex w-full max-w-[860px] flex-col items-center text-center min-[1600px]:max-w-[980px] min-[1920px]:max-w-[1120px]">
@@ -188,7 +191,6 @@ export default async function Landing() {
 
           {/* --------------------------------------------- live markets -- */}
           <section aria-label="Live markets" className={`relative isolate py-16 md:py-24 ${gutter}`}>
-            <div aria-hidden="true" className="bloom left-1/2 top-1/2 h-[min(900px,160vw)] w-[min(1500px,200vw)] -translate-x-1/2 -translate-y-1/2 [--b:0.7]" />
             <div data-stagger className="mx-auto grid max-w-[1400px] gap-4 md:grid-cols-3">
               <MarketCard title="India" market={markets?.india ?? null} />
               <MarketCard title="United States" market={markets?.us ?? null} />
@@ -204,7 +206,6 @@ export default async function Landing() {
               the next section, its core below the tape so the tape's text only
               meets its faint edge. */}
           <div aria-hidden="true" className="relative isolate">
-            <div className="bloom left-[-10%] top-[calc(50%+460px)] h-[min(1500px,200vw)] w-[min(1700px,220vw)] -translate-x-1/2 -translate-y-1/2 [--b:0.65]" />
             <div className="overflow-hidden py-6 [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
               <div data-tape className="flex w-max gap-10 whitespace-nowrap">
                 {[...tape, ...tape].map((t, i) => (
@@ -224,7 +225,6 @@ export default async function Landing() {
               <SectionHead id="rp-h" kicker="Two books, one view" title="Real and paper, never mixed."
                            body="Your broker holdings sync read-only and stay exactly as they are. Ideas live in paper books with their own totals, always marked in blue." />
               <div className="relative isolate">
-                <div aria-hidden="true" className="bloom left-[188%] top-[38%] h-[min(1300px,180vw)] w-[min(1300px,180vw)] -translate-x-1/2 -translate-y-1/2" />
                 <div className="relative flex flex-col gap-4">
                   <PortfolioFace mode="real" />
                   <PortfolioFace mode="paper" />
@@ -239,7 +239,6 @@ export default async function Landing() {
               <SectionHead id="plan-h" kicker="From symbol to plan" title="The plan comes before the button."
                            body="Entry, stop, two targets and a size that risks exactly what you chose. Shown before any paper order, every time." />
               <div className="relative isolate grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-                <div aria-hidden="true" className="bloom left-[62%] top-[55%] h-[min(1200px,170vw)] w-[min(1900px,200vw)] -translate-x-1/2 -translate-y-1/2 [--b:0.85]" />
                 <div className="glass rounded-2xl p-4 md:p-6">
                   <p className="mb-4 flex items-center justify-between">
                     <span className={`${micro} text-fg`}>Example · Daily candles</span>
@@ -275,7 +274,6 @@ export default async function Landing() {
               <SectionHead id="desk-h" kicker="AI desk" title="An AI desk that shows its work."
                            body="Four seats explain what they see, with their sources on the table. They describe and never tell you to buy or sell. When a model is down, the card says so instead of guessing." />
               <div className="relative isolate">
-                <div aria-hidden="true" className="bloom left-1/2 top-1/2 h-[min(700px,150vw)] w-[min(1400px,170vw)] -translate-x-1/2 -translate-y-1/2 [--b:0.6]" />
               <div data-stagger className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 {DESK.map((d, i) => (
                   <article key={d.seat} className={`glass flex flex-col gap-4 rounded-2xl p-6 ${i === 3 ? 'glass-warn' : ''}`}>
@@ -295,7 +293,6 @@ export default async function Landing() {
             <div className="mx-auto flex max-w-[1400px] flex-col gap-12">
               <SectionHead id="risk-h" kicker="Risk" title="Risk you can read." body="Each number comes with one plain sentence about what it means." />
               <div className="relative isolate">
-                <div aria-hidden="true" className="bloom left-1/2 top-1/2 h-[min(600px,140vw)] w-[min(1200px,170vw)] -translate-x-1/2 -translate-y-1/2 [--b:0.55]" />
               <dl data-stagger className="grid gap-4 md:grid-cols-3">
                 {RISK.map((r) => (
                   <div key={r.label} className="glass flex flex-col gap-3 rounded-2xl p-6">
@@ -385,7 +382,6 @@ export default async function Landing() {
 
           {/* ---------------------------------------------------- close -- */}
           <section aria-labelledby="close-h" className="relative isolate">
-            <div aria-hidden="true" className="bloom left-1/2 top-1/2 h-[min(1000px,180vw)] w-[min(1400px,190vw)] -translate-x-1/2 -translate-y-1/2" />
             <div className={`relative z-10 mx-auto flex max-w-[1400px] justify-center py-28 md:py-40 ${gutter}`}>
               <div data-reveal className="glass-hero flex w-full max-w-3xl flex-col items-center gap-8 rounded-[28px] px-6 py-16 text-center md:px-16">
                 <span className={`pill ${micro} text-fg`}>Invite only</span>
