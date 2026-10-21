@@ -143,7 +143,13 @@ export default async function Landing() {
           {/* One frame: the copy sits low and centred over the light field,
               three plain facts run along the bottom edge. */}
           <section data-hero aria-labelledby="hero-h" className="relative isolate flex min-h-[100dvh] flex-col">
-            <div aria-hidden="true" className="bloom left-1/2 top-[14%] h-[min(900px,140vw)] w-[min(1500px,200vw)] -translate-x-1/2 -translate-y-1/2 [--b:0.5]" />
+            {/* Full-strength background loop; LandingMotion plays it only when
+                motion is allowed, otherwise the first frame stays as a still. */}
+            <video data-hero-video aria-hidden="true" muted loop playsInline preload="auto" poster="/hero/poster.jpg"
+                   className="absolute inset-0 -z-10 size-full object-cover">
+              <source src="/hero/hero.mp4" type="video/mp4" />
+            </video>
+            <div aria-hidden="true" className="hero-scrim absolute inset-0 -z-10" />
             <div className="flex flex-1 items-end justify-center px-5 pb-12 pt-28 md:pb-16 lg:pb-[85px]">
               <div className="flex w-full max-w-[860px] flex-col items-center text-center min-[1600px]:max-w-[980px] min-[1920px]:max-w-[1120px]">
                 <span className="appear appear--pop mb-5 inline-flex items-center gap-2 hero-badge px-4 py-2 text-[12.5px] tracking-[-0.01em] min-[1600px]:text-[13.5px]"

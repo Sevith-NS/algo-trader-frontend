@@ -33,6 +33,10 @@ export function LandingMotion({ children }: { children: React.ReactNode }) {
       (ctx) => {
         const { motion, desktop, tall } = ctx.conditions as { motion: boolean; desktop: boolean; tall: boolean };
         el.dataset.motion = motion ? 'on' : 'off';
+        q<HTMLVideoElement>('[data-hero-video]').forEach((v) => {
+          if (motion) v.play().catch(() => {}); // autoplay can be refused; the poster stays
+          else v.pause();
+        });
         if (!motion) return;
         const pinning = desktop && tall;
 

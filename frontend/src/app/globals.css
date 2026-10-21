@@ -34,11 +34,11 @@
   --glass-fill-2: rgb(24 24 26 / 0.84);
   --glass-fill-hero: rgb(16 16 18 / 0.80);
   --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.06) 0%, rgb(255 255 255 / 0.02) 38%, rgb(255 255 255 / 0) 70%);
-  --glass-rim: linear-gradient(180deg, rgb(255 255 255 / 0.42) 0%, rgb(255 255 255 / 0.10) 30%, rgb(255 255 255 / 0.05) 70%, rgb(255 255 255 / 0.16) 100%);
+  --glass-rim: linear-gradient(135deg, rgb(255 255 255 / 0.50) 0%, rgb(255 255 255 / 0.10) 28%, rgb(255 255 255 / 0.04) 60%, rgb(255 255 255 / 0.28) 100%);
   --glass-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.14),
-    inset 0 -1px 0 rgb(255 255 255 / 0.04),
-    inset 0 0 28px rgb(255 255 255 / 0.025),
+    inset 1.5px 1.5px 1px -1px rgb(255 255 255 / 0.30),
+    inset -1.5px -1.5px 1px -1px rgb(255 255 255 / 0.14),
+    inset 0 0 28px rgb(255 255 255 / 0.035),
     0 1px 2px rgb(0 0 0 / 0.3),
     0 24px 56px -24px rgb(0 0 0 / 0.75);
   --blur: 20px;
@@ -379,24 +379,43 @@ select {
 
 /* --------------------------------------------------- liquid buttons -- */
 
-/* Button.tsx primary and secondary. A silver capsule lit from the top, and a
-   frosted one. No coloured glow: colour is reserved for meaning. */
+/* iOS 26 liquid glass. Light catches two opposite edges (top-left bright,
+   bottom-right softer), the body glows faintly from inside, and the backdrop
+   is blurred and saturated through it. No coloured glow: colour is meaning. */
+:root {
+  --liquid-edge:
+    inset 1.5px 1.5px 1px -1px rgb(255 255 255 / 0.75),
+    inset -1.5px -1.5px 1px -1px rgb(255 255 255 / 0.40),
+    inset 0 0 10px 1px rgb(255 255 255 / 0.07);
+}
+
+/* Prominent: white glass for the primary action. */
 .btn-solid {
-  background: linear-gradient(180deg, #FFFFFF 0%, #ECECEC 48%, #D4D4D4 100%);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.95), 0 1px 2px rgb(0 0 0 / 0.35);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.96) 0%, rgb(236 236 238 / 0.90) 100%);
+  border-color: rgb(255 255 255 / 0.6);
+  box-shadow: var(--liquid-edge), inset 0 -6px 12px -6px rgb(0 0 0 / 0.12), 0 8px 24px -8px rgb(0 0 0 / 0.55);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(180%);
 }
-.btn-solid:hover {
-  background: linear-gradient(180deg, #FFFFFF 0%, #F6F6F6 45%, #E2E2E2 100%);
-  box-shadow: inset 0 1px 0 #FFFFFF, 0 6px 18px rgb(255 255 255 / 0.10);
+.btn-solid:hover { background: linear-gradient(180deg, #FFFFFF 0%, rgb(246 246 248 / 0.95) 100%); }
+
+/* Regular: clear glass. The dark base keeps white text at 4.5:1 even over
+   the brightest part of the landing video. */
+.btn-frost,
+.glass-pill {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.10) 0%, rgb(255 255 255 / 0.02) 55%, rgb(255 255 255 / 0.05) 100%),
+    rgb(28 28 30 / 0.55);
+  border-color: rgb(255 255 255 / 0.14);
+  box-shadow: var(--liquid-edge), 0 8px 24px -10px rgb(0 0 0 / 0.6);
+  -webkit-backdrop-filter: blur(14px) saturate(200%);
+  backdrop-filter: blur(14px) saturate(200%);
 }
-.btn-frost {
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.12), rgb(255 255 255 / 0.04));
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.16);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  backdrop-filter: blur(16px) saturate(180%);
-}
-.btn-frost:hover {
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.18), rgb(255 255 255 / 0.06));
+.btn-frost:hover,
+.glass-pill:hover {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.16) 0%, rgb(255 255 255 / 0.04) 55%, rgb(255 255 255 / 0.08) 100%),
+    rgb(28 28 30 / 0.55);
 }
 
 /* Landing only: a light sweep across a button on hover. */
@@ -416,8 +435,9 @@ select {
 
 /* ---------------------------------------------------- landing hero -- */
 
-/* Metallic nav pill: a dark-to-graphite capsule with a silver rim. */
-.metal {
+/* Landing nav pill: a liquid glass capsule (fill and edges above) with a
+   light sweep on hover. */
+.glass-pill {
   position: relative;
   overflow: hidden;
   display: inline-flex;
@@ -425,15 +445,15 @@ select {
   height: 40px;
   padding: 0 18px;
   border-radius: 9999px;
-  border: 1px solid rgb(198 198 198 / 0.45);
-  background: linear-gradient(105deg, #050505 0%, #222 48%, #3E3E3E 100%);
-  color: #F3F3F3;
+  border-width: 1px;
+  border-style: solid;
+  color: #F5F5F5;
   font-size: 14px;
   letter-spacing: -0.01em;
   white-space: nowrap;
-  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  transition: background 0.35s ease, border-color 0.35s ease;
 }
-.metal::before {
+.glass-pill::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -442,8 +462,14 @@ select {
   transform: translateX(-120%);
   transition: transform 0.6s ease;
 }
-.metal:hover { border-color: rgb(235 235 235 / 0.9); background: linear-gradient(105deg, #111 0%, #3A3A3A 45%, #5E5E5E 100%); }
-.metal:hover::before { transform: translateX(120%); }
+.glass-pill:hover { border-color: rgb(255 255 255 / 0.3); }
+.glass-pill:hover::before { transform: translateX(120%); }
+
+/* Darkens only the area behind the hero copy, so text stays AA when the
+   video's bright band passes behind it. The rest of the video is untouched. */
+.hero-scrim {
+  background: radial-gradient(ellipse 60% 42% at 50% 72%, rgb(0 0 0 / 0.62), rgb(0 0 0 / 0.35) 55%, transparent 100%);
+}
 
 /* Hero headline: the italic serif word, in grey. */
 .hero-em {
@@ -480,7 +506,7 @@ select {
 @keyframes in-side  { from { opacity: 0; transform: translateX(22px); } }
 @keyframes in-stat  { from { opacity: 0; transform: translateY(20px); } }
 
-/* Phone menu (LandingNav): full-screen frosted sheet of metal pills. */
+/* Phone menu (LandingNav): full-screen frosted sheet of glass pills. */
 .menu-backdrop {
   position: fixed;
   inset: 0;
@@ -511,7 +537,7 @@ select {
     padding: max(96px, calc(env(safe-area-inset-top) + 88px)) 22px 32px;
   }
   [data-menu-open] .site-nav { display: flex; }
-  .site-nav .metal { width: 100%; height: 56px; justify-content: center; font-size: 19px; border-radius: 16px; }
+  .site-nav .glass-pill { width: 100%; height: 56px; justify-content: center; font-size: 19px; border-radius: 16px; }
 }
 
 /* ---------------------------------------------------------------- silver -- */
@@ -573,7 +599,7 @@ select {
     scroll-behavior: auto !important;
   }
   /* The duration clamp above keeps delays, which would hold these hidden. */
-  .appear, .shine::after, .metal::before { animation: none !important; transition: none !important; }
+  .appear, .shine::after, .glass-pill::before { animation: none !important; transition: none !important; }
 }
 
 /* Landing hero badge: a graphite capsule, lightest on the left. */
