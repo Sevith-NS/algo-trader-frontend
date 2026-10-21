@@ -146,7 +146,7 @@ export default async function Landing() {
             {/* Full-strength background loop; LandingMotion plays it only when
                 motion is allowed, otherwise the first frame stays as a still. */}
             <video data-hero-video aria-hidden="true" muted loop playsInline preload="auto" poster="/hero/poster.jpg"
-                   className="absolute inset-0 -z-10 size-full object-cover">
+                   className="absolute inset-0 -z-10 size-full object-cover [mask-image:linear-gradient(to_bottom,black_78%,transparent)]">
               <source src="/hero/hero.mp4" type="video/mp4" />
             </video>
             <div aria-hidden="true" className="hero-scrim absolute inset-0 -z-10" />

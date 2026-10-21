@@ -74,27 +74,10 @@ export function LandingMotion({ children }: { children: React.ReactNode }) {
         logo?.addEventListener('click', onLogo);
 
         /* ------------------------------------------------------- hero -- */
-        SplitText.create(q('[data-hero-title]'), {
-          type: 'lines',
-          mask: 'lines',
-          autoSplit: true,
-          onSplit: (self) =>
-            gsap.from(self.lines, { yPercent: 110, duration: 1.3, stagger: 0.1, ease: 'expo.out', delay: 0.1 }),
-        });
-        gsap.from(q('[data-hero-in]'), { y: 24, autoAlpha: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, delay: 0.45 });
-        gsap.from(q('[data-hero-card]'), { y: 64, scale: 0.96, autoAlpha: 0, duration: 1.2, ease: 'expo.out', stagger: 0.12, delay: 0.35 });
         q<SVGPathElement>('[data-draw]').forEach((path) => {
           const len = path.getTotalLength();
           gsap.fromTo(path, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 2, ease: 'power2.inOut', delay: 0.9 });
         });
-        if (desktop) {
-          // The cards drift a little slower than the page: depth without spectacle.
-          gsap.to(q('[data-light-cards]'), {
-            yPercent: -8,
-            ease: 'none',
-            scrollTrigger: { trigger: q('[data-hero]')[0], start: 'top top', end: 'bottom top', scrub: true },
-          });
-        }
 
         /* ------------------------------------------------------- tape -- */
         const tape = q('[data-tape]')[0];
