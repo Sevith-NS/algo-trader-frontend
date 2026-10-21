@@ -32,7 +32,7 @@ Rules that follow from this:
 | Framework | Next.js 16 App Router, React 19 | Read `frontend/node_modules/next/dist/docs/` before using an unfamiliar API (see `frontend/AGENTS.md`). |
 | Language | TypeScript, `strict: true` | Path alias `@/*` → `src/*` |
 | Auth | `@clerk/nextjs` 7 | `clerkMiddleware` in `src/proxy.ts`; themed from tokens in `app/layout.tsx` |
-| Styling | Tailwind CSS 3.4 + CSS variables | Tokens in `tailwind.config.js` and `src/app/globals.css`; `cn()` = clsx + tailwind-merge |
+| Styling | Tailwind CSS 3.4 + CSS variables | Tokens in `tailwind.config.js` and `src/app/globals.css`; classes composed with `clsx` |
 | Charts | lightweight-charts 5 | Candles, panes, drawings (`lib/drawings.ts`) |
 | Motion | GSAP 3 + `@gsap/react`, Locomotive Scroll 5 | Locomotive and ScrollTrigger on the landing page only |
 | Tests | `node:test` via `tsx --test "src/**/*.test.ts"` | Pure logic in `src/lib` |
@@ -100,7 +100,7 @@ frontend/src/
                           watchlists (v3), alerts (v3), brokers (v3)
   context/                PortfolioContext (selected portfolio, positions)
   lib/                    api.ts, server-api.ts, useApi.ts, format.ts, sse.ts, indicators.ts,
-                          sizing.ts, drawings.ts, useReducedMotion.ts, utils.ts (+ *.test.ts)
+                          sizing.ts, drawings.ts (+ *.test.ts)
   types/                  API payload types, one file per domain
   proxy.ts                Clerk middleware + CSP
 ```
@@ -166,7 +166,7 @@ Brokers: Zerodha Kite only (read-only holdings). Upstox and US brokers are not b
 
 1. `tailwind.config.js` defines the tokens (DESIGN.md §11) and **replaces** `borderRadius` and `boxShadow`, so unapproved values don't exist.
 2. `globals.css` mirrors the tokens as CSS variables (for inline SVG, charts and Clerk) and holds the base layer: focus ring, reduced motion, `.tabular`, `.skeleton`.
-3. Components compose classes with `cn()`. Variants live in a `Record<Variant, string>` beside the component (see `ui/Button.tsx`).
+3. Components compose classes with `clsx`. Variants live in a `Record<Variant, string>` beside the component (see `ui/Button.tsx`).
 4. **(v3)** The legacy aliases block in the config is deleted once T1.6 has migrated every file.
 
 ---
@@ -177,7 +177,7 @@ Brokers: Zerodha Kite only (read-only holdings). Upstox and US brokers are not b
 |---|---|---|
 | Landing `/` | Locomotive Scroll 5 (dynamic import), GSAP ScrollTrigger + SplitText, `useGSAP` scoped to the page root | Only `components/landing/LandingMotion.tsx` instantiates Locomotive. GSAP ticker drives it so ScrollTrigger stays in sync. Destroyed on unmount. |
 | App `(app)` | CSS transitions and keyframes via Tailwind tokens | No smooth scroll, no ScrollTrigger. GSAP is allowed only for the price-tick flash if CSS can't do it. |
-| Both | `useReducedMotion()` (`lib/useReducedMotion.ts`) + the global CSS block | Reduced motion skips all JS motion and renders final states. |
+| Both | `gsap.matchMedia()` (landing) + the global CSS block | Reduced motion skips all JS motion and renders final states. |
 
 A lint guard (T1.8) blocks importing `locomotive-scroll` or `gsap/ScrollTrigger` outside `components/landing/`.
 

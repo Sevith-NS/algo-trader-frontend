@@ -89,7 +89,7 @@ The running record of what's done, what was decided and why. Newest first within
 - `/dev/app/settings` logs a Clerk `cannot_render_user_missing` error because the preview isn't signed in. Harmless; not present in the real app.
 - Chart colours written as `rgba()` still carry old v1/v2 palette values and were missed by the hex sweep: `Chart.tsx` MACD histogram (`47,191,113` / `229,72,77`), Bollinger (`164,172,168`), RSI guides (`132,140,136`); `EquityChart.tsx` buy-and-hold and drawdown (`148,163,184`, `248,113,113`). Move them to `cssVar` + alpha in T4.19/T4.21.
 
-- `src/app/(app)/markets/markets.module.css` is imported nowhere (dead). Its vars were migrated anyway; delete in T6.1.
+- `markets.module.css` (dead) deleted in the 2026-10-21 cleanup.
 - Headless Chrome won't render below a 504px viewport; use the scratch CDP script (`Emulation.setDeviceMetricsOverride`) for 360/390 checks.
 - The radius scale changed under existing `rounded-lg/xl` classes (78 uses), which now render 12/16px. Review per screen when it's rebuilt.
 

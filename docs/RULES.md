@@ -31,7 +31,7 @@
 | Thing | Convention | Example |
 |---|---|---|
 | Component file | PascalCase, one main component | `PortfolioSwitcher.tsx` |
-| Hook | `useX.ts` in `lib/` or beside its only user | `useReducedMotion.ts` |
+| Hook | `useX.ts` in `lib/` or beside its only user | `useApi.ts` |
 | Lib module | camelCase | `format.ts` |
 | Test | beside the module, `.test.ts` | `format.test.ts` |
 | Types | `src/types/<domain>.ts` | `types/portfolio.ts` |
@@ -62,7 +62,7 @@
 - **MUST NOT** use inline `style={{}}` except for values computed at runtime (chart sizes, progress widths, CSS variables).
 - **MUST** get glass only from the `glass-*` classes or `Card`/overlay primitives. Never hand-roll `backdrop-blur`, and never put glass on table rows or list items.
 - **MUST NOT** add gradients except the three sanctioned ones in `DESIGN.md` §1.3 (light field, glass sheen, `text-silver`).
-- **MUST** compose classes with `cn()` from `lib/utils.ts`. Variants are `Record<Variant, string>` maps beside the component.
+- **MUST** compose classes with `clsx`. Variants are `Record<Variant, string>` maps beside the component.
 - **MUST** build mobile-first: base classes for 360px, then `md:`, `lg:`, `xl:`.
 - **MUST** use `.tabular` (or the `Price`/`Change`/`Figure` components) for every number shown in a column or that updates live.
 
@@ -80,7 +80,7 @@
 ## 7. Motion
 
 - **MUST** use motion tokens (`duration-fast/base/slow`, `ease-standard/exit`) and animate only `transform`, `opacity` and colours.
-- **MUST** gate every JS animation on `useReducedMotion()`. CSS animations are covered by the global block in `globals.css`.
+- **MUST** gate every JS animation on `prefers-reduced-motion` (e.g. `gsap.matchMedia()`). CSS animations are covered by the global block in `globals.css`.
 - **MUST NOT** import `locomotive-scroll`, `gsap/ScrollTrigger` or `gsap/SplitText` outside `components/landing/`.
 - **MUST** make anything that starts hidden for a reveal visible without JavaScript and under reduced motion.
 - **MUST NOT** loop animations in the product register (skeleton pulse is the one exception).

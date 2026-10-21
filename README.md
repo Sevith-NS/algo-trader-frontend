@@ -42,8 +42,8 @@ algo-trader/
     └── .env.example   copy to .env
 ```
 
-They talk over HTTP only: the frontend reads `NEXT_PUBLIC_API_URL` (see
-`frontend/src/lib/api.ts`) and the backend allows CORS on `/api/*`. There is no
+They talk over HTTP only: the frontend's server-side BFF proxy reads `FLINT_API_URL` (see
+`frontend/src/app/api/backend`) and the backend allows CORS on `/api/*`. There is no
 shared code or build step between them, so either can be deployed on its own.
 
 - `frontend/src/` — Next.js 16 (App Router, Tailwind) frontend on port 3000
@@ -174,20 +174,19 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000). Run this in a second terminal — the two
 services are separate processes.
 
-`.env.local` holds `NEXT_PUBLIC_API_URL` (defaults to `http://127.0.0.1:5000`) and the
-NextAuth settings. Point `NEXT_PUBLIC_API_URL` at your deployed API host in any hosted
-environment; because it is `NEXT_PUBLIC_`, it is inlined into the browser bundle at build
-time, so it must be a URL the browser can reach — not a private hostname.
+`.env.local` holds `FLINT_API_URL` (defaults to `http://127.0.0.1:5000`) and the Clerk
+keys; template in `frontend/.env.example`. `FLINT_API_URL` is server-only: the Next.js
+server calls the API, so the browser never sees it.
 
 ### 3. Deploying the frontend to Vercel
 
 Vercel builds one directory, so point it at the frontend rather than the repo root:
 
 - **Root Directory** → `frontend` (Project Settings → General)
-- **Environment Variables** → `NEXT_PUBLIC_API_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`
+- **Environment Variables** → `FLINT_API_URL`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`
 
 The Flask backend is *not* deployed by this — it needs its own host (Render, Railway, Fly,
-a VPS) with `GEMINI_API_KEY` set there, and its public URL becomes `NEXT_PUBLIC_API_URL`.
+a VPS) with `GEMINI_API_KEY` set there, and its public URL becomes `FLINT_API_URL`.
 
 ## Key API Endpoints
 

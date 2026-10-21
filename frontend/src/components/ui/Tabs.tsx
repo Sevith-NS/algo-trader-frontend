@@ -66,12 +66,3 @@ export function Tabs<T extends string>({ tabs, value, onChange, label, idPrefix 
     </div>
   );
 }
-
-export function TabPanel({ idPrefix, id, children }: { idPrefix: string; id: string; children: React.ReactNode }) {
-  return (
-    <div role="tabpanel" id={`${idPrefix}-panel-${id}`} aria-labelledby={`${idPrefix}-tab-${id}`} tabIndex={0}
-         className="focus-visible:outline-offset-4">
-      {children}
-    </div>
-  );
-}
