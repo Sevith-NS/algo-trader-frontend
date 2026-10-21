@@ -40,7 +40,7 @@ export function LandingNav({ logo, cta }: { logo: ReactNode; cta: ReactNode }) {
       <nav id="site-nav" aria-label="Sections" className="site-nav hidden items-center gap-2 md:flex">
         {LINKS.map((l) => (
           <a key={l.href} href={l.href} data-anchor onClick={() => setOpen(false)}
-             className={`glass-pill appear ${l.anim}`} style={{ '--d': l.d } as CSSProperties}>
+             className={`glass-pill lift appear ${l.anim}`} style={{ '--d': l.d } as CSSProperties}>
             {l.label}
           </a>
         ))}
@@ -49,7 +49,7 @@ export function LandingNav({ logo, cta }: { logo: ReactNode; cta: ReactNode }) {
         {cta}
         <button type="button" aria-controls="site-nav" aria-expanded={open} aria-label={open ? 'Close menu' : 'Open menu'}
                 onClick={() => setOpen((o) => !o)}
-                className="burger btn-frost grid size-11 place-content-center gap-[5px] rounded-full border md:hidden">
+                className="burger btn-frost lift grid size-11 place-content-center gap-[5px] rounded-full border md:hidden">
           <span className="block h-[1.5px] w-4 rounded-full bg-fg" />
           <span className="block h-[1.5px] w-4 rounded-full bg-fg" />
           <span className="block h-[1.5px] w-4 rounded-full bg-fg" />

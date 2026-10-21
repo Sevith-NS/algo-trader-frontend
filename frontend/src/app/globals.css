@@ -418,25 +418,17 @@ select {
     rgb(28 28 30 / 0.55);
 }
 
-/* Landing only: a light sweep across a button on hover. */
-.shine { position: relative; isolation: isolate; overflow: hidden; }
-.shine::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: linear-gradient(115deg, transparent 20%, rgb(255 255 255 / 0.45) 48%, transparent 76%);
-  transform: translateX(-130%);
-  transition: transform 0.65s ease;
+/* Landing only: Apple-style springy grow on hover, press-in on tap. Uses the
+   `scale` property, not transform, so it never fights the entrance animation. */
+.lift {
+  transition: scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, border-color 0.3s ease;
 }
-.shine:hover::after { transform: translateX(130%); }
-.btn-frost.shine::after { background: linear-gradient(115deg, transparent 20%, rgb(255 255 255 / 0.16) 48%, transparent 76%); }
+.lift:hover { scale: 1.04; }
+.lift:active { scale: 0.97; transition-duration: 0.12s; }
 
 /* ---------------------------------------------------- landing hero -- */
 
-/* Landing nav pill: a liquid glass capsule (fill and edges above) with a
-   light sweep on hover. */
+/* Landing nav pill: a liquid glass capsule (fill and edges above). */
 .glass-pill {
   position: relative;
   overflow: hidden;
@@ -451,19 +443,9 @@ select {
   font-size: 14px;
   letter-spacing: -0.01em;
   white-space: nowrap;
-  transition: background 0.35s ease, border-color 0.35s ease;
-}
-.glass-pill::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 0.16) 50%, transparent 70%);
-  transform: translateX(-120%);
-  transition: transform 0.6s ease;
+  transition: scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.35s ease, border-color 0.35s ease;
 }
 .glass-pill:hover { border-color: rgb(255 255 255 / 0.3); }
-.glass-pill:hover::before { transform: translateX(120%); }
 
 /* Darkens only the area behind the hero copy, so text stays AA when the
    video's bright band passes behind it. The rest of the video is untouched. */
@@ -599,7 +581,7 @@ select {
     scroll-behavior: auto !important;
   }
   /* The duration clamp above keeps delays, which would hold these hidden. */
-  .appear, .shine::after, .glass-pill::before { animation: none !important; transition: none !important; }
+  .appear, .lift { animation: none !important; transition: none !important; }
 }
 
 /* Landing hero badge: a graphite capsule, lightest on the left. */

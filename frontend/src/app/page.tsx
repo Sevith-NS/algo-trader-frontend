@@ -135,13 +135,13 @@ export default async function Landing() {
           {/* No band, no border: a blur and a dark wash that fade into the page. */}
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[150%] bg-gradient-to-b from-ink-0/90 via-ink-0/55 to-transparent backdrop-blur-md [mask-image:linear-gradient(to_bottom,black_45%,transparent)]" />
           <LandingNav
-            logo={<Link href="/" data-logo aria-label="Polaris, back to top"><Wordmark /></Link>}
+            logo={<Link href="/" data-logo aria-label="Polaris, back to top"><Wordmark large /></Link>}
             cta={<>
               <Show when="signed-out">
-                <Link href="/sign-up" className={buttonClass('primary', 'md', 'shine min-h-10 px-4')}>Request access</Link>
+                <Link href="/sign-up" className={buttonClass('primary', 'md', 'lift min-h-10 px-4')}>Request access</Link>
               </Show>
               <Show when="signed-in">
-                <Link href="/home" className={buttonClass('primary', 'md', 'shine min-h-10 px-4')}>Open Polaris</Link>
+                <Link href="/home" className={buttonClass('primary', 'md', 'lift min-h-10 px-4')}>Open Polaris</Link>
               </Show>
             </>}
           />
@@ -170,11 +170,11 @@ export default async function Landing() {
                 </p>
                 <div className="mt-6 flex w-full flex-col items-stretch justify-center gap-2.5 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
                   <Show when="signed-out">
-                    <Link href="/sign-up" className={buttonClass('primary', 'md', 'shine appear appear--btn px-5')} style={{ '--d': '0.96s' } as CSSProperties}>Request access</Link>
-                    <SignInButton><button className={buttonClass('secondary', 'md', 'shine appear appear--side px-5')} style={{ '--d': '1.10s' } as CSSProperties}>Sign in</button></SignInButton>
+                    <Link href="/sign-up" className={buttonClass('primary', 'md', 'lift appear appear--btn px-5')} style={{ '--d': '0.96s' } as CSSProperties}>Request access</Link>
+                    <SignInButton><button className={buttonClass('secondary', 'md', 'lift appear appear--side px-5')} style={{ '--d': '1.10s' } as CSSProperties}>Sign in</button></SignInButton>
                   </Show>
                   <Show when="signed-in">
-                    <Link href="/home" className={buttonClass('primary', 'md', 'shine appear appear--btn px-5')} style={{ '--d': '0.96s' } as CSSProperties}>Open Polaris</Link>
+                    <Link href="/home" className={buttonClass('primary', 'md', 'lift appear appear--btn px-5')} style={{ '--d': '0.96s' } as CSSProperties}>Open Polaris</Link>
                   </Show>
                 </div>
               </div>

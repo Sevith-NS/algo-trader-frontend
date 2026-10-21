@@ -41,11 +41,12 @@ function useActive() {
   return (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function Wordmark({ className, compact = false }: { className?: string; compact?: boolean }) {
+export function Wordmark({ className, compact = false, large = false }: { className?: string; compact?: boolean; large?: boolean }) {
+  const mark = large ? 40 : 28;
   return (
-    <span className={clsx('flex items-center gap-2.5 text-fg', className)}>
-      <Image src="/polaris-mark.png" alt="" width={28} height={28} priority />
-      <span className={clsx('text-h4 font-medium tracking-[-0.03em]', compact && 'sr-only')}>Polaris</span>
+    <span className={clsx('flex items-center text-fg', large ? 'gap-3' : 'gap-2.5', className)}>
+      <Image src="/polaris-mark.png" alt="" width={mark} height={mark} priority />
+      <span className={clsx('font-medium tracking-[-0.03em]', large ? 'text-[26px] leading-none md:text-[28px]' : 'text-h4', compact && 'sr-only')}>Polaris</span>
     </span>
   );
 }
