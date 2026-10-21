@@ -14,7 +14,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const API_URL = process.env.FLINT_API_URL ?? 'http://127.0.0.1:5000';
+const API_URL = (process.env.FLINT_API_URL ?? 'http://127.0.0.1:5000').replace(/\/+$/, '');
 const MAX_BODY_BYTES = 1024 * 1024;
 const SEGMENT = /^[A-Za-z0-9._\-=&^]+$/;
 
