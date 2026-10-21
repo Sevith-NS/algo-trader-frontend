@@ -22,7 +22,7 @@ A personal stock screener and portfolio management platform with quant-grade ana
   Ulcer, Omega, MAE/MFE, a drawdown table, a monthly grid and the trade log — plus three
   robustness passes: **out-of-sample**, **walk-forward** and a **Monte Carlo** resample.
 - **Polaris AI** — floating assistant (bottom-right on every page) powered by Gemini. It sees your paper portfolio, the symbol on screen, live quant signals and news sentiment, and answers grounded questions about risk, sizing and markets.
-- **ML Forecasts** — XGBoost next-day direction probability, Prophet 7-day forecast, news fear/greed index.
+- **Sentiment** — news fear/greed index.
 - **Geotrade** — AI macro analysis per country on a 3D globe.
 
 ## Architecture
@@ -52,7 +52,7 @@ shared code or build step between them, so either can be deployed on its own.
   - `risk_analytics.py` — VaR/CVaR, Sharpe/Sortino, drawdown, beta, correlations
   - `news_engine.py` — Google News RSS + VADER sentiment (5-min cache)
   - `ai_assistant.py` — Gemini chat grounded in live portfolio/signal context
-  - `ml_models.py` — XGBoost, Prophet, Markowitz optimization
+  - `ml_models.py` — news sentiment, Markowitz optimization
   - `agents_desk.py` — multi-agent trading desk: analyst team, bull/bear debate,
     risk committee, PM sign-off, plus the alpha-scored decision journal that
     feeds the reflection memory
@@ -153,7 +153,6 @@ cp .env.example .env      # then fill in GEMINI_API_KEY
 `run.sh` handles a macOS quirk: on machines behind a TLS-intercepting corporate proxy it
 exports the system keychain CAs so Yahoo Finance / Google News / Gemini requests don't fail
 with certificate errors. (`./venv/bin/python app.py` also works on a normal network.)
-XGBoost on macOS needs OpenMP: `brew install libomp`.
 
 Secrets live in `backend/.env` (gitignored; template in `backend/.env.example`). The Gemini
 key powers the AI assistant, deep analysis and Geotrade:
@@ -197,7 +196,7 @@ a VPS) with `GEMINI_API_KEY` set there, and its public URL becomes `FLINT_API_UR
 | `GET /api/news` | Global news with per-headline sentiment + mood indices |
 | `GET /api/news/ticker?symbol=` | Ticker-specific headlines + sentiment |
 | `POST /api/ai-chat` | Portfolio-aware Gemini assistant |
-| `GET /api/ml-insights?symbol=` | XGBoost direction, Prophet forecast, fear/greed |
+| `GET /api/ml-insights?symbol=` | Pivots, fear/greed |
 | `POST /api/portfolio-optimization` | Markowitz max-Sharpe weights + CAPM betas |
 | `GET /api/backtest/strategies` | Strategy catalogue with every parameter and its default |
 | `POST /api/backtest/run` | One backtest + out-of-sample split + Monte Carlo |
